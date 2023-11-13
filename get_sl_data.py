@@ -18,7 +18,7 @@ params = {
 
 url = "https://services.surfline.com/kbyg/spots/forecasts/"
 current_date = datetime.now().strftime("%Y-%m-%d")
-filename = f"{current_date}_surf_data_.json"
+filename = f"data/{current_date}_surf_data_.json"
 
 # Check if file exists and has content
 if os.path.exists(filename) and os.path.getsize(filename) > 0:
