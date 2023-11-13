@@ -1,7 +1,9 @@
 
 on:
-  schedule:
-    - cron:  '* * * * *' # Every minute. Ref https://crontab.guru/examples.html
+  # schedule:
+  #   - cron:  '* * * * *' # Every minute. Ref https://crontab.guru/examples.html
+  workflow_dispatch:
+
 name: Get SL Data
 jobs:
   build:
