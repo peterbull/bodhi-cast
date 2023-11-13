@@ -1,0 +1,1283 @@
+[
+    {
+        "condition": "rating",
+        "data": {
+            "associated": {
+                "location": {
+                    "lon": -75.96648,
+                    "lat": 36.83036135089083
+                },
+                "runInitializationTimestamp": 1699876800
+            },
+            "data": {
+                "rating": [
+                    {
+                        "timestamp": 1699851600,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699855200,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699858800,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699862400,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699866000,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699869600,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699873200,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699876800,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699880400,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699884000,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699887600,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699891200,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR_TO_FAIR",
+                            "value": 1.5
+                        }
+                    },
+                    {
+                        "timestamp": 1699894800,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR_TO_FAIR",
+                            "value": 2
+                        }
+                    },
+                    {
+                        "timestamp": 1699898400,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699902000,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699905600,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699909200,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699912800,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699916400,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1
+                        }
+                    },
+                    {
+                        "timestamp": 1699920000,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1.17
+                        }
+                    },
+                    {
+                        "timestamp": 1699923600,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1.33
+                        }
+                    },
+                    {
+                        "timestamp": 1699927200,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR",
+                            "value": 1.33
+                        }
+                    },
+                    {
+                        "timestamp": 1699930800,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR_TO_FAIR",
+                            "value": 1.67
+                        }
+                    },
+                    {
+                        "timestamp": 1699934400,
+                        "utcOffset": -5,
+                        "rating": {
+                            "key": "POOR_TO_FAIR",
+                            "value": 1.83
+                        }
+                    }
+                ]
+            },
+            "permissions": {
+                "data": [],
+                "violations": [
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-forecasts",
+                        "permission": {
+                            "name": "sl_premium-forecasts",
+                            "required": false
+                        }
+                    },
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-cams",
+                        "permission": {
+                            "name": "sl_premium-cams",
+                            "required": false
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "condition": "wave",
+        "data": {
+            "associated": {
+                "units": {
+                    "temperature": "F",
+                    "tideHeight": "FT",
+                    "swellHeight": "FT",
+                    "waveHeight": "FT",
+                    "windSpeed": "KTS",
+                    "pressure": "MB"
+                },
+                "utcOffset": -5,
+                "location": {
+                    "lon": -75.96648,
+                    "lat": 36.83036135089083
+                },
+                "forecastLocation": {
+                    "lon": -75.947,
+                    "lat": 36.847
+                },
+                "offshoreLocation": {
+                    "lon": -75.75,
+                    "lat": 37
+                },
+                "runInitializationTimestamp": 1699876800
+            },
+            "data": {
+                "wave": [
+                    {
+                        "timestamp": 1699851600,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 30.76913,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699855200,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 26.8833,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699858800,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 24.23479,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699862400,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 21.78414,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699866000,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 20.11124,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699869600,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 19.24341,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699873200,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 1,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 18.44818,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699876800,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 3,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 18.4637,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699880400,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 3,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 18.73744,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699884000,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 3,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 18.03999,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699887600,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 3,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 17.50034,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699891200,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 3,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 17.10992,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699894800,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 16.96167,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699898400,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 16.66415,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699902000,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 16.55358,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699905600,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 16.57144,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699909200,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 15.83442,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699912800,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 15.33871,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699916400,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 1,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 14.90125,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699920000,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 14.35209,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699923600,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 13.7821,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699927200,
+                        "probability": 100,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 13.56462,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699930800,
+                        "probability": null,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 13.20448,
+                        "swells": []
+                    },
+                    {
+                        "timestamp": 1699934400,
+                        "probability": null,
+                        "utcOffset": -5,
+                        "surf": {
+                            "max": 2,
+                            "min": null,
+                            "optimalScore": null
+                        },
+                        "power": 12.86562,
+                        "swells": []
+                    }
+                ]
+            },
+            "permissions": {
+                "data": [],
+                "violations": [
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-forecasts",
+                        "permission": {
+                            "name": "sl_premium-forecasts",
+                            "required": false
+                        }
+                    },
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-cams",
+                        "permission": {
+                            "name": "sl_premium-cams",
+                            "required": false
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "condition": "wind",
+        "data": {
+            "associated": {
+                "units": {
+                    "temperature": "F",
+                    "tideHeight": "FT",
+                    "swellHeight": "FT",
+                    "waveHeight": "FT",
+                    "windSpeed": "KTS",
+                    "pressure": "MB"
+                },
+                "utcOffset": -5,
+                "location": {
+                    "lon": -75.96648,
+                    "lat": 36.83036135089083
+                },
+                "runInitializationTimestamp": 1699876800
+            },
+            "data": {
+                "wind": [
+                    {
+                        "timestamp": 1699851600,
+                        "utcOffset": -5,
+                        "speed": 17.11302,
+                        "direction": 359.68655,
+                        "directionType": "Cross-shore",
+                        "gust": 18.27215,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699855200,
+                        "utcOffset": -5,
+                        "speed": 15.8084,
+                        "direction": 358.11432,
+                        "directionType": "Cross-shore",
+                        "gust": 15.8084,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699858800,
+                        "utcOffset": -5,
+                        "speed": 14.41419,
+                        "direction": 355.54696,
+                        "directionType": "Cross-shore",
+                        "gust": 14.77322,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699862400,
+                        "utcOffset": -5,
+                        "speed": 13.95077,
+                        "direction": 353.21207,
+                        "directionType": "Cross-shore",
+                        "gust": 13.99569,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699866000,
+                        "utcOffset": -5,
+                        "speed": 14.12779,
+                        "direction": 354.05281,
+                        "directionType": "Cross-shore",
+                        "gust": 14.12779,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699869600,
+                        "utcOffset": -5,
+                        "speed": 14.69917,
+                        "direction": 355.02312,
+                        "directionType": "Cross-shore",
+                        "gust": 14.77322,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699873200,
+                        "utcOffset": -5,
+                        "speed": 14.88252,
+                        "direction": 357.15925,
+                        "directionType": "Cross-shore",
+                        "gust": 14.88252,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699876800,
+                        "utcOffset": -5,
+                        "speed": 13.45438,
+                        "direction": 356.6047,
+                        "directionType": "Cross-shore",
+                        "gust": 13.60692,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699880400,
+                        "utcOffset": -5,
+                        "speed": 12.14123,
+                        "direction": 351.62838,
+                        "directionType": "Cross-shore",
+                        "gust": 12.63499,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699884000,
+                        "utcOffset": -5,
+                        "speed": 11.203,
+                        "direction": 349.97764,
+                        "directionType": "Cross-shore",
+                        "gust": 11.2743,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699887600,
+                        "utcOffset": -5,
+                        "speed": 10.12897,
+                        "direction": 347.19361,
+                        "directionType": "Cross-shore",
+                        "gust": 10.12897,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699891200,
+                        "utcOffset": -5,
+                        "speed": 8.91875,
+                        "direction": 340.71454,
+                        "directionType": "Cross-shore",
+                        "gust": 8.91875,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699894800,
+                        "utcOffset": -5,
+                        "speed": 7.55157,
+                        "direction": 335.99407,
+                        "directionType": "Cross-shore",
+                        "gust": 7.55157,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699898400,
+                        "utcOffset": -5,
+                        "speed": 6.85108,
+                        "direction": 328.73351,
+                        "directionType": "Cross-shore",
+                        "gust": 6.85108,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699902000,
+                        "utcOffset": -5,
+                        "speed": 5.95129,
+                        "direction": 319.54252,
+                        "directionType": "Offshore",
+                        "gust": 5.95129,
+                        "optimalScore": 0
+                    },
+                    {
+                        "timestamp": 1699905600,
+                        "utcOffset": -5,
+                        "speed": 4.70621,
+                        "direction": 315.20211,
+                        "directionType": "Offshore",
+                        "gust": 4.70621,
+                        "optimalScore": 2
+                    },
+                    {
+                        "timestamp": 1699909200,
+                        "utcOffset": -5,
+                        "speed": 2.82212,
+                        "direction": 325.71281,
+                        "directionType": "Cross-shore",
+                        "gust": 2.82212,
+                        "optimalScore": 2
+                    },
+                    {
+                        "timestamp": 1699912800,
+                        "utcOffset": -5,
+                        "speed": 2.31682,
+                        "direction": 343.35161,
+                        "directionType": "Cross-shore",
+                        "gust": 2.31682,
+                        "optimalScore": 2
+                    },
+                    {
+                        "timestamp": 1699916400,
+                        "utcOffset": -5,
+                        "speed": 0.47481,
+                        "direction": 339.29063,
+                        "directionType": "Cross-shore",
+                        "gust": 0.77754,
+                        "optimalScore": 2
+                    },
+                    {
+                        "timestamp": 1699920000,
+                        "utcOffset": -5,
+                        "speed": 1.86271,
+                        "direction": 235.33601,
+                        "directionType": "Offshore",
+                        "gust": 3.11015,
+                        "optimalScore": 2
+                    },
+                    {
+                        "timestamp": 1699923600,
+                        "utcOffset": -5,
+                        "speed": 3.83701,
+                        "direction": 250.10594,
+                        "directionType": "Offshore",
+                        "gust": 4.47084,
+                        "optimalScore": 2
+                    },
+                    {
+                        "timestamp": 1699927200,
+                        "utcOffset": -5,
+                        "speed": 6.14959,
+                        "direction": 264.34623,
+                        "directionType": "Offshore",
+                        "gust": 6.14959,
+                        "optimalScore": 2
+                    },
+                    {
+                        "timestamp": 1699930800,
+                        "utcOffset": -5,
+                        "speed": 5.57915,
+                        "direction": 250.06281,
+                        "directionType": "Offshore",
+                        "gust": 5.57915,
+                        "optimalScore": 2
+                    },
+                    {
+                        "timestamp": 1699934400,
+                        "utcOffset": -5,
+                        "speed": 5.95093,
+                        "direction": 242.73224,
+                        "directionType": "Offshore",
+                        "gust": 5.95093,
+                        "optimalScore": 2
+                    }
+                ]
+            },
+            "permissions": {
+                "data": [],
+                "violations": [
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-forecasts",
+                        "permission": {
+                            "name": "sl_premium-forecasts",
+                            "required": false
+                        }
+                    },
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-cams",
+                        "permission": {
+                            "name": "sl_premium-cams",
+                            "required": false
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "condition": "tides",
+        "data": {
+            "associated": {
+                "utcOffset": -5,
+                "units": {
+                    "temperature": "F",
+                    "tideHeight": "FT",
+                    "swellHeight": "FT",
+                    "waveHeight": "FT",
+                    "windSpeed": "KTS",
+                    "pressure": "MB"
+                },
+                "tideLocation": {
+                    "name": "Virginia Beach, Virginia",
+                    "min": -1.84,
+                    "max": 5.41,
+                    "lon": -75.9717,
+                    "lat": 36.8433,
+                    "mean": 0
+                }
+            },
+            "data": {
+                "tides": [
+                    {
+                        "timestamp": 1699851600,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 0.17
+                    },
+                    {
+                        "timestamp": 1699854195,
+                        "utcOffset": -5,
+                        "type": "LOW",
+                        "height": 0.07
+                    },
+                    {
+                        "timestamp": 1699855200,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 0.07
+                    },
+                    {
+                        "timestamp": 1699858800,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 0.43
+                    },
+                    {
+                        "timestamp": 1699862400,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 1.18
+                    },
+                    {
+                        "timestamp": 1699866000,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 2.14
+                    },
+                    {
+                        "timestamp": 1699869600,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 3.1
+                    },
+                    {
+                        "timestamp": 1699873200,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 3.83
+                    },
+                    {
+                        "timestamp": 1699876800,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 4.14
+                    },
+                    {
+                        "timestamp": 1699877341,
+                        "utcOffset": -5,
+                        "type": "HIGH",
+                        "height": 4.13
+                    },
+                    {
+                        "timestamp": 1699880400,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 3.97
+                    },
+                    {
+                        "timestamp": 1699884000,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 3.36
+                    },
+                    {
+                        "timestamp": 1699887600,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 2.44
+                    },
+                    {
+                        "timestamp": 1699891200,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 1.45
+                    },
+                    {
+                        "timestamp": 1699894800,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 0.62
+                    },
+                    {
+                        "timestamp": 1699898400,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 0.14
+                    },
+                    {
+                        "timestamp": 1699900455,
+                        "utcOffset": -5,
+                        "type": "LOW",
+                        "height": 0.07
+                    },
+                    {
+                        "timestamp": 1699902000,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 0.11
+                    },
+                    {
+                        "timestamp": 1699905600,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 0.51
+                    },
+                    {
+                        "timestamp": 1699909200,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 1.23
+                    },
+                    {
+                        "timestamp": 1699912800,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 2.05
+                    },
+                    {
+                        "timestamp": 1699916400,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 2.76
+                    },
+                    {
+                        "timestamp": 1699920000,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 3.16
+                    },
+                    {
+                        "timestamp": 1699921684,
+                        "utcOffset": -5,
+                        "type": "HIGH",
+                        "height": 3.22
+                    },
+                    {
+                        "timestamp": 1699923600,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 3.14
+                    },
+                    {
+                        "timestamp": 1699927200,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 2.72
+                    },
+                    {
+                        "timestamp": 1699930800,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 1.99
+                    },
+                    {
+                        "timestamp": 1699934400,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 1.16
+                    },
+                    {
+                        "timestamp": 1699938000,
+                        "utcOffset": -5,
+                        "type": "NORMAL",
+                        "height": 0.46
+                    }
+                ]
+            },
+            "permissions": {
+                "data": [],
+                "violations": [
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-forecasts",
+                        "permission": {
+                            "name": "sl_premium-forecasts",
+                            "required": false
+                        }
+                    },
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-cams",
+                        "permission": {
+                            "name": "sl_premium-cams",
+                            "required": false
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "condition": "weather",
+        "data": {
+            "associated": {
+                "units": {
+                    "temperature": "F",
+                    "tideHeight": "FT",
+                    "swellHeight": "FT",
+                    "waveHeight": "FT",
+                    "windSpeed": "KTS",
+                    "pressure": "MB"
+                },
+                "utcOffset": -5,
+                "weatherIconPath": "https://wa.cdn-surfline.com/quiver/0.21.2/weathericons",
+                "runInitializationTimestamp": 1699876800
+            },
+            "data": {
+                "sunlightTimes": [
+                    {
+                        "midnight": 1699851600,
+                        "midnightUTCOffset": -5,
+                        "dawn": 1699874014,
+                        "dawnUTCOffset": -5,
+                        "sunrise": 1699875663,
+                        "sunriseUTCOffset": -5,
+                        "sunset": 1699912677,
+                        "sunsetUTCOffset": -5,
+                        "dusk": 1699914325,
+                        "duskUTCOffset": -5
+                    }
+                ],
+                "weather": [
+                    {
+                        "timestamp": 1699851600,
+                        "utcOffset": -5,
+                        "temperature": 52.214,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1028
+                    },
+                    {
+                        "timestamp": 1699855200,
+                        "utcOffset": -5,
+                        "temperature": 51.584,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1029
+                    },
+                    {
+                        "timestamp": 1699858800,
+                        "utcOffset": -5,
+                        "temperature": 51.74604,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1028
+                    },
+                    {
+                        "timestamp": 1699862400,
+                        "utcOffset": -5,
+                        "temperature": 51.332,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1028
+                    },
+                    {
+                        "timestamp": 1699866000,
+                        "utcOffset": -5,
+                        "temperature": 51.22404,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1028
+                    },
+                    {
+                        "timestamp": 1699869600,
+                        "utcOffset": -5,
+                        "temperature": 51.098,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1029
+                    },
+                    {
+                        "timestamp": 1699873200,
+                        "utcOffset": -5,
+                        "temperature": 50.79196,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1028
+                    },
+                    {
+                        "timestamp": 1699876800,
+                        "utcOffset": -5,
+                        "temperature": 49.67596,
+                        "condition": "CLEAR",
+                        "pressure": 1029
+                    },
+                    {
+                        "timestamp": 1699880400,
+                        "utcOffset": -5,
+                        "temperature": 50.45004,
+                        "condition": "CLEAR",
+                        "pressure": 1029
+                    },
+                    {
+                        "timestamp": 1699884000,
+                        "utcOffset": -5,
+                        "temperature": 50.09,
+                        "condition": "CLEAR",
+                        "pressure": 1029
+                    },
+                    {
+                        "timestamp": 1699887600,
+                        "utcOffset": -5,
+                        "temperature": 49.982,
+                        "condition": "CLEAR",
+                        "pressure": 1028
+                    },
+                    {
+                        "timestamp": 1699891200,
+                        "utcOffset": -5,
+                        "temperature": 50.414,
+                        "condition": "CLEAR",
+                        "pressure": 1028
+                    },
+                    {
+                        "timestamp": 1699894800,
+                        "utcOffset": -5,
+                        "temperature": 51.026,
+                        "condition": "CLEAR",
+                        "pressure": 1027
+                    },
+                    {
+                        "timestamp": 1699898400,
+                        "utcOffset": -5,
+                        "temperature": 51.692,
+                        "condition": "CLEAR",
+                        "pressure": 1026
+                    },
+                    {
+                        "timestamp": 1699902000,
+                        "utcOffset": -5,
+                        "temperature": 52.25,
+                        "condition": "CLEAR",
+                        "pressure": 1026
+                    },
+                    {
+                        "timestamp": 1699905600,
+                        "utcOffset": -5,
+                        "temperature": 52.988,
+                        "condition": "CLEAR",
+                        "pressure": 1025
+                    },
+                    {
+                        "timestamp": 1699909200,
+                        "utcOffset": -5,
+                        "temperature": 53.672,
+                        "condition": "CLEAR",
+                        "pressure": 1024
+                    },
+                    {
+                        "timestamp": 1699912800,
+                        "utcOffset": -5,
+                        "temperature": 53.72596,
+                        "condition": "CLEAR",
+                        "pressure": 1024
+                    },
+                    {
+                        "timestamp": 1699916400,
+                        "utcOffset": -5,
+                        "temperature": 54.46396,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1024
+                    },
+                    {
+                        "timestamp": 1699920000,
+                        "utcOffset": -5,
+                        "temperature": 54.284,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1024
+                    },
+                    {
+                        "timestamp": 1699923600,
+                        "utcOffset": -5,
+                        "temperature": 53.41996,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1024
+                    },
+                    {
+                        "timestamp": 1699927200,
+                        "utcOffset": -5,
+                        "temperature": 51.872,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1024
+                    },
+                    {
+                        "timestamp": 1699930800,
+                        "utcOffset": -5,
+                        "temperature": 51.638,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1024
+                    },
+                    {
+                        "timestamp": 1699934400,
+                        "utcOffset": -5,
+                        "temperature": 51.512,
+                        "condition": "NIGHT_CLEAR",
+                        "pressure": 1024
+                    }
+                ]
+            },
+            "permissions": {
+                "data": [],
+                "violations": [
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-forecasts",
+                        "permission": {
+                            "name": "sl_premium-forecasts",
+                            "required": false
+                        }
+                    },
+                    {
+                        "code": 4001,
+                        "message": "User does not have optional permission:sl_premium-cams",
+                        "permission": {
+                            "name": "sl_premium-cams",
+                            "required": false
+                        }
+                    }
+                ]
+            }
+        }
+    }
+]
