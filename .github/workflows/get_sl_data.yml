@@ -28,6 +28,6 @@ jobs:
     - name: Run Script
       run: python get_sl_data.py
 
-    - uses: mikeal/publish-to-github-action@1.0.0
+    - uses: mikeal/publish-to-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub sets this for you
