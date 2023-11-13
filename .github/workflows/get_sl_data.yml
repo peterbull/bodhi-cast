@@ -1,7 +1,7 @@
 
 on:
   schedule:
-    - cron:  '*/5 * * * *' # Every minute. Ref https://crontab.guru/examples.html
+    - cron:  '* * * * *' # Every minute. Ref https://crontab.guru/examples.html
 name: Get SL Data
 jobs:
   build:
