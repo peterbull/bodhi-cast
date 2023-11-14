@@ -1,7 +1,6 @@
 
 on:
-  schedule:
-    - cron:  '0 7 * * *' # Every day at 2am EST. Ref https://crontab.guru/examples.html
+  workflow_dispatch:
 
 name: Get SL Data
 jobs:
