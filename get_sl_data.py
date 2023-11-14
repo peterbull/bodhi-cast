@@ -1,7 +1,14 @@
 import os
+import logging
 import requests
 import json
+
 from datetime import datetime
+
+
+# Set up basic logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 condition_list = ['rating', 'wave', 'wind', 'tides', 'weather']
@@ -32,15 +39,22 @@ else:
 
 for condition in condition_list:
     res = requests.get(url + condition, params=params)
+    logging.info(f"Requesting {condition} data: Status Code {res.status_code}")
 
     # Check if the response is successful and has JSON content
     if res.status_code == 200 and 'application/json' in res.headers.get('Content-Type', ''):
         # Append new data
+        logging.info(f"Data for {condition} received")
         data.append({
             "condition": condition,
             "data": res.json()
         })
+    else:
+        logging.warning(f"Failed to retrieve {condition} data: Status Code {res.status_code}")
+
 
 # Write updated data back to the file
 with open(filename, 'w') as file:
     json.dump(data, file, indent=4)
+
+logging.info(f"Data written to {filename}")
