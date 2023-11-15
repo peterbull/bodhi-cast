@@ -1,0 +1,11 @@
+.gitignore
+LICENSE
+poetry.lock
+pyproject.toml
+swellmatrix.ipynb
+.vscode
+.github
+export_all.sh
+export_exclude.txt
+.git
+backend/app/.gitignore
