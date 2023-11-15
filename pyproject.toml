@@ -10,6 +10,7 @@ python = "^3.10"
 fastapi = "^0.104.1"
 requests = "^2.31.0"
 asyncpg = "^0.29.0"
+sqlalchemy = "^2.0.23"
 
 
 
