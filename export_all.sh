@@ -22,6 +22,14 @@ should_ignore() {
 # Function to process directories
 process_directories() {
     local output_file="./export/text.txt" # Define output file
+
+    # Display directory structure using tree
+    echo "### Directory Structure"
+    echo "   "
+    tree "$@"
+    echo "###"
+    echo "   "
+
     for dir in "${directories_to_scan[@]}"; do
         # Recursively iterate over files in directory
         find "$dir" -type f | while read -r file; do
