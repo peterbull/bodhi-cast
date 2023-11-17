@@ -23,6 +23,10 @@ should_ignore() {
 process_directories() {
     local output_file="./export/text.txt" # Define output file
 
+    # Add notes
+    echo "Some notes about my app:"
+    echo "Uses sqlalchemy 2.0"
+    
     # Display directory structure using tree
     echo "### Directory Structure"
     echo "   "
