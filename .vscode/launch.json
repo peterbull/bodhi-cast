@@ -1,16 +1,18 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "FastAPI",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": true
+            "module": "uvicorn",
+            "args": [
+                "main:app", // Replace 'main:app' with '<your_file>:<your_app_instance>' if different
+                "--reload"
+            ],
+            "cwd": "${workspaceFolder}/backend/app",
+            "jinja": false,
+            "console": "integratedTerminal"
         }
     ]
 }
