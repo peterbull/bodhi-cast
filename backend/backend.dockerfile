@@ -5,9 +5,5 @@ FROM python:3.10.12-slim AS server
 WORKDIR /usr/src/app
 
 RUN apt-get update && \
-    apt-get install -y wget && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential cmake wget && \
     rm -rf /var/lib/apt/lists/*
