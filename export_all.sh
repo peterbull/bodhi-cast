@@ -10,6 +10,12 @@ ignore_list=($(cat "$ignore_file"))
 # Function to check if a file or directory should be ignored
 should_ignore() {
     local file_path=$(realpath "$1") # Get absolute path of the file
+
+    # Check if the path contains __pycache__
+    if [[ "$file_path" == *"__pycache__"* ]]; then
+        return 0 # True, should be ignored
+    fi
+
     for item in "${ignore_list[@]}"; do
         local abs_ignore=$(realpath "$item") # Convert ignore item to absolute path
         if [[ "$file_path" == "$abs_ignore" ]] || [[ "$file_path" == "$abs_ignore/"* ]]; then

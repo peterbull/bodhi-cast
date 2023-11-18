@@ -9,3 +9,4 @@ export_all.sh
 export_exclude.txt
 .git
 backend/app/.gitignore
+__pycache__
