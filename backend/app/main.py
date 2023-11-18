@@ -1,13 +1,23 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.future import select
-from db.database import get_db
+from db.database import init_db, get_db
 from models.models import SurfData
 import uvicorn
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize the database before the application starts receiving requests
+    await init_db()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 
 @app.get("/")
