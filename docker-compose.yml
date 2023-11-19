@@ -1,6 +1,19 @@
 version: '3.1'
 
 services:
+  web:
+    build: 
+      context: ./backend
+      dockerfile: backend.dockerfile
+    command: poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    volumes:
+      - ./backend:/usr/src/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
   db:
     image: postgres
     restart: always
@@ -9,3 +22,17 @@ services:
       POSTGRES_DB: surfing_data
     ports:
       - "5433:5432"
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  celery:
+    build:
+      context: ./backend
+      dockerfile: backend.dockerfile
+    command: celery -A app.celery_app worker --loglevel=info
+    depends_on:
+      - web
+      - redis
