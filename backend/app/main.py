@@ -22,7 +22,7 @@ celery_app = Celery(
 celery_app.conf.beat_schedule = {
     'fetch-and-save-swell-data-every-minute': {
         'task': 'app.main.update_swell_data',
-        'schedule': crontab(minute='*'), # crontab(minute=0, hour='*') for every hour
+        'schedule': crontab(minute='0', hour='*'), # crontab(minute=*) for every minute debug
     },
 }
 
