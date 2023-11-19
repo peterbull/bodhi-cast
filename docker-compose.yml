@@ -32,7 +32,7 @@ services:
     build:
       context: ./backend
       dockerfile: backend.dockerfile
-    command: celery -A app.celery_app worker --loglevel=info
+    command: celery -A app.main.celery_app worker --loglevel=info
     depends_on:
       - web
       - redis

@@ -4,6 +4,7 @@ from celery import Celery
 
 from app.db.database import get_db, create_tables
 from app.models.models import SwellData
+from app.utils.fetch_data import fetch_data, parse_swell_data, save_swell_data
 
 
 
