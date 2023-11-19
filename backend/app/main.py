@@ -30,3 +30,17 @@ def read_root():
 def read_swell_data(db: Session = Depends(get_db)):
     data = db.query(SwellData).all()
     return data
+
+
+# testing celery
+@app.get("/test_celery/{word}")
+def test_celery_endpoint(word: str):
+    task = test_celery.delay(word)
+    return {"task_id": task.id}
+
+@app.get("/fetch_task/{task_id}")
+def fetch_task_result(task_id: str):
+    task = celery_app.AsyncResult(task_id)
+    if task.ready():
+        return {"status": task.status, "result": task.result}
+    return {"status": task.status}
