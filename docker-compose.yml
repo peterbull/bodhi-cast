@@ -36,3 +36,11 @@ services:
     depends_on:
       - web
       - redis
+      
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: backend.dockerfile
+    command: celery -A app.main.celery_app beat --loglevel=info
+    depends_on:
+      - redis
