@@ -10,3 +10,5 @@ export_exclude.txt
 .git
 backend/app/.gitignore
 __pycache__
+backend/poetry.lock
+backend/pyproject.toml

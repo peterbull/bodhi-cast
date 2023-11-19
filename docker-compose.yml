@@ -21,7 +21,7 @@ services:
       POSTGRES_PASSWORD: your_password
       POSTGRES_DB: surfing_data
     ports:
-      - "5433:5432"
+      - "5432:5432"
 
   redis:
     image: redis

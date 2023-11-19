@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.models.models import Base
 
-DATABASE_URL = "postgresql+psycopg2://postgres:your_password@0.0.0.0:5432/surfing_data"
+DATABASE_URL = "postgresql+psycopg2://postgres:your_password@db:5432/surfing_data"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
