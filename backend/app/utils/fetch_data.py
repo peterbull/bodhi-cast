@@ -37,7 +37,18 @@ def save_swell_data(parsed_data):
     db = SessionLocal()
     try:
         for data in parsed_data:
-            db.add(data)
+            # check if a row with the same entry at `hourly` exists
+            existing_data = db.query(SwellData).filter(SwellData.hourly == data.hourly).first()
+
+            if existing_data:
+                # if the entry exists, update with more recent swell data
+                existing_data.swell_wave_height = data.swell_wave_height
+                existing_data.swell_wave_period = data.swell_wave_period
+                existing_data.generationtime_ms = data.generationtime_ms
+            else:
+                # otherwise create a new row
+                db.add(data)
+
         db.commit()
     finally:
         db.close()
