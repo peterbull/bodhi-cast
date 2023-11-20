@@ -20,6 +20,8 @@ services:
     environment:
       POSTGRES_PASSWORD: your_password
       POSTGRES_DB: surfing_data
+    volumes:
+      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
@@ -44,3 +46,6 @@ services:
     command: celery -A app.main.celery_app beat --loglevel=info
     depends_on:
       - redis
+
+volumes:
+  db_data:
