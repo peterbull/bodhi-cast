@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Float, Integer, String, JSON, DateTime
+from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base
+
 
 Base = declarative_base()
 
@@ -17,3 +19,5 @@ class SwellData(Base):
     hourly = Column(DateTime(timezone=True))
     swell_wave_height = Column(Float)
     swell_wave_period = Column(Float)
+    entry_created = Column(DateTime(timezone=True), default=func.now())
+    entry_updated = Column(DateTime(timezone=True), onupdate=func.now())
