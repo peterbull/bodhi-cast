@@ -45,6 +45,7 @@ def save_swell_data(parsed_data):
                 existing_data.swell_wave_height = data.swell_wave_height
                 existing_data.swell_wave_period = data.swell_wave_period
                 existing_data.generationtime_ms = data.generationtime_ms
+                
             else:
                 # otherwise create a new row
                 db.add(data)

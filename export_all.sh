@@ -49,7 +49,9 @@ process_directories() {
                 echo "### File: $file"
                 echo "   "
                 echo "###"
+                echo "   "
                 cat "$file"
+                echo "   "
                 echo "###"
                 echo "   "
             fi
