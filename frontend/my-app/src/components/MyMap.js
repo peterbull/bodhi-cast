@@ -8,8 +8,9 @@ const swellData = async () => {
     const year = parseInt(currentDate.format('YYYY'));
     const month = parseInt(currentDate.format('MM'));
     const day = parseInt(currentDate.format('DD'));
+    const hour = parseInt(currentDate.format('hh'));
 
-    const url = `http://localhost:8000/swelldata/${year}/${month}/${day}`;
+    const url = `http://localhost:8000/swelldata/${year}/${month}/${day}/${hour}`;
 
     try {
         const response = await fetch(url);
@@ -22,7 +23,9 @@ const swellData = async () => {
         return null;
     }
 }
-
+// 2023-11-21T20:00:00+00:00 example data to match
+// currentDate.format("YYYY-MM-DDThh:mm:ss+00:00")
+// 2023-11-21T15:12:20+00:00 
 
 
 
@@ -54,7 +57,8 @@ const MyMap = () => {
             />
             <Marker position={coordinates}>
                 <Popup>
-                    A pretty CSS3 popup. <br /> Easily customizable.
+                    Current Swell Wave Height: {swellState[0].swell_wave_height} meters <br />
+                    Current Swell Wave Period: {swellState[0].swell_wave_period} seconds
                 </Popup>
             </Marker>
         </MapContainer>
