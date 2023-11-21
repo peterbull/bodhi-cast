@@ -20,12 +20,12 @@
             // "preLaunchTask": "npm: start",
             "type": "chrome",
             "url": "http://localhost:3000/",
-            "program": "${workspaceFolder}/client/App.js",
+            "program": "${workspaceFolder}/frontend/my-app/App.js",
             "webRoot": "${workspaceFolder}",
             "skipFiles": [
                 "<node_internals>/**/*.js",
-                "${workspaceFolder}/client/node_modules/**/*.js",
-                "${workspaceFolder}/server/node_modules/**/*.js"
+                "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
+                "${workspaceFolder}/frontend/my-app/node_modules/**/*.js"
             ]
         },
     ]

@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import moment from 'moment-js';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const swellData = async () => {
     const currentDate = moment();
@@ -15,8 +15,10 @@ const swellData = async () => {
 
         const data = await response.json();
         console.log(data)
+        return data;
     } catch (error) {
         console.error("Error fetching swell data:", error)
+        return null;
     }
 }
 
@@ -24,18 +26,30 @@ const swellData = async () => {
 
 
 const MyMap = () => {
+    // initialize state
+    const [swellState, setSwellState] = useState(null);
 
     useEffect(() => {
-        swellData();
+        const fetchData = async () => {
+            const data = await swellData();
+            setSwellState(data); // update state with the fetched data
+        };  
+        
+        fetchData();
     }, [])
 
+    // Default coordinates in case swellState is null
+    const defaultCoordinates = [51.505, -0.09];
+    
+    const coordinates = swellState ? [swellState[0].latitude, swellState[0].longitude] : defaultCoordinates;
+
     return (
-        <MapContainer center={[51.505, -0.09]} zoom={13} className='h-screen'>
+        <MapContainer center={coordinates} zoom={13} className='h-screen'>
             <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
-            <Marker position={[51.505, -0.09]}>
+            <Marker position={coordinates}>
                 <Popup>
                     A pretty CSS3 popup. <br /> Easily customizable.
                 </Popup>
