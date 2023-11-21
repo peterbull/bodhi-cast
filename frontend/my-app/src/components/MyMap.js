@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import moment from 'moment-js';
 import { useEffect, useState } from 'react';
+import { CircularProgress } from '@mui/material';
 
 const swellData = async () => {
     const currentDate = moment();
@@ -38,10 +39,12 @@ const MyMap = () => {
         fetchData();
     }, [])
 
-    // Default coordinates in case swellState is null
-    const defaultCoordinates = [51.505, -0.09];
+    if (!swellState) {
+        // render a loading spinner as placeholder until data is fetched
+        return <CircularProgress />;
+    }
     
-    const coordinates = swellState ? [swellState[0].latitude, swellState[0].longitude] : defaultCoordinates;
+    const coordinates = [swellState[0].latitude, swellState[0].longitude];
 
     return (
         <MapContainer center={coordinates} zoom={13} className='h-screen'>
