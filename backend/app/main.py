@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from sqlalchemy import extract
 from sqlalchemy.orm import Session
 from celery import Celery
 from celery.schedules import crontab
@@ -45,6 +46,15 @@ def read_root():
 @app.get("/swelldata")
 def read_swell_data(db: Session = Depends(get_db)):
     data = db.query(SwellData).all()
+    return data
+
+@app.get("/swelldata/{year}/{month}/{day}")
+def swell_data_by_date(year: int, month: int, day: int, db: Session = Depends(get_db)):
+    data = db.query(SwellData).filter(
+        extract('year', SwellData.hourly) == year,
+        extract('month', SwellData.hourly) == month,
+        extract('day', SwellData.hourly) == day
+        ).all()
     return data
 
 
