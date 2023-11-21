@@ -66,6 +66,15 @@ def swell_data_by_date(year: int, month: int, day: int, db: Session = Depends(ge
         ).all()
     return data
 
+@app.get("/swelldata/{year}/{month}/{day}/{hour}")
+def swell_data_by_date(year: int, month: int, day: int, hour: int, db: Session = Depends(get_db)):
+    data = db.query(SwellData).filter(
+        extract('year', SwellData.hourly) == year,
+        extract('month', SwellData.hourly) == month,
+        extract('day', SwellData.hourly) == day,
+        extract('hour', SwellData.hourly) == hour
+        ).all()
+    return data
 
 # testing celery
 @app.get("/test_celery/{word}")
