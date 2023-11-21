@@ -13,6 +13,20 @@
             "cwd": "${workspaceFolder}/backend/app",
             "jinja": false,
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "name": "Launch Chrome against localhost client",
+            "request": "launch",
+            // "preLaunchTask": "npm: start",
+            "type": "chrome",
+            "url": "http://localhost:3000/",
+            "program": "${workspaceFolder}/client/App.js",
+            "webRoot": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                "${workspaceFolder}/client/node_modules/**/*.js",
+                "${workspaceFolder}/server/node_modules/**/*.js"
+            ]
+        },
     ]
 }
