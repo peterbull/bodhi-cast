@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import extract
 from sqlalchemy.orm import Session
 from celery import Celery
@@ -13,6 +14,14 @@ from app.utils.fetch_data import fetch_data, parse_swell_data, save_swell_data
 create_tables()
 db = get_db()
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 celery_app = Celery(
     "tasks",
