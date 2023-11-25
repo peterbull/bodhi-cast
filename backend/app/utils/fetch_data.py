@@ -53,3 +53,9 @@ def save_swell_data(parsed_data):
         db.commit()
     finally:
         db.close()
+
+
+# Functions for fetching and commiting grib files to database
+
+def fetch_grib_data
+
