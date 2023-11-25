@@ -21,3 +21,14 @@ class SwellData(Base):
     swell_wave_period = Column(Float)
     entry_created = Column(DateTime(timezone=True), default=func.now())
     entry_updated = Column(DateTime(timezone=True), onupdate=func.now())
+
+
+class WaveForecast(Base):
+    __tablename__ = 'wave_forecast'
+    id = Column(Integer, primary_key=True)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    swh = Column(Float) # Significant height of combined wind waves and swell
+    forecast_hour = Column(DateTime(timezone=True))
+    entry_created = Column(DateTime(timezone=True), default=func.now())
+    entry_updated = Column(DateTime(timezone=True), onupdate=func.now())
