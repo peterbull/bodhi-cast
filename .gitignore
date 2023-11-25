@@ -164,3 +164,6 @@ export
 
 # Data files
 data
+
+# modules
+cartopy
