@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 from celery import Celery
 from celery.schedules import crontab
 
-from app.db.database import get_db, create_tables
+from app.db.database import get_db, create_tables, engine
 from app.models.models import SwellData
-from app.utils.fetch_data import fetch_data, parse_swell_data, save_swell_data
+from app.utils.fetch_data import fetch_data, parse_swell_data, save_swell_data, all_wave_forecasts_to_db
 
 
 
@@ -30,24 +30,30 @@ celery_app = Celery(
 )
 
 celery_app.conf.beat_schedule = {
-    'fetch-and-save-swell-data-every-minute': {
+    'fetch-and-commit-open-meteo-data-every-hour': {
         'task': 'app.main.update_swell_data',
         'schedule': crontab(minute='0', hour='*'),
         # 'schedule': crontab(minute='*'), # crontab(minute=*) for every minute debug
     },
+    'fetch-transform-commit-noaa-data-daily': {
+        'task': 'app.main.noaa_update',
+        'schedule': crontab(minute='0', hour='2'), # Runs daily at 2am
+    }
 }
 
-# celery test function
-@celery_app.task
-def test_celery(word:str) -> str:
-    return f"test task returns {word}"
-
+# Celery tasks
 @celery_app.task
 def update_swell_data():
     json_data = fetch_data()
     parsed_data = parse_swell_data(json_data)
     save_swell_data(parsed_data)
 
+@celery_app.task
+def noaa_update():
+    all_wave_forecasts_to_db(engine, 'wave_forecast')
+
+
+# Routes
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
@@ -76,15 +82,12 @@ def swell_data_by_date(year: int, month: int, day: int, hour: int, db: Session =
         ).all()
     return data
 
-# testing celery
-@app.get("/test_celery/{word}")
-def test_celery_endpoint(word: str):
-    task = test_celery.delay(word)
-    return {"task_id": task.id}
-
-@app.get("/fetch_task/{task_id}")
-def fetch_task_result(task_id: str):
-    task = celery_app.AsyncResult(task_id)
-    if task.ready():
-        return {"status": task.status, "result": task.result}
-    return {"status": task.status}
+# Celery Worker Status
+@app.get("/worker-status")
+def get_worker_status():
+    i = celery_app.control.inspect()
+    return {
+        "active": i.active(),
+        "scheduled": i.scheduled(),
+        "reserved": i.reserved()
+    }
