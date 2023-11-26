@@ -133,7 +133,7 @@ def all_wave_forecasts_to_db(engine, table_name):
         print(f"Wrote grib file number {count} out of {len(targets)}")
 
 
-# debug area
+# # debug area
 # from sqlalchemy import create_engine
 # table_name = 'wave_forecast'
 # DATABASE_URL = "postgresql://postgres:your_password@localhost:5432/surfing_data"
@@ -143,7 +143,7 @@ def all_wave_forecasts_to_db(engine, table_name):
 # df = grib2_url_to_dataframe(hrefs[0])
 # print(df.head())
 
-# save_dataframe_to_db(df, engine, table_name)
+# all_wave_forecasts_to_db(engine, table_name)
 
 
 
