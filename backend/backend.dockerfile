@@ -26,6 +26,9 @@ RUN pip install "poetry==$POETRY_VERSION"
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
+# Set the PYTHONPATH to include the directory set in WORKDIR
+ENV PYTHONPATH /usr/src/app
+
 # Copy Poetry configuration files
 COPY pyproject.toml poetry.lock ./
 
