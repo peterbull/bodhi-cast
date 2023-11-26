@@ -167,3 +167,6 @@ data
 
 # modules
 cartopy
+
+# dev snapshots of db
+db_snap.sql
