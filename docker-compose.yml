@@ -5,11 +5,17 @@ services:
     build: 
       context: ./backend
       dockerfile: backend.dockerfile
-    command: poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    command: >
+      sh -c "python -Xfrozen_modules=off -m debugpy --wait-for-client --listen 0.0.0.0:5678 -m
+      uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+    # debugger test config
+    # command: >
+    #   sh -c "python -Xfrozen_modules=off -m debugpy --wait-for-client --listen 0.0.0.0:5678 -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
     volumes:
       - ./backend:/usr/src/app
     ports:
-      - "8000:8000"
+      - "8000:8000" # application port
+      - "5678:5678" # debug port
     depends_on:
       - db
       - redis
