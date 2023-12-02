@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+# Open Meteo Swell Forecast
 class SwellData(Base):
     __tablename__ = 'surf_data'
     id = Column(Integer, primary_key=True)
@@ -22,7 +23,7 @@ class SwellData(Base):
     entry_created = Column(DateTime(timezone=True), default=func.now())
     entry_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
-
+# NOAA WaveWatch III forecast 
 class WaveForecast(Base):
     __tablename__ = 'wave_forecast'
     id = Column(Integer, primary_key=True)

@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import extract
+from sqlalchemy import extract, func
 from sqlalchemy.orm import Session
 from celery import Celery
 from celery.schedules import crontab
 
 from app.db.database import get_db, create_tables, engine
-from app.models.models import SwellData
+from app.models.models import SwellData, WaveForecast
 from app.utils.fetch_data import fetch_data, parse_swell_data, save_swell_data, all_wave_forecasts_to_db
 
 
@@ -83,6 +83,12 @@ def swell_data_by_date(year: int, month: int, day: int, hour: int, db: Session =
         extract('day', SwellData.hourly) == day,
         extract('hour', SwellData.hourly) == hour
         ).all()
+    return data
+
+# Test fetching NOAA data
+@app.get("/waveforecast/{lat}/{lon}")
+def wave_forecast_by_location(lat: float, lon: float, db: Session = Depends(get_db)):
+    data = db.query(WaveForecast).first()
     return data
 
 # Celery Worker
