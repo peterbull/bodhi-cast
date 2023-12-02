@@ -1,10 +1,13 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import GetData from './components/GetData';
 
 function App() {
   return (
-    
+    <>
+      <p>placeholder</p>
+      <GetData />
+    </>
   );
 }
 
