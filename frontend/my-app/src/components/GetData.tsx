@@ -1,7 +1,8 @@
-import React, { ReactElement, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+
 
 function GetData() {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<any>(null);
 
     const fetchData = async () => {
         const res = await fetch("http://localhost:8000/waveforecast/1/1");
@@ -13,7 +14,15 @@ function GetData() {
     fetchData().then(data => setData(data)).catch(error => console.error(error))
   },[])
 
-  return data;
+  if (data === null) {
+    return (
+      <div>
+        <h3>loading...</h3>
+      </div>
+    );
+  }
+
+  return <div>{JSON.stringify(data)}</div>
 }
 
 export default GetData;
