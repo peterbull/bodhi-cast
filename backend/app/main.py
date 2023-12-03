@@ -88,7 +88,7 @@ def swell_data_by_date(year: int, month: int, day: int, hour: int, db: Session =
 # Test fetching NOAA data
 @app.get("/waveforecast/{lat}/{lon}")
 def wave_forecast_by_location(lat: float, lon: float, db: Session = Depends(get_db)):
-    data = db.query(WaveForecast).first()
+    data = db.query(WaveForecast).order_by(SwellData.id).limit(20).all()
     return data
 
 # Celery Worker
