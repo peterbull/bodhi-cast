@@ -22,6 +22,26 @@
         {
             "language": "typescript",
             "source": [
+                "import React from \"../frontend/react\";"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.error",
+                            "value": {
+                                "name": "Error",
+                                "message": "Cannot find module '../frontend/react'\nRequire stack:\n- <repl>",
+                                "stack": "node:internal/modules/cjs/loader:1147\n  throw err;\n  ^\n\n    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:1144:15)\n    at Function.Module._resolveFilename.sharedData.moduleResolveFilenameHook.installedValue [as _resolveFilename] (/home/pete-00/.vscode-server-insiders/extensions/donjayamanne.typescript-notebook-2.0.6/resources/scripts/node_modules/@cspotcode/source-map-support/source-map-support.js:679:30)\n    at Function.Module._load (node:internal/modules/cjs/loader:985:27)\n    at Function._._load (/home/pete-00/.vscode-server-insiders/extensions/donjayamanne.typescript-notebook-2.0.6/out/extension/server/index.js:2:115372)\n    at Module.require (node:internal/modules/cjs/loader:1235:19)\n    at require (node:internal/modules/helpers:176:18)\n    at <Cell 2> [1, 41]\n    at Script.runInContext (node:vm:133:12)\n    at Script.runInNewContext (node:vm:138:17)\n    at Object.runInNewContext (node:vm:296:38)"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
                 ""
             ],
             "outputs": []
