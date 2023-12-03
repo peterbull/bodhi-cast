@@ -1,3 +1,4 @@
+import { table } from "console";
 import { useState, useEffect } from "react";
 
 function GetData() {
@@ -25,15 +26,21 @@ function GetData() {
   console.log(data);
   // return null;
   return (
-    <div>
-      <th>
-        {Object.keys(data[0]).map(
-          (category, index) => <tr key={index}>{category}</tr>
-        )}
-      </th>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          {Object.keys(data[0]).map(key => <th key={key}>{key}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((item: any, index: number) => (
+          <tr key={index}>
+          {Object.keys(data[0]).map(key => <td key={key}>{item[key]}</td>)}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
-  
 }
 
 export default GetData;
