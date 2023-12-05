@@ -8,8 +8,6 @@ import pytz
 from bs4 import BeautifulSoup
 from sqlalchemy.exc import SQLAlchemyError
 
-
-from app.models.models import SwellData
 from app.db.database import SessionLocal
 
 # Functions for fetching and commiting global grib wave forecast files from Wavewatch III models to database
@@ -76,9 +74,4 @@ def all_wave_forecasts_to_db(engine, table_name):
         save_dataframe_to_db(df, engine, table_name)
         count += 1
         print(f"Wrote grib file number {count} out of {len(targets)}")
-
-
-
-
-
 
