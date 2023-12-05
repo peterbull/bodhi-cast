@@ -7,7 +7,7 @@ from celery.schedules import crontab
 
 from app.db.database import get_db, create_tables, engine
 from app.models.models import WaveForecast
-from app.data.fetch_data import all_wave_forecasts_to_db
+from app.data.noaa.wavewatch import Wavewatch
 
 
 
@@ -42,7 +42,7 @@ celery_app.conf.beat_schedule = {
 # Celery tasks
 @celery_app.task
 def noaa_update():
-    all_wave_forecasts_to_db(engine, 'wave_forecast')
+    Wavewatch(engine, 'wave_forecast').run()
 
 
 # Routes
