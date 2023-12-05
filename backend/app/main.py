@@ -7,7 +7,7 @@ from celery.schedules import crontab
 
 from app.db.database import get_db, create_tables, engine
 from app.models.models import WaveForecast
-from app.utils.fetch_data import all_wave_forecasts_to_db
+from app.data.fetch_data import all_wave_forecasts_to_db
 
 
 
