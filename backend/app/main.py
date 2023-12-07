@@ -10,7 +10,6 @@ from app.models.models import WaveForecast
 from app.data.noaa.wavewatch import Wavewatch
 
 
-
 create_tables()
 db = get_db()
 app = FastAPI()
@@ -34,15 +33,23 @@ celery_app.conf.broker_connection_retry_on_startup = True
 celery_app.conf.beat_schedule = {
     'fetch-transform-commit-noaa-data-daily': {
         'task': 'app.main.noaa_update',
-        'schedule': crontab(minute='0', hour='7'), # Runs daily at 7am UTC 2am EST
+        # Runs daily at 7am UTC 2am EST
+        'schedule': crontab(minute='0', hour='7'),
         # 'schedule': crontab(minute='17', hour='19'), # Variable debug run
     }
 }
 
 # Celery tasks
+
+
 @celery_app.task
 def noaa_update():
     Wavewatch(engine, 'wave_forecast').run()
+
+
+@celery_app.task
+def noaa_sample():
+    Wavewatch(engine, 'wave_forecast').run_sample()
 
 
 # Routes
