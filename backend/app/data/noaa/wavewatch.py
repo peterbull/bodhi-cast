@@ -86,7 +86,7 @@ class Wavewatch:
                 with xr.open_dataset(tmp.name, engine='cfgrib') as ds:
                     data = ds.load()
                     df = data.to_dataframe()
-                    df = df.dropna(subset=['swh'])
+                    # df = df.dropna(subset=['swh'])
                     df.reset_index(
                         level=['latitude', 'longitude'], inplace=True)
 
