@@ -141,6 +141,7 @@ class Wavewatch:
             count += 1
             print(
                 f"Wrote grib file number {count} out of {len(self.url_list)}")
+            print("Updated")
 
     def run_sample(self) -> None:
         """
