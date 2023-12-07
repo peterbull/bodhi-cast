@@ -87,6 +87,7 @@ class Wavewatch:
                     data = ds.load()
                     df = data.to_dataframe()
                     # df = df.dropna(subset=['swh'])
+                    df['longitude'] = df['longitude'].apply(lambda x: x - 360 if x > 180 else 180)
                     df.reset_index(
                         level=['latitude', 'longitude'], inplace=True)
 
