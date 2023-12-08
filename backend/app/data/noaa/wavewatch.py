@@ -91,7 +91,7 @@ class Wavewatch:
                         level=['latitude', 'longitude'], inplace=True)
 
                     df['longitude'] = df['longitude'].apply(
-                        lambda x: x - 360 if x > 180 else 180).round(2)
+                        lambda x: x - 360 if x > 180 else x).round(2)
                     df['step'] = df['step'].dt.total_seconds() / 3600.0
                     df['step'] = df['step'].astype(str) + ' hours'
                     return df
