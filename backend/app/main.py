@@ -52,6 +52,16 @@ def noaa_sample():
     Wavewatch(engine, 'wave_forecast').run_sample()
 
 
+@celery_app.task
+def noaa_update_swell_only():
+    Wavewatch(engine, 'wave_forecast').run(swell_only=True)
+
+
+@celery_app.task
+def noaa_sample_swell_only():
+    Wavewatch(engine, 'wave_forecast').run_sample(swell_only=True)
+
+
 # Routes
 @app.get("/")
 def read_root():

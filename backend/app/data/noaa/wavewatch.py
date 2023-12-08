@@ -67,37 +67,43 @@ class Wavewatch:
         urls = [a.get('href') for a in soup.find_all('a', href=pattern)]
         return urls
 
-    def url_to_df(self, target: str) -> pd.DataFrame:
-        """
-        Fetches data from the specified URL and returns it as a pandas DataFrame.
+    def url_to_df(self, target: str, swell_only: bool = False) -> pd.DataFrame:
+            """
+            Fetches data from the specified URL and returns it as a pandas DataFrame.
 
-        Args:
-            target (str): The target URL to fetch the data from.
+            Args:
+                target (str): The target URL to fetch the data from.
+                swell_only (bool, optional): Flag indicating whether to include only swell data. Defaults to False.
 
-        Returns:
-            pandas.DataFrame: The fetched data as a pandas DataFrame, with NaN swell values dropped and index reset.
-        """
-        response = requests.get(f'{self.url}/{target}')
-        if response.status_code == 200:
-            with tempfile.NamedTemporaryFile() as tmp:
-                tmp.write(response.content)
-                tmp.flush()
+            Returns:
+                pandas.DataFrame: The fetched data as a pandas DataFrame, with NaN swell values dropped and index reset.
+            """
+            response = requests.get(f'{self.url}/{target}')
+            if response.status_code == 200:
+                with tempfile.NamedTemporaryFile() as tmp:
+                    tmp.write(response.content)
+                    tmp.flush()
 
-                with xr.open_dataset(tmp.name, engine='cfgrib') as ds:
-                    data = ds.load()
-                    df = data.to_dataframe()
-                    # df = df.dropna(subset=['swh'])
-                    df.reset_index(
-                        level=['latitude', 'longitude'], inplace=True)
+                    with xr.open_dataset(tmp.name, engine='cfgrib') as ds:
+                        data = ds.load()
+                        df = data.to_dataframe()
+                        # df = df.dropna(subset=['swh'])
+                        df.reset_index(
+                            level=['latitude', 'longitude'], inplace=True)
 
-                    df['longitude'] = df['longitude'].apply(
-                        lambda x: x - 360 if x > 180 else x).round(2)
-                    df['step'] = df['step'].dt.total_seconds() / 3600.0
-                    df['step'] = df['step'].astype(str) + ' hours'
-                    return df
+                        if swell_only:
+                            df = df.drop(columns=[
+                                'surface', 'swh', 'perpw', 'dirpw', 'shww', 'mpww',
+                                'wvdir', 'ws', 'wdir', 'swper'
+                            ])
+                        df['longitude'] = df['longitude'].apply(
+                            lambda x: x - 360 if x > 180 else x).round(2)
+                        df['step'] = df['step'].dt.total_seconds() / 3600.0
+                        df['step'] = df['step'].astype(str) + ' hours'
+                        return df
 
-        else:
-            print(f"Failed to get data: {response.status_code}")
+            else:
+                print(f"Failed to get data: {response.status_code}")
 
     def commit_df_to_db(self, df: pd.DataFrame) -> None:
         """
@@ -119,47 +125,48 @@ class Wavewatch:
             except SQLAlchemyError as e:
                 print(f"An error occurred: {e}")
 
-    def run(self) -> None:
-        """
-        Retrieve data from the Wavewatch URLs, convert it to a DataFrame, and commit it to the database.
+    def run(self, swell_only: bool = False) -> None:
+            """
+            Retrieve data from the Wavewatch URLs, convert it to a DataFrame, and commit it to the database.
 
-        This method processes all URLs in self.url_list. Each URL is processed individually, 
-        converted to a DataFrame with the url_to_df method, and committed to the database with 
-        the commit_df_to_db method.
+            This method processes all URLs in self.url_list. Each URL is processed individually, 
+            converted to a DataFrame with the url_to_df method, and committed to the database with 
+            the commit_df_to_db method.
 
-        Note: This is a full run and can be time consuming. Use the sample method for a quicker test 
-        with a single URL.
+            Note: This is a full run and can be time consuming. Use the sample method for a quicker test 
+            with a single URL.
 
-        Args:
-            None
+            Args:
+                swell_only (bool, optional): If True, only retrieve data for swells. Defaults to False.
 
-        Returns:
-            None
-        """
-        count = 0
-        for url in self.url_list:
-            df = self.url_to_df(url)
+            Returns:
+                None
+            """
+            count = 0
+            for url in self.url_list:
+                df = self.url_to_df(url, swell_only)
+                self.commit_df_to_db(df)
+                count += 1
+                print(
+                    f"Wrote grib file number {count} out of {len(self.url_list)}")
+                print("Updated")
+
+    def run_sample(self, swell_only: bool = False) -> None:
+            """
+            Retrieve data from a single Wavewatch URL, convert it to a DataFrame, and commit it to the database.
+
+            This method is a sample run and is intended for quick testing with a single URL. It retrieves data from 
+            a single URL, converts it to a DataFrame with the url_to_df method, and commits it to the database with 
+            the commit_df_to_db method.
+
+            Args:
+                swell_only (bool): If True, retrieve only the swell data. Defaults to False.
+
+            Returns:
+                None
+            """
+            url = self.url_list[0]
+            df = self.url_to_df(url, swell_only)
             self.commit_df_to_db(df)
-            count += 1
-            print(
-                f"Wrote grib file number {count} out of {len(self.url_list)}")
-            print("Updated")
+            print("Sample run completed.")
 
-    def run_sample(self) -> None:
-        """
-        Retrieve data from a single Wavewatch URL, convert it to a DataFrame, and commit it to the database.
-
-        This method is a sample run and is intended for quick testing with a single URL. It retrieves data from 
-        a single URL, converts it to a DataFrame with the url_to_df method, and commits it to the database with 
-        the commit_df_to_db method.
-
-        Args:
-            None
-
-        Returns:
-            None
-        """
-        url = self.url_list[0]
-        df = self.url_to_df(url)
-        self.commit_df_to_db(df)
-        print("Sample run completed.")
