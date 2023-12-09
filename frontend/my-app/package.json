@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@types/dat.gui": "^0.7.12",
-    "@types/three": "^0.159.0"
+    "@types/three": "^0.159.0",
+    "react-globe.gl": "^2.27.1"
   }
 }
