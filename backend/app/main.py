@@ -84,7 +84,7 @@ def datatype_forecast_by_date(datatype: str, date: int, db: Session = Depends(ge
     sql_query = text(f"""
     SELECT COALESCE({datatype}, 0) as {datatype}, latitude, longitude
     FROM wave_forecast
-    WHERE valid_time = :date
+    WHERE valid_time = :date AND (latitude < 80 OR latitude > -80)
     """)
 
     result = db.execute(sql_query, {"date": format_date(date)}).mappings().first()
