@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import extract, func
+from sqlalchemy import extract, func, select, text
 from sqlalchemy.orm import Session
 from celery import Celery
 from celery.schedules import crontab
@@ -8,10 +10,13 @@ from celery.schedules import crontab
 from app.db.database import get_db, create_tables, engine
 from app.models.models import WaveForecast
 from app.data.noaa.wavewatch import Wavewatch
+from sqlalchemy.orm import Session
+from app.models.models import WaveForecast
+from sqlalchemy.orm import Session
 
 
 create_tables()
-db = get_db()
+# db = get_db()
 app = FastAPI()
 
 app.add_middleware(
@@ -68,11 +73,27 @@ def read_root():
     return {"Hello": "World"}
 
 
-# Test fetching NOAA data
-@app.get("/waveforecast/{lat}/{lon}")
-def wave_forecast_by_location(lat: float, lon: float, db: Session = Depends(get_db)):
-    data = db.query(WaveForecast).order_by(WaveForecast.id).limit(20).all()
-    return data
+@app.get("/waveforecast/{datatype}/{date}")
+def datatype_forecast_by_date(datatype: str, date: int, db: Session = Depends(get_db)):
+
+    def format_date(date_int: int) -> str:
+        date_obj = datetime.strptime(str(date_int), "%Y%m%d")
+        formatted_date = date_obj.strftime("%Y-%m-%d %H:%M:%S+00")
+        return formatted_date
+
+    sql_query = text(f"""
+    SELECT COALESCE({datatype}, 0) as {datatype}, latitude, longitude
+    FROM wave_forecast
+    WHERE valid_time = :date
+    """)
+
+    result = db.execute(sql_query, {"date": format_date(date)}).mappings().first()
+
+    if result is not None:
+        return result
+    else:
+        return {}
+
 
 
 # Celery Worker Status
