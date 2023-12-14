@@ -8,9 +8,7 @@ function App() {
   return (
     <>
       <p>placeholder</p>
-      <GetData />
-      <ThreeMap />
-      <SwellGlobe />
+     
     </>
   );
 }
