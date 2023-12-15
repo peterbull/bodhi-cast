@@ -1,15 +1,19 @@
-import React from 'react';
-import './App.css';
-import GetData from './components/GetData';
-import ThreeMap from './components/ThreeMap';
-import SwellGlobe from './components/SwellGlobe';
+import "./App.css";
+
+import { MapContainer, TileLayer } from "react-leaflet";
 
 function App() {
   return (
-    <>
-      <p>placeholder</p>
-     
-    </>
+    <div>
+      <p>testing</p>
+      <MapContainer
+        center={[48.860770272151804, 2.3435901324493194]}
+        zoom={13}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+      </MapContainer>
+    </div>
   );
 }
 
