@@ -1,14 +1,18 @@
 from sqlalchemy import Column, Float, Integer, String, JSON, DateTime, Interval
 from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base
+from geoalchemy2 import Geography
 
 
 Base = declarative_base()
 
-# NOAA WaveWatch III forecast 
+# NOAA WaveWatch III forecast
+
+
 class WaveForecast(Base):
     __tablename__ = 'wave_forecast'
     id = Column(Integer, primary_key=True)
+    location = Column(Geography('POINT', srid=4326))
     latitude = Column(Float)
     longitude = Column(Float)
     time = Column(DateTime(timezone=True))

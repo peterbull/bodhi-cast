@@ -39,7 +39,7 @@
                 "PYTHONPATH": "${workspaceFolder}/backend:${env:PYTHONPATH}"
             }
         },
-        {
+       {
             "name": "Docker: Attach to FastAPI",
             "type": "python",
             "request": "attach",
@@ -52,5 +52,20 @@
                 }
             ]
         },
+       {
+            "name": "Docker: Attach to Celery",
+            "type": "python",
+            "request": "attach",
+            "port": 5679,
+            "host": "localhost",
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}/backend/app",
+                    "remoteRoot": "/usr/src/app/app"
+                }
+            ]
+        },
+        
+        
     ]
 }

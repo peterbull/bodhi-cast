@@ -2,17 +2,14 @@ from datetime import datetime
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import extract, func, select, text
+from sqlalchemy import extract, select, text
 from sqlalchemy.orm import Session
+
 from celery import Celery
 from celery.schedules import crontab
 
 from app.db.database import get_db, create_tables, engine
-from app.models.models import WaveForecast
 from app.data.noaa.wavewatch import Wavewatch
-from sqlalchemy.orm import Session
-from app.models.models import WaveForecast
-from sqlalchemy.orm import Session
 
 
 create_tables()
@@ -87,13 +84,13 @@ def datatype_forecast_by_date(datatype: str, date: int, db: Session = Depends(ge
     WHERE valid_time = :date AND (latitude < 80 OR latitude > -80)
     """)
 
-    result = db.execute(sql_query, {"date": format_date(date)}).mappings().first()
+    result = db.execute(
+        sql_query, {"date": format_date(date)}).mappings().first()
 
     if result is not None:
         return result
     else:
         return {}
-
 
 
 # Celery Worker Status
