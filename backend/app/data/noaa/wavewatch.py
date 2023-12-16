@@ -135,6 +135,29 @@ class Wavewatch:
             except SQLAlchemyError as e:
                 print(f"An error occurred: {e}")
 
+
+def reindex_db(self) -> None:
+    """
+    Create a GiST index on the 'location' column of the table in the database if it doesn't already exist,
+    then reindex the 'location' column.
+
+    Raises:
+        SQLAlchemyError: If an error occurs while creating or reindexing the index.
+    """
+    with self.engine.begin() as connection:
+        try:
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS location_gist ON wave_forecast USING gist(location);")
+            print("Successfully created the index if it did not exist")
+        except SQLAlchemyError as e:
+            print(f"An error occurred while creating the index: {e}")
+
+        try:
+            connection.execute("REINDEX INDEX location_gist;")
+            print("Successfully reindexed the table")
+        except SQLAlchemyError as e:
+            print(f"An error occurred while reindexing the table: {e}")
+
     def run(self, swell_only: bool = False) -> None:
         """
         Retrieve data from the Wavewatch URLs, convert it to a DataFrame, and commit it to the database.
@@ -160,6 +183,7 @@ class Wavewatch:
             print(
                 f"Wrote grib file number {count} out of {len(self.url_list)}")
             print("Updated")
+        self.reindex_db()
 
     def run_sample(self, swell_only: bool = False) -> None:
         """
@@ -178,4 +202,5 @@ class Wavewatch:
         url = self.url_list[0]
         df = self.url_to_df(url, swell_only)
         self.commit_df_to_db(df)
+        self.reindex_db
         print("Sample run completed.")
