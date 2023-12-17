@@ -19,31 +19,36 @@ class Wavewatch:
     """
     Class representing the Wavewatch data processing and database interaction.
 
-    This class provides methods to retrieve data from Wavewatch URLs, convert it to a pandas DataFrame,
-    and commit it to a database. It also includes methods for running a full data processing run or a sample run.
+    This class provides methods to retrieve data from Wavewatch URLs, convert
+    it to a pandas DataFrame, and commit it to a database. It also includes
+    methods for running a full data processing run or a sample run.
 
     Attributes:
-        engine (str): The database engine to be used for committing the DataFrame.
-        table_name (str): The name of the table in the database to which the DataFrame will be committed.
-        date (str): The current date in the format "%Y%m%d".
-        url (str): The base URL for retrieving Wavewatch data.
-        url_list (list): A list of URLs for retrieving Wavewatch data.
+        engine (str): The database engine to be used for committing the
+        DataFrame. table_name (str): The name of the table in the database to
+        which the DataFrame will be committed. date (str): The current date in
+        the format "%Y%m%d". url (str): The base URL for retrieving Wavewatch
+        data. url_list (list): A list of URLs for retrieving Wavewatch data.
 
     Methods:
         get_global_mean_urls(url: str) -> list:
-            Retrieves the list of links for the average global model for all forecast hours.
+            Retrieves the list of links for the average global model for all
+            forecast hours.
 
         url_to_df(target: str) -> pandas.DataFrame:
-            Fetches data from the specified URL and returns it as a pandas DataFrame.
+            Fetches data from the specified URL and returns it as a pandas
+            DataFrame.
 
         commit_df_to_db(df: pandas.DataFrame) -> None:
             Commit a DataFrame to the database.
 
         run() -> None:
-            Retrieve data from the Wavewatch URLs, convert it to a DataFrame, and commit it to the database.
+            Retrieve data from the Wavewatch URLs, convert it to a DataFrame,
+            and commit it to the database.
 
         run_sample() -> None:
-            Retrieve data from a single Wavewatch URL, convert it to a DataFrame, and commit it to the database.
+            Retrieve data from a single Wavewatch URL, convert it to a
+            DataFrame, and commit it to the database.
     """
 
     def __init__(self, engine: Engine, table_name: str):
@@ -55,13 +60,12 @@ class Wavewatch:
 
     def get_global_mean_urls(self, url: str) -> list:
         """
-        Retrieves the list of links for the average global model for all forecast hours.
+        Retrieves the list of links for the average global model for all
+        forecast hours.
 
-        Parameters:
-        url (str): The URL of the webpage to scrape.
+        Parameters: url (str): The URL of the webpage to scrape.
 
-        Returns:
-        urls (list): A list of links for the average global model.
+        Returns: urls (list): A list of links for the average global model.
         """
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -72,14 +76,17 @@ class Wavewatch:
 
     def url_to_df(self, target: str, swell_only: bool = False) -> pd.DataFrame:
         """
-        Fetches data from the specified URL and returns it as a pandas DataFrame.
+        Fetches data from the specified URL and returns it as a pandas
+        DataFrame.
 
         Args:
-            target (str): The target URL to fetch the data from.
-            swell_only (bool, optional): Flag indicating whether to include only swell data. Defaults to False.
+            target (str): The target URL to fetch the data from. swell_only
+            (bool, optional): Flag indicating whether to include only swell
+            data. Defaults to False.
 
         Returns:
-            pandas.DataFrame: The fetched data as a pandas DataFrame, with NaN swell values dropped and index reset.
+            pandas.DataFrame: The fetched data as a pandas DataFrame, with NaN
+            swell values dropped and index reset.
         """
         response = requests.get(f'{self.url}/{target}')
         if response.status_code == 200:
@@ -121,7 +128,8 @@ class Wavewatch:
             df (pandas.DataFrame): The DataFrame to be committed.
 
         Raises:
-            SQLAlchemyError: If an error occurs while committing the DataFrame to the database.
+            SQLAlchemyError: If an error occurs while committing the DataFrame
+            to the database.
         """
         with self.engine.begin() as connection:
             try:
@@ -138,16 +146,21 @@ class Wavewatch:
 
 def reindex_db(self) -> None:
     """
-    Create a GiST index on the 'location' column of the table in the database if it doesn't already exist,
-    then reindex the 'location' column.
+    Create a GiST index on the 'location' column of the table in the database
+    if it doesn't already exist, then reindex the 'location' column.
 
     Raises:
-        SQLAlchemyError: If an error occurs while creating or reindexing the index.
+        SQLAlchemyError: If an error occurs while creating or reindexing the
+        index.
     """
     with self.engine.begin() as connection:
         try:
             connection.execute(
-                "CREATE INDEX IF NOT EXISTS location_gist ON wave_forecast USING gist(location);")
+                """
+                CREATE INDEX IF NOT EXISTS location_gist ON wave_forecast
+                USING gist(location);
+                """
+            )
             print("Successfully created the index if it did not exist")
         except SQLAlchemyError as e:
             print(f"An error occurred while creating the index: {e}")
@@ -160,17 +173,19 @@ def reindex_db(self) -> None:
 
     def run(self, swell_only: bool = False) -> None:
         """
-        Retrieve data from the Wavewatch URLs, convert it to a DataFrame, and commit it to the database.
+        Retrieve data from the Wavewatch URLs, convert it to a DataFrame, and
+        commit it to the database.
 
-        This method processes all URLs in self.url_list. Each URL is processed individually, 
-        converted to a DataFrame with the url_to_df method, and committed to the database with 
-        the commit_df_to_db method.
+        This method processes all URLs in self.url_list. Each URL is processed
+        individually, converted to a DataFrame with the url_to_df method, and
+        committed to the database with the commit_df_to_db method.
 
-        Note: This is a full run and can be time consuming. Use the sample method for a quicker test 
-        with a single URL.
+        Note: This is a full run and can be time consuming. Use the sample
+        method for a quicker test with a single URL.
 
         Args:
-            swell_only (bool, optional): If True, only retrieve data for swells. Defaults to False.
+            swell_only (bool, optional): If True, only retrieve data for
+            swells. Defaults to False.
 
         Returns:
             None
@@ -187,14 +202,17 @@ def reindex_db(self) -> None:
 
     def run_sample(self, swell_only: bool = False) -> None:
         """
-        Retrieve data from a single Wavewatch URL, convert it to a DataFrame, and commit it to the database.
+        Retrieve data from a single Wavewatch URL, convert it to a DataFrame,
+        and commit it to the database.
 
-        This method is a sample run and is intended for quick testing with a single URL. It retrieves data from 
-        a single URL, converts it to a DataFrame with the url_to_df method, and commits it to the database with 
-        the commit_df_to_db method.
+        This method is a sample run and is intended for quick testing with a
+        single URL. It retrieves data from a single URL, converts it to a
+        DataFrame with the url_to_df method, and commits it to the database
+        with the commit_df_to_db method.
 
         Args:
-            swell_only (bool): If True, retrieve only the swell data. Defaults to False.
+            swell_only (bool): If True, retrieve only the swell data. Defaults
+            to False.
 
         Returns:
             None
