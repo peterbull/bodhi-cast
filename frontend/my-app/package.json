@@ -12,6 +12,7 @@
     "@types/react-dom": "^18.2.17",
     "dat.gui": "^0.7.9",
     "leaflet": "^1.9.4",
+    "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
