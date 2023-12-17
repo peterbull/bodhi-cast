@@ -117,6 +117,36 @@ def get_locations(date: str, db: Session = Depends(get_db)):
 
     return {"locations": locations, "maxSwell": max_swell}
 
+
+@app.get("/locations/gridded/{degrees}/{date}")
+def get_locations_gridded(date: str, degrees: str, db: Session = Depends(get_db)):
+    date = datetime.strptime(date, "%Y%m%d").date()
+    result = db.execute(text(
+        """
+        SELECT
+            ST_X(ST_SnapToGrid(location::geometry, :degrees)) AS lon,
+            ST_Y(ST_SnapToGrid(location::geometry, :degrees)) AS lat,
+            AVG(swell) as avg_swell
+        FROM wave_forecast WHERE valid_time = :date GROUP BY
+        ST_SnapToGrid(location::geometry, :degrees);
+        """),
+        {"date": date, "degrees": int(degrees)})
+
+    rows = result.all()
+    locations = [row._asdict() for row in rows]
+
+    result = db.execute(text(
+        """
+        SELECT MAX(swell) AS max_swell FROM wave_forecast
+        WHERE valid_time = :date;
+        """),
+        {"date": date})
+
+    max_swell = result.scalar()
+
+    return {"locations": locations, "maxSwell": max_swell}
+
+
 # Celery Worker Status
 
 
