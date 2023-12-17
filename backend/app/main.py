@@ -13,7 +13,7 @@ from app.data.noaa.wavewatch import Wavewatch
 
 
 create_tables()
-# db = get_db()
+db = get_db()
 app = FastAPI()
 
 app.add_middleware(
@@ -93,7 +93,22 @@ def datatype_forecast_by_date(datatype: str, date: int, db: Session = Depends(ge
         return {}
 
 
+@app.get("/locations/{date}")
+def get_locations(date: str, db: Session = Depends(get_db)):
+    date = datetime.strptime(date, "%Y%m%d").date()
+    result = db.execute(text(
+        """
+        SELECT ST_X(location::geometry) AS lon, ST_Y(location::geometry) AS lat
+        FROM wave_forecast
+        WHERE valid_time = :date;
+        """),
+        {"date": date})
+
+    rows = result.all()
+    return [row._asdict() for row in rows]
 # Celery Worker Status
+
+
 @app.get("/worker-status")
 def get_worker_status():
     i = celery_app.control.inspect()
