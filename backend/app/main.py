@@ -98,14 +98,25 @@ def get_locations(date: str, db: Session = Depends(get_db)):
     date = datetime.strptime(date, "%Y%m%d").date()
     result = db.execute(text(
         """
-        SELECT ST_X(location::geometry) AS lon, ST_Y(location::geometry) AS lat
-        FROM wave_forecast
-        WHERE valid_time = :date;
+        SELECT ST_X(location::geometry) AS lon, ST_Y(location::geometry) AS
+        lat, swell FROM wave_forecast WHERE valid_time = :date;
         """),
         {"date": date})
 
     rows = result.all()
-    return [row._asdict() for row in rows]
+    locations = [row._asdict() for row in rows]
+
+    result = db.execute(text(
+        """
+        SELECT MAX(swell) AS max_swell FROM wave_forecast
+        WHERE valid_time = :date;
+        """),
+        {"date": date})
+
+    max_swell = result.scalar()
+
+    return {"locations": locations, "maxSwell": max_swell}
+
 # Celery Worker Status
 
 
