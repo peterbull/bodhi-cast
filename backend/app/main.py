@@ -50,8 +50,8 @@ def noaa_update():
 
 
 @celery_app.task
-def noaa_sample():
-    Wavewatch(engine, 'wave_forecast').run_sample()
+def noaa_sample(num_samples=1):
+    Wavewatch(engine, 'wave_forecast').run_sample(num_samples=num_samples)
 
 
 @celery_app.task
