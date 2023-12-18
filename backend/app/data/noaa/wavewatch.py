@@ -11,6 +11,7 @@ from geoalchemy2.types import Geography
 
 from bs4 import BeautifulSoup
 
+from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine.base import Engine
 
@@ -154,18 +155,15 @@ class Wavewatch:
         """
         with self.engine.begin() as connection:
             try:
-                connection.execute(
-                    """
-                    CREATE INDEX IF NOT EXISTS location_gist ON wave_forecast
-                    USING gist(location);
-                    """
-                )
+                connection.execute(text(
+                    "CREATE INDEX IF NOT EXISTS location_gist ON wave_forecast USING gist(location);"))
+
                 print("Successfully created the index if it did not exist")
             except SQLAlchemyError as e:
                 print(f"An error occurred while creating the index: {e}")
 
             try:
-                connection.execute("REINDEX INDEX location_gist;")
+                connection.execute(text("REINDEX INDEX location_gist;"))
                 print("Successfully reindexed the table")
             except SQLAlchemyError as e:
                 print(f"An error occurred while reindexing the table: {e}")
