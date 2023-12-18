@@ -147,6 +147,41 @@ def get_locations_gridded(date: str, degrees: str, db: Session = Depends(get_db)
     return {"locations": locations, "maxSwell": max_swell}
 
 
+@app.get("/forecasts/gridded/{degrees}/{date}")
+def get_forecasts_gridded(date: str, degrees: str, db: Session = Depends(get_db)):
+    date = datetime.strptime(date, "%Y%m%d").date()
+    result = db.execute(text(
+        """
+        SELECT
+            ST_X(ST_SnapToGrid(location::geometry, :degrees)) AS lon,
+            ST_Y(ST_SnapToGrid(location::geometry, :degrees)) AS lat,
+            valid_time,
+            AVG(swell) as avg_swell
+        FROM wave_forecast
+        WHERE valid_time >= :date
+        GROUP BY ST_SnapToGrid(location::geometry, :degrees), valid_time
+        ORDER BY ST_SnapToGrid(location::geometry, :degrees), valid_time;
+        """),
+        {"date": date, "degrees": int(degrees)})
+
+    rows = result.all()
+    # Group forecasts by valid_time
+    forecasts_by_time = {}
+    for row in rows:
+        if row.valid_time not in forecasts_by_time:
+            forecasts_by_time[row.valid_time] = {
+                "locations": [],
+                "maxSwell": 0
+            }
+        forecast = {"lon": row.lon, "lat": row.lat,
+                    "swell": row.avg_swell}
+        forecasts_by_time[row.valid_time]["locations"].append(forecast)
+        forecasts_by_time[row.valid_time]["maxSwell"] = max(
+            forecasts_by_time[row.valid_time]["maxSwell"], row.avg_swell)
+
+    return forecasts_by_time
+
+
 # Celery Worker Status
 
 
