@@ -269,6 +269,17 @@ files = [
 beautifulsoup4 = "*"
 
 [[package]]
+name = "cachetools"
+version = "5.3.2"
+description = "Extensible memoizing collections and decorators"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "cachetools-5.3.2-py3-none-any.whl", hash = "sha256:861f35a13a451f94e301ce2bec7cac63e881232ccce7ed67fab9b5df4d3beaa1"},
+    {file = "cachetools-5.3.2.tar.gz", hash = "sha256:086ee420196f7b2ab9ca2db2520aca326318b68fe5ba8bc4d49cca91add450f2"},
+]
+
+[[package]]
 name = "cartopy"
 version = "0.22.0"
 description = "A Python library for cartographic visualizations with Matplotlib"
@@ -2845,4 +2856,4 @@ viz = ["matplotlib", "nc-time-axis", "seaborn"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "28deeaf6dda5af940445d8f9a0ac2a6667ba324e2a10b30abfef1c627ee97c07"
+content-hash = "2fd7d529cd9771ef5d85d2599e8255797c1af37412881cdb28eca9759d03a99d"

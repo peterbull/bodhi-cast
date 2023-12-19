@@ -1,9 +1,12 @@
+import json
 from datetime import datetime
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import extract, select, text
 from sqlalchemy.orm import Session
+
+import redis
 
 from celery import Celery
 from celery.schedules import crontab
@@ -23,6 +26,8 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
+redis_client = redis.Redis(host='redis', port=6379, db=0)
 
 celery_app = Celery(
     "tasks",
@@ -149,37 +154,46 @@ def get_locations_gridded(date: str, degrees: str, db: Session = Depends(get_db)
 
 @app.get("/forecasts/gridded/{degrees}/{date}")
 def get_forecasts_gridded(date: str, degrees: str, db: Session = Depends(get_db)):
-    date = datetime.strptime(date, "%Y%m%d").date()
-    result = db.execute(text(
-        """
-        SELECT
-            ST_X(ST_SnapToGrid(location::geometry, :degrees)) AS lon,
-            ST_Y(ST_SnapToGrid(location::geometry, :degrees)) AS lat,
-            valid_time,
-            AVG(swell) as avg_swell
-        FROM wave_forecast
-        WHERE valid_time >= :date
-        GROUP BY ST_SnapToGrid(location::geometry, :degrees), valid_time
-        ORDER BY ST_SnapToGrid(location::geometry, :degrees), valid_time;
-        """),
-        {"date": date, "degrees": int(degrees)})
+    cache_key = f"forecasts_gridded:{date}:{degrees}"
+    cached_result = redis_client.get(cache_key)
 
-    rows = result.all()
-    # Group forecasts by valid_time
-    forecasts_by_time = {}
-    for row in rows:
-        if row.valid_time not in forecasts_by_time:
-            forecasts_by_time[row.valid_time] = {
-                "locations": [],
-                "maxSwell": 0
-            }
-        forecast = {"lon": row.lon, "lat": row.lat,
-                    "swell": row.avg_swell}
-        forecasts_by_time[row.valid_time]["locations"].append(forecast)
-        forecasts_by_time[row.valid_time]["maxSwell"] = max(
-            forecasts_by_time[row.valid_time]["maxSwell"], row.avg_swell)
+    if cached_result is not None:
+        return json.loads(cached_result.decode("utf-8"))
+    else:
+        date = datetime.strptime(date, "%Y%m%d").date()
+        result = db.execute(text(
+            """
+            SELECT
+                ST_X(ST_SnapToGrid(location::geometry, :degrees)) AS lon,
+                ST_Y(ST_SnapToGrid(location::geometry, :degrees)) AS lat,
+                valid_time,
+                AVG(swell) as avg_swell
+            FROM wave_forecast
+            WHERE valid_time >= :date
+            GROUP BY ST_SnapToGrid(location::geometry, :degrees), valid_time
+            ORDER BY ST_SnapToGrid(location::geometry, :degrees), valid_time;
+            """),
+            {"date": date, "degrees": int(degrees)})
 
-    return forecasts_by_time
+        rows = result.all()
+        # Group forecasts by valid_time
+        forecasts_by_time = {}
+        for row in rows:
+            valid_time_str = row.valid_time.isoformat()
+            if valid_time_str not in forecasts_by_time:
+                forecasts_by_time[valid_time_str] = {
+                    "locations": [],
+                    "maxSwell": 0
+                }
+            forecast = {"lon": row.lon, "lat": row.lat,
+                        "swell": row.avg_swell}
+            forecasts_by_time[valid_time_str]["locations"].append(forecast)
+            forecasts_by_time[valid_time_str]["maxSwell"] = max(
+                forecasts_by_time[valid_time_str]["maxSwell"], row.avg_swell)
+
+        redis_client.set(cache_key, json.dumps(forecasts_by_time), ex=86400)
+
+        return forecasts_by_time
 
 
 # Celery Worker Status

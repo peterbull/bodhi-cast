@@ -30,6 +30,7 @@ bs4 = "^0.0.1"
 debugpy = "^1.8.0"
 click = "^8.1.7"
 geoalchemy2 = "^0.14.2"
+cachetools = "^5.3.2"
 
 
 
