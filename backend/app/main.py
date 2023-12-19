@@ -167,29 +167,35 @@ def get_forecasts_gridded(date: str, degrees: str, db: Session = Depends(get_db)
                 ST_X(ST_SnapToGrid(location::geometry, :degrees)) AS lon,
                 ST_Y(ST_SnapToGrid(location::geometry, :degrees)) AS lat,
                 valid_time,
+                step,
                 AVG(swell) as avg_swell
             FROM wave_forecast
             WHERE valid_time >= :date
-            GROUP BY ST_SnapToGrid(location::geometry, :degrees), valid_time
+            GROUP BY ST_SnapToGrid(location::geometry, :degrees), valid_time, step
             ORDER BY ST_SnapToGrid(location::geometry, :degrees), valid_time;
             """),
             {"date": date, "degrees": int(degrees)})
 
         rows = result.all()
         # Group forecasts by valid_time
-        forecasts_by_time = {}
+        forecasts_by_time = []
         for row in rows:
             valid_time_str = row.valid_time.isoformat()
-            if valid_time_str not in forecasts_by_time:
-                forecasts_by_time[valid_time_str] = {
-                    "locations": [],
-                    "maxSwell": 0
+            forecast_data = next(
+                (item for item in forecasts_by_time if item["time"] == valid_time_str), None)
+            if not forecast_data:
+                forecast_data = {
+                    "time": valid_time_str,
+                    "step": row.step.total_seconds(),
+                    "maxSwell": row.avg_swell or 0,
+                    "locations": []
                 }
-            forecast = {"lon": row.lon, "lat": row.lat,
-                        "swell": row.avg_swell}
-            forecasts_by_time[valid_time_str]["locations"].append(forecast)
-            forecasts_by_time[valid_time_str]["maxSwell"] = max(
-                forecasts_by_time[valid_time_str]["maxSwell"], row.avg_swell)
+                forecasts_by_time.append(forecast_data)
+            forecast = {"lon": row.lon, "lat": row.lat, "swell": row.avg_swell}
+            forecast_data["locations"].append(forecast)
+            if row.avg_swell is not None:
+                forecast_data["maxSwell"] = max(
+                    forecast_data["maxSwell"] or 0, row.avg_swell)
 
         redis_client.set(cache_key, json.dumps(forecasts_by_time), ex=86400)
 

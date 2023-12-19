@@ -10,7 +10,8 @@ import iconRetina from "leaflet/dist/images/marker-icon-2x.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import L from "leaflet";
 import Globe from "react-globe.gl";
-import GlobeSwell from "./components/GlobeSwell";
+// import GlobeSwell from "./components/GlobeSwell";
+import { json } from "stream/consumers";
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: iconRetina,
@@ -25,22 +26,21 @@ export interface Coord {
 }
 
 export interface SwellData {
-  locations: Coord[];
-  maxSwell: number;
+  [key: string]: {
+    locations: Coord[];
+    maxSwell: number;
+  };
 }
 
 function App() {
-  const [swellData, setSwellData] = useState<SwellData>({
-    locations: [],
-    maxSwell: 0,
-  });
+  const [swellData, setSwellData] = useState<SwellData>({});
   useEffect(() => {
     const fetchSwell = async () => {
       try {
-        const date = "20231216";
-        const degrees = "1";
+        const date = "20231218";
+        const degrees = "5";
         const res = await fetch(
-          `http://localhost:8000/locations/gridded/${degrees}/${date}`
+          `http://localhost:8000/forecasts/gridded/${degrees}/${date}`
         );
         const data = await res.json();
         setSwellData(data);
@@ -72,7 +72,8 @@ function App() {
     //       })}
     //   </MapContainer>
     */}
-      {swellData.locations.length > 0 && <GlobeSwell {...swellData} />}
+      {Object.keys(swellData).length > 0 && <p>{JSON.stringify(swellData)}</p>}
+      {/* {swellData.locations.length > 0 && <GlobeSwell {...swellData} />} */}
     </div>
   );
 }
