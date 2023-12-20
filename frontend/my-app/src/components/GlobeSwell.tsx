@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Globe from "react-globe.gl";
-import globeImageUrl from "../img/earth-dark.jpg";
+import globeImageUrl from "../img/earth-blue-marble.jpg";
 import { SwellData } from "../App";
 
 const GlobeSwell: React.FC<{ swellData: SwellData }> = ({ swellData }) => {
