@@ -1,8 +1,6 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 
-import { MapContainer, Marker, TileLayer, Popup } from "react-leaflet";
-
 //CSS and marker image fix for Leaflet map
 import "leaflet/dist/leaflet.css";
 import Globe from "react-globe.gl";
@@ -24,11 +22,15 @@ export interface SwellData {
 
 function App() {
   const [swellData, setSwellData] = useState<SwellData[]>([]);
+  const [currentComponent, setCurrentComponent] = useState<
+    "SwellMap" | "GlobeSwell" | null
+  >(null);
+
   useEffect(() => {
     const fetchSwell = async () => {
       try {
         const date = "20231218";
-        const degrees = "20";
+        const degrees = "5";
         const res = await fetch(
           `http://localhost:8000/forecasts/gridded/${degrees}/${date}`
         );
@@ -44,9 +46,26 @@ function App() {
 
   return (
     <div>
-      {swellData.length > 0 && <SwellMap swellData={swellData[0]} />}
-      {/* {Object.keys(swellData).length > 0 && <p>{JSON.stringify(swellData)}</p>} */}
-      {/* {swellData.length > 0 && <GlobeSwell swellData={swellData} />} */}
+      <button
+        onClick={() => {
+          setCurrentComponent("SwellMap");
+        }}
+      >
+        Show Swell Map
+      </button>
+      <button
+        onClick={() => {
+          setCurrentComponent("GlobeSwell");
+        }}
+      >
+        Show Globe Swell Map
+      </button>
+      {swellData.length > 0 && currentComponent === "SwellMap" && (
+        <SwellMap swellData={swellData[0]} />
+      )}
+      {swellData.length > 0 && currentComponent === "GlobeSwell" && (
+        <GlobeSwell swellData={swellData[0]} />
+      )}
     </div>
   );
 }
