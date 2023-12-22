@@ -5,8 +5,11 @@ services:
     build:
       context: ./frontend
       dockerfile: frontend.dockerfile
+    volumes:
+      - ./frontend:/usr/src/app
     ports:
-      - "80:80"
+      - "3000:3000" # Development
+      # - "80:80" # Production
     depends_on:
       - backend
   
@@ -43,6 +46,8 @@ services:
 
   redis:
     image: redis
+    volumes:
+      - redis_data:/data
     ports:
       - "6379:6379"
 
@@ -65,3 +70,4 @@ services:
 
 volumes:
   db_data:
+  redis_data:
