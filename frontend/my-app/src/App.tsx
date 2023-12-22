@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import Globe from "react-globe.gl";
 import GlobeSwell from "./components/GlobeSwell";
 import SwellMap from "./components/SwellMap";
+import GlobeBump from "./components/GlobeBump";
 
 export interface Coord {
   lat: number;
@@ -23,7 +24,7 @@ export interface SwellData {
 function App() {
   const [swellData, setSwellData] = useState<SwellData[]>([]);
   const [currentComponent, setCurrentComponent] = useState<
-    "SwellMap" | "GlobeSwell" | null
+    "SwellMap" | "GlobeSwell" | "GlobeBump" | null
   >(null);
 
   useEffect(() => {
@@ -60,11 +61,21 @@ function App() {
       >
         Show Globe Swell Map
       </button>
+      <button
+        onClick={() => {
+          setCurrentComponent("GlobeBump");
+        }}
+      >
+        Show Globe Bump Map
+      </button>
       {swellData.length > 0 && currentComponent === "SwellMap" && (
         <SwellMap swellData={swellData[0]} />
       )}
       {swellData.length > 0 && currentComponent === "GlobeSwell" && (
         <GlobeSwell swellData={swellData[0]} />
+      )}
+      {swellData.length > 0 && currentComponent === "GlobeBump" && (
+        <GlobeBump swellData={swellData[0]} />
       )}
     </div>
   );
