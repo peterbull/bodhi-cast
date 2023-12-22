@@ -1,7 +1,16 @@
 version: '3.1'
 
 services:
-  web:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+  
+  backend:
     build: 
       context: ./backend
       dockerfile: backend.dockerfile
@@ -43,7 +52,7 @@ services:
       dockerfile: backend.dockerfile
     command: celery -A app.main.celery_app worker --loglevel=info
     depends_on:
-      - web
+      - backend
       - redis
       
   celery-beat:
