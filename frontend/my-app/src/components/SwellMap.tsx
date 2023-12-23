@@ -15,7 +15,10 @@ L.Icon.Default.mergeOptions({
 const SwellMap: React.FC<{ swellData: SwellData }> = ({ swellData }) => {
   return (
     <MapContainer center={[36.83054488384606, -75.96902159539191]} zoom={13}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        noWrap={true}
+      />
       {swellData.locations.length > 0 &&
         swellData.locations.slice(0, 100).map((coord: Coord) => {
           return (

@@ -202,6 +202,21 @@ def get_forecasts_gridded(date: str, degrees: str, db: Session = Depends(get_db)
         return forecasts_by_time
 
 
+@app.get("/forecasts/swell")
+def get_swell_forecasts(db: Session = Depends(get_db)):
+    result = db.execute(text(
+        """
+        SELECT
+            latitude, longitude, valid_time, step, swell
+        FROM wave_forecast
+        WHERE swell IS NOT NULL
+        ORDER BY valid_time;
+        """
+    ))
+    rows = result.all()
+    return [row._asdict for row in rows]
+
+
 # Celery Worker Status
 
 
