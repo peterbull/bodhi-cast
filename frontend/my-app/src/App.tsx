@@ -7,6 +7,7 @@ import Globe from "react-globe.gl";
 import GlobeSwell from "./components/GlobeSwell";
 import SwellMap from "./components/SwellMap";
 import GlobeBump from "./components/GlobeBump";
+import GlobeSpots from "./components/GlobeSpots";
 
 export interface Coord {
   lat: number;
@@ -23,14 +24,13 @@ export interface SwellData {
 
 function App() {
   const [swellData, setSwellData] = useState<SwellData[]>([]);
-  const [currentComponent, setCurrentComponent] = useState<
-    "SwellMap" | "GlobeSwell" | "GlobeBump" | null
-  >(null);
+  const [spots, setSpots] = useState<any>([]);
+  const [currentComponent, setCurrentComponent] = useState<any>(null);
 
   useEffect(() => {
     const fetchSwell = async () => {
       try {
-        const date = "20231218";
+        const date = "20231224";
         const degrees = "5";
         const res = await fetch(
           `http://localhost:8000/forecasts/gridded/${degrees}/${date}`
@@ -42,7 +42,18 @@ function App() {
       }
     };
 
+    const fetchAllSpots = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/spots");
+        const data = await res.json();
+        setSpots(data);
+      } catch (error) {
+        console.error("Error fetching spot data:", error);
+      }
+    };
+
     fetchSwell();
+    fetchAllSpots();
   }, []);
 
   return (
@@ -68,6 +79,14 @@ function App() {
       >
         Show Globe Bump Map
       </button>
+      <button
+        onClick={() => {
+          setCurrentComponent("GlobeSpots");
+        }}
+      >
+        Show Globe Spot Map
+      </button>
+
       {swellData.length > 0 && currentComponent === "SwellMap" && (
         <SwellMap swellData={swellData[0]} />
       )}
@@ -76,6 +95,9 @@ function App() {
       )}
       {swellData.length > 0 && currentComponent === "GlobeBump" && (
         <GlobeBump swellData={swellData[0]} />
+      )}
+      {spots.length > 0 && currentComponent === "GlobeSpots" && (
+        <GlobeSpots spots={spots} />
       )}
     </div>
   );
