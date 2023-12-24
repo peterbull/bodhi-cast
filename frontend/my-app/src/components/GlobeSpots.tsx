@@ -6,6 +6,7 @@ import globeEarthTopology from "../img/earth-topology.png";
 import globeEarthNightSky from "../img/night-sky.png";
 import { SwellData } from "../App";
 import * as THREE from "three";
+// import { tween } from "d3.transition";
 
 const globeMaterial = new THREE.MeshPhongMaterial();
 globeMaterial.bumpScale = 10;
@@ -25,6 +26,15 @@ const GlobeSpots: React.FC<any> = ({ spots }) => {
     directionalLight && directionalLight.position.set(1, 1, 1); // change light position to see the specularMap's effect
   }, []);
 
+  useEffect(() => {
+    globeEl.current.pointOfView({
+      lat: spots[0].latitude,
+      lng: spots[0].longitude,
+    });
+    globeEl.current.controls().autoRotate = true;
+    globeEl.current.controls().autoRotateSpeed = -0.025;
+  });
+
   return (
     <Globe
       ref={globeEl}
@@ -37,13 +47,23 @@ const GlobeSpots: React.FC<any> = ({ spots }) => {
       labelLng="longitude"
       labelText="spot_name"
       labelSize={0.0}
-      labelDotRadius={0.3}
+      labelDotRadius={0.4}
       labelColor={() => "rgba(164, 255, 61, 0.5)"}
       labelLabel={(spot: any) =>
         `<div>
-          <b>${spot.street_address}</b>
+          <b>${spot.spot_name}</b>
         </div>`
       }
+      onLabelClick={(label: any) => {
+        globeEl.current.pointOfView(
+          {
+            lat: label.latitude,
+            lng: label.longitude,
+            altitude: 0.25,
+          },
+          2500
+        );
+      }}
     />
   );
 };
