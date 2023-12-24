@@ -11,7 +11,7 @@ import redis
 from celery import Celery
 from celery.schedules import crontab
 
-from app.db.database import get_db, create_tables, engine
+from app.db.database import get_db, create_tables, engine, add_spots
 from app.data.noaa.wavewatch import Wavewatch
 
 
@@ -45,7 +45,8 @@ celery_app.conf.beat_schedule = {
         # 'schedule': crontab(minute='17', hour='19'), # Variable debug run
     }
 }
-
+# Add spots to spots table
+add_spots()
 # Celery tasks
 
 
