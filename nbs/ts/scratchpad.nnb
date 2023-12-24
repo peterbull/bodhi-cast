@@ -547,9 +547,16 @@
             ]
         },
         {
+            "language": "javascript",
+            "source": [
+                "const spots = {\n  _id: 1,\n  coordinates: [6.83055459542353, -75.96764801341773],\n  spot_name: \"First Street Jetty\",\n  street_address: \"100 2nd St, Virginia Beach, VA 23451\"\n};"
+            ],
+            "outputs": []
+        },
+        {
             "language": "typescript",
             "source": [
-                "const maxWeight = gData.reduce((max, obj) => obj.weight > max ? obj.weight : max, 0);\nmaxWeight;\n"
+                "spots"
             ],
             "outputs": [
                 {
@@ -557,28 +564,16 @@
                         {
                             "mime": "text/plain",
                             "value": [
-                                "\u001b[33m0.9996819459676758\u001b[39m"
+                                "{",
+                                "  _id: \u001b[33m1\u001b[39m,",
+                                "  coordinates: [",
+                                "    \u001b[33m6.83055459542353\u001b[39m,",
+                                "    \u001b[33m-75.96764801341773\u001b[39m",
+                                "  ],",
+                                "  spot_name: \u001b[32m'First Street Jetty'\u001b[39m,",
+                                "  street_address: \u001b[32m'100 2nd St, Virginia Beach, VA 23451'\u001b[39m",
+                                "}"
                             ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "language": "typescript",
-            "source": [
-                "const fetch = require('node-fetch');\n\nconst date = '20231216'; \n\nfetch(`http://localhost:8000/locations/${date}`)\n  .then(response => response.json())\n  .then(data => console.log(data))\n  .catch(error => console.error('Error:', error));"
-            ],
-            "outputs": [
-                {
-                    "items": [
-                        {
-                            "mime": "application/vnd.code.notebook.error",
-                            "value": {
-                                "name": "Error",
-                                "message": "Cannot find module 'node-fetch'\nRequire stack:\n- <repl>",
-                                "stack": "    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:1144:15)\n    at Function.Module._resolveFilename.sharedData.moduleResolveFilenameHook.installedValue [as _resolveFilename] (/home/pete-00/.vscode-server-insiders/extensions/donjayamanne.typescript-notebook-2.0.6/resources/scripts/node_modules/@cspotcode/source-map-support/source-map-support.js:679:30)\n    at Function.Module._load (node:internal/modules/cjs/loader:985:27)\n    at Function._._load (/home/pete-00/.vscode-server-insiders/extensions/donjayamanne.typescript-notebook-2.0.6/out/extension/server/index.js:2:115372)\n    at Module.require (node:internal/modules/cjs/loader:1235:19)\n    at require (node:internal/modules/helpers:176:18)\n    at <Cell 5> [1, 0]\n    at <Cell 5> [9, 46]\n    at Script.runInContext (node:vm:133:12)\n    at Script.runInNewContext (node:vm:138:17)"
-                            }
                         }
                     ]
                 }

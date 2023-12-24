@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, Integer, String, JSON, DateTime, Interval
+from sqlalchemy import Column, Float, Integer, String, DateTime, Interval
 from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base
 from geoalchemy2 import Geography
@@ -31,3 +31,12 @@ class WaveForecast(Base):
     swper = Column(Float)  # Mean period of swell waves
     entry_created = Column(DateTime(timezone=True), default=func.now())
     entry_updated = Column(DateTime(timezone=True), onupdate=func.now())
+
+
+class Spots(Base):
+    __tablename__ = "spots"
+    id = Column(Integer, primary_key=True)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    spot_name = Column(String(255))
+    street_address = Column(String(255))
