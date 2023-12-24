@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Float, Integer, String, DateTime, Interval
 from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.inspection import inspect
+
 from geoalchemy2 import Geography
 
 
@@ -40,3 +42,6 @@ class Spots(Base):
     longitude = Column(Float)
     spot_name = Column(String(255))
     street_address = Column(String(255))
+
+    def as_dict(self):
+        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}

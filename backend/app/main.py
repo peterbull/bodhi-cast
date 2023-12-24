@@ -13,6 +13,7 @@ from celery.schedules import crontab
 
 from app.db.database import get_db, create_tables, engine, add_spots
 from app.data.noaa.wavewatch import Wavewatch
+from app.models.models import Spots
 
 
 create_tables()
@@ -217,6 +218,10 @@ def get_swell_forecasts(db: Session = Depends(get_db)):
     rows = result.all()
     return [row._asdict for row in rows]
 
+@app.get("/spots")
+def get_all_spots(db: Session = Depends(get_db)):
+    spots = db.query(Spots).all()
+    return [spot.as_dict() for spot in spots]
 
 # Celery Worker Status
 
