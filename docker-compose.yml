@@ -1,17 +1,19 @@
 version: '3.1'
 
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: frontend.dockerfile
-    volumes:
-      - ./frontend:/usr/src/app
-    ports:
-      - "3000:3000" # Development
-      # - "80:80" # Production
-    depends_on:
-      - backend
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: frontend.dockerfile
+  #   volumes:
+  #     - ./frontend:/usr/src/app
+  #   ports:
+  #     - "3000:3000" # Development
+  #     # - "80:80" # Production
+  #   environment:
+  #     CHOKIDAR_USEPOLLING: "true"
+  #   depends_on:
+  #     - backend
   
   backend:
     build: 

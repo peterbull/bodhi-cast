@@ -39,7 +39,7 @@
                 "PYTHONPATH": "${workspaceFolder}/backend:${env:PYTHONPATH}"
             }
         },
-       {
+        {
             "name": "Docker: Attach to FastAPI",
             "type": "python",
             "request": "attach",
@@ -52,7 +52,7 @@
                 }
             ]
         },
-       {
+        {
             "name": "Docker: Attach to Celery",
             "type": "python",
             "request": "attach",
@@ -65,7 +65,15 @@
                 }
             ]
         },
-        
-        
+        {
+            "name": "Docker: Attach to React",
+            "type": "node",
+            "request": "attach",
+            "port": 3000,
+            "address": "localhost",
+            "localRoot": "${workspaceFolder}/frontend",
+            "remoteRoot": "/app",
+            // "protocol": "inspector",
+        },
     ]
 }
