@@ -31,8 +31,6 @@ const GlobeSpots: React.FC<any> = ({ spots }) => {
       lat: spots[0].latitude,
       lng: spots[0].longitude,
     });
-    globeEl.current.controls().autoRotate = true;
-    globeEl.current.controls().autoRotateSpeed = -0.025;
   });
 
   return (

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import Globe from "react-globe.gl";
 import GlobeSpots from "./components/GlobeSpots";
+import { ComponentMapProvider } from "./contexts/ComponentMapProvider";
 
 export interface Coord {
   lat: number;
@@ -50,7 +51,11 @@ function App() {
     fetchAllSpots();
   }, []);
 
-  return <div>{spots.length > 0 && <GlobeSpots spots={spots} />}</div>;
+  return (
+    <ComponentMapProvider>
+      <div>{spots.length > 0 && <GlobeSpots spots={spots} />}</div>
+    </ComponentMapProvider>
+  );
 }
 
 export default App;

@@ -19,19 +19,6 @@ const SwellMap: React.FC<{ swellData: SwellData }> = ({ swellData }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         noWrap={true}
       />
-      {swellData.locations.length > 0 &&
-        swellData.locations.slice(0, 100).map((coord: Coord) => {
-          return (
-            <Marker
-              key={`${coord.lat}-${coord.lon}`}
-              position={[coord.lat, coord.lon]}
-            >
-              <Popup key={`${coord.lat}-${coord.lon}`}>
-                {`Lat: ${coord.lat}, Lon: ${coord.lon}`}
-              </Popup>
-            </Marker>
-          );
-        })}
     </MapContainer>
   );
 };

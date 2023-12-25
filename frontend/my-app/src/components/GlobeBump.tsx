@@ -4,7 +4,7 @@ import globeImageUrl from "../img/earth-blue-marble.jpg";
 import globeSpecularMap from "../img/earth-water.png";
 import globeEarthTopology from "../img/earth-topology.png";
 import globeEarthNightSky from "../img/night-sky.png";
-import { SwellData } from "../App";
+// import { SwellData } from "../App";
 import * as THREE from "three";
 
 const globeMaterial = new THREE.MeshPhongMaterial();
@@ -15,7 +15,7 @@ new THREE.TextureLoader().load(globeSpecularMap, (texture) => {
   globeMaterial.shininess = 15;
 });
 
-const GlobeBump: React.FC<{ swellData: SwellData }> = ({ swellData }) => {
+const GlobeBump: any = ({ swellData }: any) => {
   const globeEl = useRef<any>();
 
   useEffect(() => {

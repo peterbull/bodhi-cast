@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
-import { SwellData } from "../App";
+// import { SwellData } from "../App";
 
-const GlobeSwell: React.FC<{ swellData: SwellData }> = ({ swellData }) => {
+const GlobeSwell: any = ({ swellData }: any) => {
   return (
     <Globe
       globeImageUrl={globeImageUrl}
