@@ -1,9 +1,5 @@
 import { MapContainer, TileLayer, Popup, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import iconMarker from "leaflet/dist/images/marker-icon.png";
-import iconRetina from "leaflet/dist/images/marker-icon-2x.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import L from "leaflet";
 import React from "react";
 
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
@@ -14,12 +10,6 @@ const SwellMap: React.FC<any> = ({ currentSpot }) => {
     currentSpot.latitude,
     currentSpot.longitude,
   ];
-
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: iconRetina,
-    iconUrl: iconMarker,
-    shadowUrl: iconShadow,
-  });
 
   return (
     <MapContainer center={spotCoords} zoom={13}>
