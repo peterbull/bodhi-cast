@@ -36,6 +36,7 @@ const GlobeSpots: React.FC<any> = ({
       globeEl.current.pointOfView({
         lat: spots[0].latitude,
         lng: spots[0].longitude,
+        altitude: 1.8,
       });
     }
   });
@@ -52,7 +53,7 @@ const GlobeSpots: React.FC<any> = ({
       labelLng="longitude"
       labelText="spot_name"
       labelSize={0.0}
-      labelDotRadius={0.4}
+      labelDotRadius={0.5}
       labelColor={() => "rgba(164, 255, 61, 0.5)"}
       labelLabel={(spot: any) =>
         `<div>
@@ -64,14 +65,14 @@ const GlobeSpots: React.FC<any> = ({
           {
             lat: label.latitude,
             lng: label.longitude,
-            altitude: 0.25,
+            altitude: 0.1,
           },
           2500
         );
         setCurrentSpot(spots.find((spot: any) => spot.id === label.id));
         setTimeout(() => {
           setCurrentComponent("SwellMap");
-        }, 2800);
+        }, 2500);
       }}
     />
   ) : (
