@@ -11,9 +11,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: iconShadow,
 });
 
-const SwellMap: React.FC<any> = ({ spots }) => {
+const SwellMap: React.FC<any> = ({ currentSpot }) => {
   return (
-    <MapContainer center={[spots.latitude, spots.longitude]} zoom={13}>
+    <MapContainer
+      center={[currentSpot.latitude, currentSpot.longitude]}
+      zoom={13}
+    >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         noWrap={true}

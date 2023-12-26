@@ -20,6 +20,7 @@ export interface SwellData {
 function App() {
   const [swellData, setSwellData] = useState<SwellData[]>([]);
   const [spots, setSpots] = useState([]);
+  const [currentSpot, setCurrentSpot] = useState<any>(null);
 
   useEffect(() => {
     const fetchAllSpots = async () => {
@@ -55,7 +56,12 @@ function App() {
 
   return (
     <ComponentMapProvider>
-      <ComponentWrapper spots={spots} swellData={swellData} />
+      <ComponentWrapper
+        spots={spots}
+        swellData={swellData}
+        currentSpot={currentSpot}
+        setCurrentSpot={setCurrentSpot}
+      />
     </ComponentMapProvider>
   );
 }

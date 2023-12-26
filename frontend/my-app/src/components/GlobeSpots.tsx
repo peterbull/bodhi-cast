@@ -16,7 +16,7 @@ new THREE.TextureLoader().load(globeSpecularMap, (texture) => {
   globeMaterial.shininess = 15;
 });
 
-const GlobeSpots: React.FC<any> = ({ spots }) => {
+const GlobeSpots: React.FC<any> = ({ setCurrentSpot, spots }) => {
   const globeEl = useRef<any>();
   const { componentMap, setComponentMap } = useContext(ComponentMapContext);
 
@@ -67,6 +67,7 @@ const GlobeSpots: React.FC<any> = ({ spots }) => {
           2500
         );
         setTimeout(() => {
+          setCurrentSpot(spots.find((spot: any) => spot.id === label.id));
           setComponentMap(SwellMap);
         }, 2800);
       }}
