@@ -1,8 +1,7 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import Globe from "react-globe.gl";
-import GlobeSpots from "./components/GlobeSpots";
+import ComponentWrapper from "./components/ComponentWrapper";
 import { ComponentMapProvider } from "./contexts/ComponentMapProvider";
 
 export interface Coord {
@@ -20,7 +19,6 @@ export interface SwellData {
 
 function App() {
   const [swellData, setSwellData] = useState<SwellData[]>([]);
-  const [spots, setSpots] = useState<any>([]);
 
   useEffect(() => {
     const fetchSwell = async () => {
@@ -37,23 +35,12 @@ function App() {
       }
     };
 
-    const fetchAllSpots = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/spots");
-        const data = await res.json();
-        setSpots(data);
-      } catch (error) {
-        console.error("Error fetching spot data:", error);
-      }
-    };
-
     fetchSwell();
-    fetchAllSpots();
   }, []);
 
   return (
     <ComponentMapProvider>
-      <div>{spots.length > 0 && <GlobeSpots spots={spots} />}</div>
+      {spots.length > 0 && <ComponentWrapper />}
     </ComponentMapProvider>
   );
 }

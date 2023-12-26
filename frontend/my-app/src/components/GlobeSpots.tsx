@@ -1,12 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
 import globeSpecularMap from "../img/earth-water.png";
 import globeEarthTopology from "../img/earth-topology.png";
 import globeEarthNightSky from "../img/night-sky.png";
-import { SwellData } from "../App";
 import * as THREE from "three";
-// import { tween } from "d3.transition";
 
 const globeMaterial = new THREE.MeshPhongMaterial();
 globeMaterial.bumpScale = 10;
@@ -16,24 +14,43 @@ new THREE.TextureLoader().load(globeSpecularMap, (texture) => {
   globeMaterial.shininess = 15;
 });
 
-const GlobeSpots: React.FC<any> = ({ spots }) => {
+const GlobeSpots: React.FC<any> = () => {
   const globeEl = useRef<any>();
+  const [spots, setSpots] = useState<any>([]);
 
   useEffect(() => {
-    const directionalLight = globeEl.current
-      .lights()
-      .find((obj3d: any) => obj3d.type === "DirectionalLight");
-    directionalLight && directionalLight.position.set(1, 1, 1); // change light position to see the specularMap's effect
+    const fetchAllSpots = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/spots");
+        const data = await res.json();
+        setSpots(data);
+      } catch (error) {
+        console.error("Error fetching spot data:", error);
+      }
+    };
+
+    fetchAllSpots();
   }, []);
 
   useEffect(() => {
-    globeEl.current.pointOfView({
-      lat: spots[0].latitude,
-      lng: spots[0].longitude,
-    });
+    if (globeEl.current) {
+      const directionalLight = globeEl.current
+        .lights()
+        .find((obj3d: any) => obj3d.type === "DirectionalLight");
+      directionalLight && directionalLight.position.set(1, 1, 1); // change light position to see the specularMap's effect
+    }
+  }, []);
+
+  useEffect(() => {
+    if (globeEl.current) {
+      globeEl.current.pointOfView({
+        lat: spots[0].latitude,
+        lng: spots[0].longitude,
+      });
+    }
   });
 
-  return (
+  return spots.length > 0 ? (
     <Globe
       ref={globeEl}
       globeMaterial={globeMaterial}
@@ -63,6 +80,8 @@ const GlobeSpots: React.FC<any> = ({ spots }) => {
         );
       }}
     />
+  ) : (
+    <p>Loading...</p>
   );
 };
 
