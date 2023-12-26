@@ -21,6 +21,8 @@ function App() {
   const [swellData, setSwellData] = useState<SwellData[]>([]);
   const [spots, setSpots] = useState([]);
   const [currentSpot, setCurrentSpot] = useState<any>(null);
+  const [tileData, setTileData] = useState<any>([]);
+  const [zoom, setZoom] = useState<any>(16);
 
   useEffect(() => {
     const fetchAllSpots = async () => {
@@ -54,6 +56,25 @@ function App() {
     fetchSwell();
   }, []);
 
+  useEffect(() => {
+    if (currentSpot) {
+      const fetchTileData = async () => {
+        try {
+          const date = "20231224";
+          const res = await fetch(
+            `http://localhost:8000/forecasts/tiles/${date}/${currentSpot.latitude}/${currentSpot.longitude}/${zoom}`
+          );
+          const data = await res.json();
+          setTileData(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      fetchTileData();
+    }
+  }, [currentSpot, zoom]);
+
   return (
     <ComponentMapProvider>
       <ComponentWrapper
@@ -61,6 +82,9 @@ function App() {
         swellData={swellData}
         currentSpot={currentSpot}
         setCurrentSpot={setCurrentSpot}
+        zoom={zoom}
+        tileData={tileData}
+        tenMCoastline={tenMCoastline}
       />
     </ComponentMapProvider>
   );
