@@ -40,7 +40,7 @@ function App() {
 
   return (
     <ComponentMapProvider>
-      {spots.length > 0 && <ComponentWrapper />}
+      <ComponentWrapper />
     </ComponentMapProvider>
   );
 }
