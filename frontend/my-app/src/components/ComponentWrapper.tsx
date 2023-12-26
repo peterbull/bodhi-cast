@@ -6,7 +6,11 @@ const ComponentWrapper: React.FC<any> = (props: any) => {
   const [currentComponent, setCurrentComponent] = useState("GlobeSpots");
   const CurrentComponent = componentMap[currentComponent];
 
-  return CurrentComponent ? <CurrentComponent {...props} /> : <p>Loading...</p>;
+  return CurrentComponent ? (
+    <CurrentComponent {...props} setCurrentComponent={setCurrentComponent} />
+  ) : (
+    <p>Loading...</p>
+  );
 };
 
 export default ComponentWrapper;
