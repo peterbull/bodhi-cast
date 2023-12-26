@@ -218,6 +218,31 @@ def get_swell_forecasts(db: Session = Depends(get_db)):
     rows = result.all()
     return [row._asdict for row in rows]
 
+
+@app.get("/forecasts/tiles/{date}/{lat}/{lng}/{zoom}")
+def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session = Depends(get_db)):
+    date = datetime.strptime(date, "%Y%m%d").date()
+    zoom_factor = 1 / (float(zoom) / 4)
+    lat_min = float(lat) - zoom_factor
+    lat_max = float(lat) + zoom_factor
+    lng_min = float(lng) - zoom_factor
+    lng_max = float(lng) + zoom_factor
+    result = db.execute(text(
+        """SELECT *
+        FROM wave_forecast
+        WHERE
+            location::geometry && ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326)
+            AND ST_Intersects(
+                location::geometry,
+                ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326));
+                """),
+        {"lng_min": lng_min, "lat_min": lat_min, "lng_max": lng_max, "lat_max": lat_max})
+    rows = result.all()
+    return [row._asdict() for row in rows]
+
+# Get all spots
+
+
 @app.get("/spots")
 def get_all_spots(db: Session = Depends(get_db)):
     spots = db.query(Spots).all()
