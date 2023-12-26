@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { ComponentMapContext } from "../contexts/ComponentMapProvider";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
 import globeSpecularMap from "../img/earth-water.png";
 import globeEarthTopology from "../img/earth-topology.png";
 import globeEarthNightSky from "../img/night-sky.png";
 import * as THREE from "three";
+import SwellMap from "./SwellMap";
 
 const globeMaterial = new THREE.MeshPhongMaterial();
 globeMaterial.bumpScale = 10;
@@ -14,23 +16,9 @@ new THREE.TextureLoader().load(globeSpecularMap, (texture) => {
   globeMaterial.shininess = 15;
 });
 
-const GlobeSpots: React.FC<any> = () => {
+const GlobeSpots: React.FC<any> = ({ spots }) => {
   const globeEl = useRef<any>();
-  const [spots, setSpots] = useState<any>([]);
-
-  useEffect(() => {
-    const fetchAllSpots = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/spots");
-        const data = await res.json();
-        setSpots(data);
-      } catch (error) {
-        console.error("Error fetching spot data:", error);
-      }
-    };
-
-    fetchAllSpots();
-  }, []);
+  const { componentMap, setComponentMap } = useContext(ComponentMapContext);
 
   useEffect(() => {
     if (globeEl.current) {
@@ -78,6 +66,9 @@ const GlobeSpots: React.FC<any> = () => {
           },
           2500
         );
+        setTimeout(() => {
+          setComponentMap(SwellMap);
+        }, 2800);
       }}
     />
   ) : (

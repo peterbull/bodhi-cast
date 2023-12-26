@@ -4,7 +4,6 @@ import iconRetina from "leaflet/dist/images/marker-icon-2x.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import L from "leaflet";
 import React from "react";
-import { SwellData, Coord } from "../App";
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: iconRetina,
@@ -12,9 +11,9 @@ L.Icon.Default.mergeOptions({
   shadowUrl: iconShadow,
 });
 
-const SwellMap: React.FC<{ swellData: SwellData }> = ({ swellData }) => {
+const SwellMap: React.FC<any> = ({ spots }) => {
   return (
-    <MapContainer center={[36.83054488384606, -75.96902159539191]} zoom={13}>
+    <MapContainer center={[spots.latitude, spots.longitude]} zoom={13}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         noWrap={true}

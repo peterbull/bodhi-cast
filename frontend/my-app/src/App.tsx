@@ -19,6 +19,21 @@ export interface SwellData {
 
 function App() {
   const [swellData, setSwellData] = useState<SwellData[]>([]);
+  const [spots, setSpots] = useState([]);
+
+  useEffect(() => {
+    const fetchAllSpots = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/spots");
+        const data = await res.json();
+        setSpots(data);
+      } catch (error) {
+        console.error("Error fetching spot data:", error);
+      }
+    };
+
+    fetchAllSpots();
+  }, []);
 
   useEffect(() => {
     const fetchSwell = async () => {
@@ -40,7 +55,7 @@ function App() {
 
   return (
     <ComponentMapProvider>
-      <ComponentWrapper />
+      <ComponentWrapper spots={spots} swellData={swellData} />
     </ComponentMapProvider>
   );
 }
