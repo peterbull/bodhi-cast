@@ -71,7 +71,7 @@ const GlobeSpots: React.FC<any> = ({
         );
         setCurrentSpot(spots.find((spot: any) => spot.id === label.id));
         setTimeout(() => {
-          setCurrentComponent("SwellMap");
+          setCurrentComponent("SwellMapGl");
         }, 2500);
       }}
     />
