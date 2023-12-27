@@ -26,6 +26,7 @@
                 "<node_internals>/**/*.js",
                 "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
                 "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
+                "${workspaceFolder}/frontend/my-app/node_modules/**/*.mjs",
                 "**/build/*"
             ]
         },
