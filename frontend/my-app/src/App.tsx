@@ -84,7 +84,6 @@ function App() {
         setCurrentSpot={setCurrentSpot}
         zoom={zoom}
         tileData={tileData}
-        tenMCoastline={tenMCoastline}
       />
     </ComponentMapProvider>
   );
