@@ -218,13 +218,17 @@ def get_swell_forecasts(db: Session = Depends(get_db)):
     rows = result.all()
     return [row._asdict for row in rows]
 
+# Get wave forecast data if points fall within a given bounding box
+
 
 @app.get("/forecasts/tiles/{date}/{lat}/{lng}/{zoom}")
 def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session = Depends(get_db)):
     date = datetime.strptime(date, "%Y%m%d").date()
-    zoom_factor = 1 / (float(zoom) / 4)
-    lat_min = float(lat) - zoom_factor
-    lat_max = float(lat) + zoom_factor
+    # To do: Find an equation that returns proportionally at all zoom levels
+    # Current: A placeholder that will only really work with values near the default `zoom`
+    zoom_factor = float(zoom) / 7.5
+    lat_min = float(lat) - (zoom_factor / 2)
+    lat_max = float(lat) + (zoom_factor / 2)
     lng_min = float(lng) - zoom_factor
     lng_max = float(lng) + zoom_factor
     result = db.execute(text(
