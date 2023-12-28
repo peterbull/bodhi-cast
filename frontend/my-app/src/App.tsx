@@ -22,7 +22,7 @@ function App() {
   const [spots, setSpots] = useState([]);
   const [currentSpot, setCurrentSpot] = useState<any>(null);
   const [tileData, setTileData] = useState<any>([]);
-  const [zoom, setZoom] = useState<any>(16);
+  const [zoom, setZoom] = useState<any>(15);
 
   useEffect(() => {
     const fetchAllSpots = async () => {
