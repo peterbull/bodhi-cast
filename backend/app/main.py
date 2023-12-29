@@ -244,6 +244,35 @@ def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session 
     rows = result.all()
     return [row._asdict() for row in rows]
 
+# Find the nearest point in the db to the spot
+# Swell is null at land points, so they are excluded from the search
+
+
+@app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}/")
+def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
+    date = datetime.strptime(date, "%Y%m%d").date()
+    spot_lat = float(spot_lat)
+    spot_lng = float(spot_lng)
+
+    result = db.execute(text(
+        """
+        SELECT *
+        FROM wave_forecast
+        WHERE
+            valid_time = :date
+            AND swell IS NOT NULL
+        ORDER BY ST_Distance(
+            ST_MakePoint(longitude, latitude),
+            ST_MakePoint(:spot_lng, :spot_lat)
+        )
+        LIMIT 1;
+        """),
+        {"date": date, "spot_lat": spot_lat, "spot_lng": spot_lng})
+
+    row = result.first()
+    return row._asdict() if row else {}
+
+
 # Get all spots
 
 
