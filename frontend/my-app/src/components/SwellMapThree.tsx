@@ -1,37 +1,32 @@
-import { useFrame } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Map from "react-map-gl/maplibre";
 // import { Canvas } from "react-three-map/maplibre";
-import { Canvas } from "react-three-map"; // if you are using MapBox
+import { Canvas, Coordinates } from "react-three-map";
 
-function Box(props: any) {
-  // This reference will give us direct access to the mesh
+function SimpleBox() {
   const meshRef = useRef<any>();
-  // Set up state for the hovered and active state
   const [hovered, setHover] = useState(false);
-  const [active, setActive] = useState(false);
-  // Subscribe this component to the render-loop, rotate the mesh every frame
-  useFrame((state, delta) => (meshRef.current.rotation.x += delta));
-  // Return view, these are regular three.js elements expressed in JSX
+
   return (
     <mesh
-      {...props}
       ref={meshRef}
-      scale={active ? 1.5 : 1}
-      onClick={(event) => setActive(!active)}
-      onPointerOver={(event) => setHover(true)}
-      onPointerOut={(event) => setHover(false)}
+      scale={hovered ? 1.5 : 1}
+      onPointerOver={() => setHover(true)}
+      onPointerOut={() => setHover(false)}
     >
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={hovered ? "hotpink" : "orange"} />
+      <boxGeometry args={[10, 10, 10]} />
+      <meshStandardMaterial color={"white"} />
     </mesh>
   );
 }
 
 const SwellMapThree: React.FC<any> = ({ currentSpot, tileData, zoom }) => {
+  const mapRef = useRef<any>();
+
   return (
     <Map
-      mapLib={import("mapbox-gl")}
+      ref={mapRef}
+      // mapLib={import("mapbox-gl")}
       initialViewState={{
         latitude: currentSpot.latitude,
         longitude: currentSpot.longitude,
@@ -42,11 +37,25 @@ const SwellMapThree: React.FC<any> = ({ currentSpot, tileData, zoom }) => {
       mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
     >
       <Canvas latitude={currentSpot.latitude} longitude={currentSpot.longitude}>
-        <hemisphereLight args={["#ffffff", "#60666C"]} position={[1, 4.5, 3]} />
-        <object3D scale={100}>
-          <Box position={[-1.2, 1, 0]} />
-          <Box position={[1.2, 1, 0]} />
-        </object3D>
+        <Coordinates
+          latitude={currentSpot.latitude}
+          longitude={currentSpot.longitude}
+        >
+          <SimpleBox />
+        </Coordinates>
+        {tileData.map((data: any) => {
+          console.log(data.latitude, data.longitude, data.id);
+          return (
+            // Added return statement here
+            <Coordinates
+              key={data.id} // Ensure key prop is unique for each child
+              latitude={data.latitude}
+              longitude={data.longitude}
+            >
+              <SimpleBox key={`box-${data.id}`} />
+            </Coordinates>
+          );
+        })}
       </Canvas>
     </Map>
   );

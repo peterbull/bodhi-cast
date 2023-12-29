@@ -42,39 +42,41 @@ const GlobeSpots: React.FC<any> = ({
   });
 
   return spots.length > 0 ? (
-    <Globe
-      ref={globeEl}
-      globeMaterial={globeMaterial}
-      globeImageUrl={globeImageUrl}
-      bumpImageUrl={globeEarthTopology}
-      backgroundImageUrl={globeEarthNightSky}
-      labelsData={spots}
-      labelLat="latitude"
-      labelLng="longitude"
-      labelText="spot_name"
-      labelSize={0.0}
-      labelDotRadius={0.5}
-      labelColor={() => "rgba(164, 255, 61, 0.5)"}
-      labelLabel={(spot: any) =>
-        `<div>
+    <>
+      <Globe
+        ref={globeEl}
+        globeMaterial={globeMaterial}
+        globeImageUrl={globeImageUrl}
+        bumpImageUrl={globeEarthTopology}
+        backgroundImageUrl={globeEarthNightSky}
+        labelsData={spots}
+        labelLat="latitude"
+        labelLng="longitude"
+        labelText="spot_name"
+        labelSize={0.0}
+        labelDotRadius={0.5}
+        labelColor={() => "rgba(164, 255, 61, 0.5)"}
+        labelLabel={(spot: any) =>
+          `<div>
           <b>${spot.spot_name}</b>
         </div>`
-      }
-      onLabelClick={(label: any) => {
-        globeEl.current.pointOfView(
-          {
-            lat: label.latitude,
-            lng: label.longitude,
-            altitude: 0.1,
-          },
-          2500
-        );
-        setCurrentSpot(spots.find((spot: any) => spot.id === label.id));
-        setTimeout(() => {
-          setCurrentComponent("SwellMapThree");
-        }, 2500);
-      }}
-    />
+        }
+        onLabelClick={(label: any) => {
+          globeEl.current.pointOfView(
+            {
+              lat: label.latitude,
+              lng: label.longitude,
+              altitude: 0.1,
+            },
+            2500
+          );
+          setCurrentSpot(spots.find((spot: any) => spot.id === label.id));
+          setTimeout(() => {
+            setCurrentComponent("SwellMap");
+          }, 2500);
+        }}
+      />
+    </>
   ) : (
     <p>Loading...</p>
   );
