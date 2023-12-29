@@ -9,4 +9,10 @@ spots = [{
     "longitude": -117.56709607562253,
     "spot_name": "San Onofre State Beach",
     "street_address": "Beach Club Rd, San Clemente, CA 92672"
+},
+    {
+    "latitude": 36.69435032676719,
+    "longitude": -75.92244365210605,
+    "spot_name": "Sandbridge Beach",
+    "street_address": "3820 Sandpiper Rd, Virginia Beach, VA 23456"
 }]

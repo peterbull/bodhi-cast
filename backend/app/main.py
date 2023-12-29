@@ -40,7 +40,8 @@ celery_app.conf.broker_connection_retry_on_startup = True
 
 celery_app.conf.beat_schedule = {
     'fetch-transform-commit-noaa-data-daily': {
-        'task': 'app.main.noaa_update',
+        'task': 'app.main.noaa_sample',
+        'args': (24,),
         # Runs daily at 7am UTC 2am EST
         'schedule': crontab(minute='0', hour='7'),
         # 'schedule': crontab(minute='17', hour='19'), # Variable debug run
