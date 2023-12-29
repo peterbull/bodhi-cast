@@ -49,11 +49,6 @@ const SwellMap: React.FC<any> = ({
           </Marker>
         </MapContainer>
       </div>
-      {spotForecast.length > 0 ? (
-        <p>{JSON.stringify(spotForecast[0])} Loaded Successfully</p>
-      ) : (
-        <p>Loading Spot Forecast...</p>
-      )}
       {tileData.length > 0 ? (
         <div className="w-1/2 h-screen bg-gray-50">
           <h1 className="text-3xl font-thin text-center">
