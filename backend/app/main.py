@@ -1,9 +1,9 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import extract, select, text
+from sqlalchemy import extract, select, text, and_
 from sqlalchemy.orm import Session
 
 import redis
@@ -13,7 +13,7 @@ from celery.schedules import crontab
 
 from app.db.database import get_db, create_tables, engine, add_spots
 from app.data.noaa.wavewatch import Wavewatch
-from app.models.models import Spots
+from app.models.models import Spots, WaveForecast
 
 
 create_tables()
@@ -244,34 +244,47 @@ def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session 
     rows = result.all()
     return [row._asdict() for row in rows]
 
-# Find the nearest point in the db to the spot
-# Swell is null at land points, so they are excluded from the search
+# Find the nearest point in the db to the spot, then return all forecast items for that day
+# Swell is null at landlocked areas, so excluding it ensures the selected point is at sea
 
 
 @app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}/")
 def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
     date = datetime.strptime(date, "%Y%m%d").date()
+    next_day = date + timedelta(days=1)
     spot_lat = float(spot_lat)
     spot_lng = float(spot_lng)
 
-    result = db.execute(text(
-        """
+    sql = text("""
+        WITH closest_point AS (
+            SELECT latitude, longitude
+            FROM wave_forecast
+            WHERE
+                valid_time >= :date
+                AND valid_time < :next_day
+                AND swell IS NOT NULL
+            ORDER BY ST_Distance(
+                ST_MakePoint(longitude, latitude),
+                ST_MakePoint(:spot_lng, :spot_lat)
+            )
+            LIMIT 1
+        )
         SELECT *
         FROM wave_forecast
         WHERE
-            valid_time = :date
+            valid_time >= :date
+            AND valid_time < :next_day
             AND swell IS NOT NULL
-        ORDER BY ST_Distance(
-            ST_MakePoint(longitude, latitude),
-            ST_MakePoint(:spot_lng, :spot_lat)
-        )
-        LIMIT 1;
-        """),
-        {"date": date, "spot_lat": spot_lat, "spot_lng": spot_lng})
+            AND latitude = (SELECT latitude FROM closest_point)
+            AND longitude = (SELECT longitude FROM closest_point)
+        ORDER BY valid_time;
+    """)
 
-    row = result.first()
-    return row._asdict() if row else {}
+    result = db.execute(sql, {"date": date, "next_day": next_day,
+                        "spot_lat": spot_lat, "spot_lng": spot_lng})
 
+    rows = result.all()
+    return [row._asdict() for row in rows]
 
 # Get all spots
 
