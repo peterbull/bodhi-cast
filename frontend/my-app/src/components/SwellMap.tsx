@@ -21,29 +21,38 @@ const SwellMap: React.FC<any> = ({ currentSpot, tileData, zoom }) => {
   ];
 
   return (
-    <MapContainer center={spotCoords} zoom={zoom}>
-      <TileLayer
-        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
-        noWrap={true}
-      />
-      <Marker
-        position={spotCoords}
-        icon={
-          new Icon({
-            iconUrl: markerIconPng,
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-          })
-        }
-      >
-        <Popup position={spotCoords} offset={[0, -41]}>
+    <div className="flex">
+      <div className="w-1/2 h-screen">
+        <MapContainer center={spotCoords} zoom={zoom}>
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+            noWrap={true}
+          />
+          <Marker
+            position={spotCoords}
+            icon={
+              new Icon({
+                iconUrl: markerIconPng,
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+              })
+            }
+          >
+            <Popup position={spotCoords} offset={[0, -41]}>
+              {currentSpot.spot_name}
+              <br />
+              {currentSpot.latitude}, {currentSpot.longitude}
+            </Popup>
+          </Marker>
+        </MapContainer>
+      </div>
+      <div className="w-1/2 h-screen bg-gray-50">
+        <h1 className="text-xl font-thin text-center">
           {currentSpot.spot_name}
-          <br />
-          {currentSpot.latitude}, {currentSpot.longitude}
-        </Popup>
-      </Marker>
-    </MapContainer>
+        </h1>
+      </div>
+    </div>
   );
 };
 
