@@ -49,7 +49,24 @@ const SwellMap: React.FC<any> = ({ currentSpot, tileData, zoom }) => {
           <h1 className="text-xl font-thin text-center">
             {currentSpot.spot_name}
           </h1>
-          <p>{JSON.stringify(filteredTileData[0])}</p>
+          <table>
+            <thead>
+              <tr>
+                {Object.keys(filteredTileData[0]).map((key: string) => (
+                  <th key={key}>{key}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTileData.map((data: any) => (
+                <tr key={data.id}>
+                  {Object.values(data).map((item: any) => (
+                    <td>{item}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : (
         <p>Loading...</p>
