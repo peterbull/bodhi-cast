@@ -1,16 +1,7 @@
-import {
-  MapContainer,
-  TileLayer,
-  Popup,
-  Marker,
-  useMap,
-  LayerGroup,
-} from "react-leaflet";
+import { MapContainer, TileLayer, Popup, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import React, { useEffect } from "react";
-import * as d3 from "d3";
-import L from "leaflet";
-
+import React from "react";
+import { format } from "date-fns";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon } from "leaflet";
 
@@ -19,6 +10,12 @@ const SwellMap: React.FC<any> = ({ currentSpot, tileData, zoom }) => {
     currentSpot.latitude,
     currentSpot.longitude,
   ];
+
+  const currentDate = format(new Date(), "yyyy-MM-dd") + "T00:00:00+00:00";
+  const filteredTileData =
+    tileData.length > 0
+      ? tileData.filter((data: any) => data.valid_time === currentDate)
+      : [];
 
   return (
     <div className="flex">
@@ -47,11 +44,16 @@ const SwellMap: React.FC<any> = ({ currentSpot, tileData, zoom }) => {
           </Marker>
         </MapContainer>
       </div>
-      <div className="w-1/2 h-screen bg-gray-50">
-        <h1 className="text-xl font-thin text-center">
-          {currentSpot.spot_name}
-        </h1>
-      </div>
+      {tileData.length > 0 ? (
+        <div className="w-1/2 h-screen bg-gray-50">
+          <h1 className="text-xl font-thin text-center">
+            {currentSpot.spot_name}
+          </h1>
+          <p>{JSON.stringify(filteredTileData[0])}</p>
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 };
