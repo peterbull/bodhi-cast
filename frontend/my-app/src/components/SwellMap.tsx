@@ -5,7 +5,12 @@ import { format } from "date-fns";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon } from "leaflet";
 
-const SwellMap: React.FC<any> = ({ currentSpot, tileData, zoom }) => {
+const SwellMap: React.FC<any> = ({
+  currentSpot,
+  spotForecast,
+  tileData,
+  zoom,
+}) => {
   const spotCoords: [number, number] = [
     currentSpot.latitude,
     currentSpot.longitude,
@@ -44,11 +49,19 @@ const SwellMap: React.FC<any> = ({ currentSpot, tileData, zoom }) => {
           </Marker>
         </MapContainer>
       </div>
+      {spotForecast.length > 0 ? (
+        <p>{JSON.stringify(spotForecast[0])} Loaded Successfully</p>
+      ) : (
+        <p>Loading Spot Forecast...</p>
+      )}
       {tileData.length > 0 ? (
         <div className="w-1/2 h-screen bg-gray-50">
-          <h1 className="text-xl font-thin text-center">
+          <h1 className="text-3xl font-thin text-center">
             {currentSpot.spot_name}
           </h1>
+          <h3 className="text-xl font-extralight text-center">
+            {currentSpot.street_address}
+          </h3>
           <table>
             <thead>
               <tr>

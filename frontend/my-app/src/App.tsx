@@ -23,6 +23,7 @@ function App() {
   const [currentSpot, setCurrentSpot] = useState<any>(null);
   const [tileData, setTileData] = useState<any>([]);
   const [zoom, setZoom] = useState<any>(15);
+  const [spotForecast, setSpotForecast] = useState<any>([]);
 
   useEffect(() => {
     const fetchAllSpots = async () => {
@@ -38,23 +39,23 @@ function App() {
     fetchAllSpots();
   }, []);
 
-  useEffect(() => {
-    const fetchSwell = async () => {
-      try {
-        const date = "20231224";
-        const degrees = "5";
-        const res = await fetch(
-          `http://localhost:8000/forecasts/gridded/${degrees}/${date}`
-        );
-        const data = await res.json();
-        setSwellData(data);
-      } catch (error) {
-        console.error("Error fetching swell data:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchSwell = async () => {
+  //     try {
+  //       const date = "20231224";
+  //       const degrees = "5";
+  //       const res = await fetch(
+  //         `http://localhost:8000/forecasts/gridded/${degrees}/${date}`
+  //       );
+  //       const data = await res.json();
+  //       setSwellData(data);
+  //     } catch (error) {
+  //       console.error("Error fetching swell data:", error);
+  //     }
+  //   };
 
-    fetchSwell();
-  }, []);
+  //   fetchSwell();
+  // }, []);
 
   useEffect(() => {
     if (currentSpot) {
@@ -75,6 +76,29 @@ function App() {
     }
   }, [currentSpot, zoom]);
 
+  useEffect(() => {
+    if (currentSpot) {
+      const fetchSpotForecast = async () => {
+        try {
+          const now = new Date();
+          const date =
+            now.getUTCFullYear().toString() +
+            (now.getUTCMonth() + 1).toString().padStart(2, "0") +
+            now.getUTCDate().toString().padStart(2, "0");
+          const res = await fetch(
+            `http://localhost:8000/forecasts/spots/${date}/${currentSpot.latitude}/${currentSpot.longitude}/`
+          );
+          const data = await res.json();
+          setSpotForecast(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      fetchSpotForecast();
+    }
+  }, [currentSpot]);
+
   return (
     <ComponentMapProvider>
       <ComponentWrapper
@@ -84,6 +108,7 @@ function App() {
         setCurrentSpot={setCurrentSpot}
         zoom={zoom}
         tileData={tileData}
+        spotForecast={spotForecast}
       />
     </ComponentMapProvider>
   );
