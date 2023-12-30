@@ -8,6 +8,7 @@ import HourlyForecast from "./HourlyForecast";
 import PrimaryWaveForecast from "./PrimaryWaveForecast";
 import SwellWaveForecast from "./SwellWaveForecast";
 import WindWaveForecast from "./WindWaveForecast";
+import WindForecast from "./WindForecast";
 
 const SwellMap: React.FC<any> = ({
   currentSpot,
@@ -19,6 +20,17 @@ const SwellMap: React.FC<any> = ({
   const spotCoords: [number, number] = [
     currentSpot.latitude,
     currentSpot.longitude,
+  ];
+
+  const timeKeys = [
+    "12 a.m.",
+    "3 a.m.",
+    "6 a.m.",
+    "9 a.m.",
+    "12 p.m.",
+    "3 p.m.",
+    "6 p.m.",
+    "9 p.m.",
   ];
 
   const MapEvents: React.FC<any> = (): any => {
@@ -97,47 +109,59 @@ const SwellMap: React.FC<any> = ({
                   ></th>
                   <th
                     colSpan={3}
-                    className="w-1/3 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Primary Waves
                   </th>
                   <th
                     colSpan={3}
-                    className="w-1/3 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Secondary Swell
                   </th>
                   <th
                     colSpan={3}
-                    className="w-1/3 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Wind Waves
+                  </th>
+                  <th
+                    colSpan={2}
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium
+                    text-gray-500 uppercase tracking-wider"
+                  >
+                    Wind Report
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="text-center text-xs border-0 bg-white divide-gray-200">
-                  <td>12 a.m.</td>
-                  <PrimaryWaveForecast
-                    hourlyIndex={0}
-                    spotForecast={spotForecast}
-                  />
-                  <SwellWaveForecast
-                    hourlyIndex={0}
-                    spotForecast={spotForecast}
-                  />
-                  <WindWaveForecast
-                    hourlyIndex={0}
-                    spotForecast={spotForecast}
-                  />
-                </tr>
+                {Array(spotForecast.length)
+                  .fill(null)
+                  .map((_, index) => (
+                    <tr
+                      className="text-center text-s font-thin border-0 bg-white divide-gray-200"
+                      key={index}
+                    >
+                      <td className="font-normal">{timeKeys[index]}</td>
+                      <PrimaryWaveForecast
+                        hourlyIndex={index}
+                        spotForecast={spotForecast}
+                      />
+                      <SwellWaveForecast
+                        hourlyIndex={index}
+                        spotForecast={spotForecast}
+                      />
+                      <WindWaveForecast
+                        hourlyIndex={index}
+                        spotForecast={spotForecast}
+                      />
+                      <WindForecast
+                        hourlyIndex={index}
+                        spotForecast={spotForecast}
+                      />
+                    </tr>
+                  ))}
               </tbody>
-              {/* <HourlyForecast hourlyIndex={0} spotForecast={spotForecast} />
-              <HourlyForecast hourlyIndex={1} spotForecast={spotForecast} />
-              <HourlyForecast hourlyIndex={2} spotForecast={spotForecast} />
-              <HourlyForecast hourlyIndex={3} spotForecast={spotForecast} />
-              <HourlyForecast hourlyIndex={4} spotForecast={spotForecast} />
-              <HourlyForecast hourlyIndex={0} spotForecast={spotForecast} /> */}
             </>
           )}
         </table>
