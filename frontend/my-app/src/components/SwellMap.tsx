@@ -1,15 +1,17 @@
-import { MapContainer, TileLayer, Popup, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Popup, Marker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import React from "react";
+import React, { useEffect } from "react";
 import { format } from "date-fns";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
-import { Icon } from "leaflet";
+import { Icon, map } from "leaflet";
 
 const SwellMap: React.FC<any> = ({
   currentSpot,
   spotForecast,
   tileData,
   zoom,
+  currentComponent,
+  setCurrentComponent,
 }) => {
   const spotCoords: [number, number] = [
     currentSpot.latitude,
@@ -22,10 +24,34 @@ const SwellMap: React.FC<any> = ({
       ? tileData.filter((data: any) => data.valid_time === currentDate)
       : [];
 
+  const MapEvents: React.FC<any> = (): any => {
+    const map = useMap();
+
+    useEffect(() => {
+      const zoomend = () => {
+        const currentZoom = map.getZoom();
+        console.log(currentZoom);
+        if (currentZoom <= 7) {
+          setCurrentComponent("GlobeSpots");
+        }
+      };
+
+      map.on("zoomend", zoomend);
+
+      // Clean up map component on unmount
+      return () => {
+        map.off("zoomend", zoomend);
+      };
+    }, [map]);
+
+    return null;
+  };
+
   return (
     <div className="flex">
       <div className="w-1/2 h-screen">
-        <MapContainer center={spotCoords} zoom={zoom}>
+        <MapContainer center={spotCoords} zoom={zoom} key={currentComponent}>
+          <MapEvents />
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"

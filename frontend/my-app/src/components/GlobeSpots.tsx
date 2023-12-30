@@ -54,7 +54,7 @@ const GlobeSpots: React.FC<any> = ({
         labelLng="longitude"
         labelText="spot_name"
         labelSize={0.0}
-        labelDotRadius={0.5}
+        labelDotRadius={0.4}
         labelColor={() => "rgba(164, 255, 61, 0.5)"}
         labelLabel={(spot: any) =>
           `<div>
