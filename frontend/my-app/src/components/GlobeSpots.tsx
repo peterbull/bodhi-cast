@@ -6,7 +6,6 @@ import globeSpecularMap from "../img/earth-water.png";
 import globeEarthTopology from "../img/earth-topology.png";
 import globeEarthNightSky from "../img/night-sky.png";
 import * as THREE from "three";
-import SwellMap from "./SwellMap";
 
 const globeMaterial = new THREE.MeshPhongMaterial();
 globeMaterial.bumpScale = 10;

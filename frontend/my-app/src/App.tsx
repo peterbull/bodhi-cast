@@ -59,25 +59,6 @@ function App() {
 
   useEffect(() => {
     if (currentSpot) {
-      const fetchTileData = async () => {
-        try {
-          const date = "20231224";
-          const res = await fetch(
-            `http://localhost:8000/forecasts/tiles/${date}/${currentSpot.latitude}/${currentSpot.longitude}/${zoom}`
-          );
-          const data = await res.json();
-          setTileData(data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-
-      fetchTileData();
-    }
-  }, [currentSpot, zoom]);
-
-  useEffect(() => {
-    if (currentSpot) {
       const fetchSpotForecast = async () => {
         try {
           const now = new Date();
@@ -98,6 +79,25 @@ function App() {
       fetchSpotForecast();
     }
   }, [currentSpot]);
+
+  // useEffect(() => {
+  //   if (currentSpot) {
+  //     const fetchTileData = async () => {
+  //       try {
+  //         const date = "20231224";
+  //         const res = await fetch(
+  //           `http://localhost:8000/forecasts/tiles/${date}/${currentSpot.latitude}/${currentSpot.longitude}/${zoom}`
+  //         );
+  //         const data = await res.json();
+  //         setTileData(data);
+  //       } catch (error) {
+  //         console.error(error);
+  //       }
+  //     };
+
+  //     fetchTileData();
+  //   }
+  // }, [currentSpot, zoom]);
 
   return (
     <ComponentMapProvider>
