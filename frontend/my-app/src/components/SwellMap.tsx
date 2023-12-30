@@ -32,7 +32,10 @@ const SwellMap: React.FC<any> = ({
         const currentZoom = map.getZoom();
         console.log(currentZoom);
         if (currentZoom <= 7) {
-          setCurrentComponent("GlobeSpots");
+          map.flyTo(spotCoords, 2.5, { duration: 3.5 });
+          setTimeout(() => {
+            setCurrentComponent("GlobeSpots");
+          }, 3500);
         }
       };
 
