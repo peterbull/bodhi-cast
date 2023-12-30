@@ -59,6 +59,7 @@ function App() {
 
   useEffect(() => {
     if (currentSpot) {
+      setSpotForecast([]);
       const fetchSpotForecast = async () => {
         try {
           const now = new Date();

@@ -13,6 +13,7 @@ import WindForecast from "./WindForecast";
 const SwellMap: React.FC<any> = ({
   currentSpot,
   spotForecast,
+  setSpotForecast,
   zoom,
   currentComponent,
   setCurrentComponent,
@@ -99,7 +100,7 @@ const SwellMap: React.FC<any> = ({
           </>
         )}
         <table className="divide-y divide-gray-200">
-          {spotForecast.length > 0 && (
+          {spotForecast.length > 0 ? (
             <>
               <thead className="bg-gray-50">
                 <tr>
@@ -163,6 +164,8 @@ const SwellMap: React.FC<any> = ({
                   ))}
               </tbody>
             </>
+          ) : (
+            <p className="w-1/2 text-center text-s font-thin">Loading...</p>
           )}
         </table>
       </div>
