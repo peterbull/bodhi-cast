@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon, map } from "leaflet";
 import HourlyForecast from "./HourlyForecast";
+import PrimaryWaveForecast from "./PrimaryWaveForecast";
 
 const SwellMap: React.FC<any> = ({
   currentSpot,
@@ -86,7 +87,24 @@ const SwellMap: React.FC<any> = ({
         <table>
           {spotForecast.length > 0 && (
             <>
-              <HourlyForecast hourlyIndex={0} spotForecast={spotForecast} />
+              <tr>
+                <th>
+                  <td>Primary Waves</td>
+                </th>
+              </tr>
+              <tr>
+                <h3>12 a.m.</h3>
+                <PrimaryWaveForecast
+                  hourlyIndex={0}
+                  spotForecast={spotForecast}
+                />
+              </tr>
+              {/* <HourlyForecast hourlyIndex={0} spotForecast={spotForecast} />
+              <HourlyForecast hourlyIndex={1} spotForecast={spotForecast} />
+              <HourlyForecast hourlyIndex={2} spotForecast={spotForecast} />
+              <HourlyForecast hourlyIndex={3} spotForecast={spotForecast} />
+              <HourlyForecast hourlyIndex={4} spotForecast={spotForecast} />
+              <HourlyForecast hourlyIndex={0} spotForecast={spotForecast} /> */}
             </>
           )}
         </table>

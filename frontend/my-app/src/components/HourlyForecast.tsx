@@ -1,20 +1,27 @@
 import React from "react";
 
 const HourlyForecast: React.FC<any> = ({ spotForecast, hourlyIndex }) => {
+  const includedKeys = [
+    "swh",
+    "perpw",
+    "dirpw",
+    "swell",
+    "swper",
+    "shww",
+    "mpww",
+    "wvdir",
+    "ws",
+    "wdir",
+  ];
+
   return (
     <>
-      <tr>
-        {Object.keys(spotForecast[hourlyIndex]).map((key: string) => (
-          <th key={key}>{key}</th>
-        ))}
-      </tr>
-
       <tr key={spotForecast[hourlyIndex].id}>
-        {Object.values(spotForecast[hourlyIndex]).map(
-          (data: any, index: number) => (
+        {Object.entries(spotForecast[hourlyIndex])
+          .filter(([key]) => includedKeys.includes(key))
+          .map(([key, data], index) => (
             <td key={`data-${index}`}>{JSON.stringify(data)}</td>
-          )
-        )}
+          ))}
       </tr>
     </>
   );
