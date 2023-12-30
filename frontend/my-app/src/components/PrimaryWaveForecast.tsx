@@ -1,15 +1,19 @@
 import React from "react";
 
 const PrimaryWaveForecast: React.FC<any> = ({ spotForecast, hourlyIndex }) => {
-  const includedKeys = ["swh", "perpw", "dirpw"];
+  const heightKey = "swh";
+  const timeKey = "perpw";
+  const directionKey = "dirpw";
 
   return (
     <>
-      {Object.entries(spotForecast[hourlyIndex])
-        .filter(([key]) => includedKeys.includes(key))
-        .map(([key, data], index) => (
-          <td key={`data-${index}`}>{JSON.stringify(data)}</td>
-        ))}
+      <td>
+        {(parseFloat(spotForecast[hourlyIndex][heightKey]) * 3.281).toFixed(1)}
+      </td>
+      <td>ft</td>
+      <td>{spotForecast[hourlyIndex][timeKey].toFixed(1)}</td>
+      <td>s</td>
+      <td></td>
     </>
   );
 };
