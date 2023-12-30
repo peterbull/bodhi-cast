@@ -6,6 +6,7 @@ import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon, map } from "leaflet";
 import HourlyForecast from "./HourlyForecast";
 import PrimaryWaveForecast from "./PrimaryWaveForecast";
+import SwellWaveForecast from "./SwellWaveForecast";
 
 const SwellMap: React.FC<any> = ({
   currentSpot,
@@ -89,20 +90,36 @@ const SwellMap: React.FC<any> = ({
             <>
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    colSpan={1}
+                    className="w-1/3 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  ></th>
+                  <th
+                    colSpan={3}
+                    className="w-1/3 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Primary Waves
+                  </th>
+                  <th
+                    colSpan={3}
+                    className="w-1/3 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Secondary Swell
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                <PrimaryWaveForecast
-                  hourlyIndex={0}
-                  spotForecast={spotForecast}
-                />
-                <PrimaryWaveForecast
-                  hourlyIndex={1}
-                  spotForecast={spotForecast}
-                />
+              <tbody>
+                <tr className="bg-white divide-y divide-gray-200">
+                  <td>12 a.m.</td>
+                  <PrimaryWaveForecast
+                    hourlyIndex={0}
+                    spotForecast={spotForecast}
+                  />
+                  <SwellWaveForecast
+                    hourlyIndex={0}
+                    spotForecast={spotForecast}
+                  />
+                </tr>
               </tbody>
               {/* <HourlyForecast hourlyIndex={0} spotForecast={spotForecast} />
               <HourlyForecast hourlyIndex={1} spotForecast={spotForecast} />
