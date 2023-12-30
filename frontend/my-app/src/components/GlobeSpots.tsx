@@ -18,6 +18,7 @@ new THREE.TextureLoader().load(globeSpecularMap, (texture) => {
 
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,
+  currentSpot,
   setCurrentSpot,
   spots,
 }) => {
@@ -34,8 +35,8 @@ const GlobeSpots: React.FC<any> = ({
   useEffect(() => {
     if (globeEl.current) {
       globeEl.current.pointOfView({
-        lat: spots[0].latitude,
-        lng: spots[0].longitude,
+        lat: currentSpot ? currentSpot.latitude : spots[0].latitude,
+        lng: currentSpot ? currentSpot.longitude : spots[0].longitude,
         altitude: 1.8,
       });
     }
