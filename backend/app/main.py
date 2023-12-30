@@ -263,14 +263,17 @@ def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session =
             WHERE
                 valid_time >= :date
                 AND valid_time < :next_day
-                AND swell IS NOT NULL
+                AND swh IS NOT NULL
             ORDER BY ST_Distance(
                 ST_MakePoint(longitude, latitude),
                 ST_MakePoint(:spot_lng, :spot_lat)
             )
             LIMIT 1
         )
-        SELECT *
+        SELECT id, location, time, valid_time, COALESCE(swh, 0) as swh, COALESCE(perpw, 0) as perpw, COALESCE(dirpw, 0) as dirpw,
+            COALESCE(swell, 0) as swell, COALESCE(swper, 0) as swper, COALESCE(shww, 0) as shww,
+            COALESCE(mpww, 0) as mpww, COALESCE(wvdir, 0) as wvdir, COALESCE(ws, 0) as ws, COALESCE(wdir, 0) as wdir,
+           latitude, longitude
         FROM wave_forecast
         WHERE
             valid_time >= :date
