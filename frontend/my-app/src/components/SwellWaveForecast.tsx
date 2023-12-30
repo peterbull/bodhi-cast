@@ -9,9 +9,9 @@ const SwellWaveForecast: React.FC<any> = ({ spotForecast, hourlyIndex }) => {
 
   return (
     <>
-      <td>{swellWaveHeight} ft</td>
-      <td>{swellWavePeriod} s</td>
-      <td>
+      <td className="py-2 text-right">{swellWaveHeight} ft</td>
+      <td className="py-2">{swellWavePeriod} s</td>
+      <td className="py-2">
         <svg
           width="12"
           height="18"

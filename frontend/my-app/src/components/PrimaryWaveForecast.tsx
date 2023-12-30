@@ -9,9 +9,9 @@ const PrimaryWaveForecast: React.FC<any> = ({ spotForecast, hourlyIndex }) => {
 
   return (
     <>
-      <td className="px-4 py-2">{primaryWaveHeight} ft</td>
-      <td className="px-4 py-2">{primaryWavePeriod} s</td>
-      <td className="px-4 py-2">
+      <td className="py-2 text-right">{primaryWaveHeight} ft</td>
+      <td className="py-2">{primaryWavePeriod} s</td>
+      <td className="py-2">
         <svg
           width="12"
           height="18"

@@ -7,6 +7,7 @@ import { Icon, map } from "leaflet";
 import HourlyForecast from "./HourlyForecast";
 import PrimaryWaveForecast from "./PrimaryWaveForecast";
 import SwellWaveForecast from "./SwellWaveForecast";
+import WindWaveForecast from "./WindWaveForecast";
 
 const SwellMap: React.FC<any> = ({
   currentSpot,
@@ -85,14 +86,14 @@ const SwellMap: React.FC<any> = ({
             </h3>
           </>
         )}
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="divide-y divide-gray-200">
           {spotForecast.length > 0 && (
             <>
               <thead className="bg-gray-50">
                 <tr>
                   <th
                     colSpan={1}
-                    className="w-1/3 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   ></th>
                   <th
                     colSpan={3}
@@ -106,16 +107,26 @@ const SwellMap: React.FC<any> = ({
                   >
                     Secondary Swell
                   </th>
+                  <th
+                    colSpan={3}
+                    className="w-1/3 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Wind Waves
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-white divide-y divide-gray-200">
+                <tr className="text-center text-xs border-0 bg-white divide-gray-200">
                   <td>12 a.m.</td>
                   <PrimaryWaveForecast
                     hourlyIndex={0}
                     spotForecast={spotForecast}
                   />
                   <SwellWaveForecast
+                    hourlyIndex={0}
+                    spotForecast={spotForecast}
+                  />
+                  <WindWaveForecast
                     hourlyIndex={0}
                     spotForecast={spotForecast}
                   />
