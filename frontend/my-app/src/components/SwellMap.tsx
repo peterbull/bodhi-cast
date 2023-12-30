@@ -42,7 +42,7 @@ const SwellMap: React.FC<any> = ({
         const currentZoom = map.getZoom();
         console.log(currentZoom);
         if (currentZoom <= 7) {
-          map.flyTo(spotCoords, 2.5, { duration: 3.5 });
+          map.flyTo(spotCoords, 2.1, { duration: 3.5 });
           setTimeout(() => {
             setCurrentComponent("GlobeSpots");
           }, 3500);
@@ -68,7 +68,6 @@ const SwellMap: React.FC<any> = ({
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
-            noWrap={true}
           />
           <Marker
             position={spotCoords}
@@ -99,9 +98,10 @@ const SwellMap: React.FC<any> = ({
             </h3>
           </>
         )}
-        <table className="divide-y divide-gray-200">
-          {spotForecast.length > 0 ? (
-            <>
+
+        {spotForecast.length > 0 ? (
+          <>
+            <table className="divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th
@@ -143,7 +143,7 @@ const SwellMap: React.FC<any> = ({
                       className="text-center text-s font-thin border-0 bg-white divide-gray-200"
                       key={index}
                     >
-                      <td className="font-normal">{timeKeys[index]}</td>
+                      <td className="py-6 font-normal">{timeKeys[index]}</td>
                       <PrimaryWaveForecast
                         hourlyIndex={index}
                         spotForecast={spotForecast}
@@ -163,11 +163,13 @@ const SwellMap: React.FC<any> = ({
                     </tr>
                   ))}
               </tbody>
-            </>
-          ) : (
-            <p className="w-1/2 text-center text-s font-thin">Loading...</p>
-          )}
-        </table>
+            </table>
+          </>
+        ) : (
+          <div className="flex justify-center items-center h-half h-screen transform -translate-y-16 animate-pulse">
+            <p className="text-center text-s font-thin">Loading...</p>
+          </div>
+        )}
       </div>
     </div>
   );
