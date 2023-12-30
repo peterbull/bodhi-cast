@@ -84,21 +84,26 @@ const SwellMap: React.FC<any> = ({
             </h3>
           </>
         )}
-        <table>
+        <table className="min-w-full divide-y divide-gray-200">
           {spotForecast.length > 0 && (
             <>
-              <tr>
-                <th>
-                  <td>Primary Waves</td>
-                </th>
-              </tr>
-              <tr>
-                <h3>12 a.m.</h3>
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Primary Waves
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
                 <PrimaryWaveForecast
                   hourlyIndex={0}
                   spotForecast={spotForecast}
                 />
-              </tr>
+                <PrimaryWaveForecast
+                  hourlyIndex={1}
+                  spotForecast={spotForecast}
+                />
+              </tbody>
               {/* <HourlyForecast hourlyIndex={0} spotForecast={spotForecast} />
               <HourlyForecast hourlyIndex={1} spotForecast={spotForecast} />
               <HourlyForecast hourlyIndex={2} spotForecast={spotForecast} />
