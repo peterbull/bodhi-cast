@@ -141,6 +141,8 @@ def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session =
     - It then calculates the nearest data point by distance to this origin.
     - Forecasts where significant combined swell and wind wave height (swh) values
       are null are excluded, as null values indicate land areas rather than water.
+    - Additional logic will need to be added to handle rolling forecast updates
+      if fetching from NOAA multiple times per day
 
     Args:
         date (str): The date in the format 'YYYYMMDD'.
@@ -163,7 +165,9 @@ def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session =
             FROM wave_forecast
             WHERE
                 valid_time >= :date
+                AND time >= :date
                 AND valid_time < :next_day
+                AND time < :next_day
                 AND swh IS NOT NULL
             ORDER BY ST_Distance(
                 ST_MakePoint(longitude, latitude),
@@ -178,7 +182,9 @@ def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session =
         FROM wave_forecast
         WHERE
             valid_time >= :date
+            AND time >= :date
             AND valid_time < :next_day
+            AND time < :next_day
             AND swell IS NOT NULL
             AND latitude = (SELECT latitude FROM closest_point)
             AND longitude = (SELECT longitude FROM closest_point)
