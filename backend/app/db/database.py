@@ -1,9 +1,8 @@
-from sqlalchemy import create_engine, exists
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import SQLAlchemyError
-
-from app.models.models import Base, Spots
 from app.data.spots.spots import spots
+from app.models.models import Base, Spots
+from sqlalchemy import create_engine, exists
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = "postgresql+psycopg2://postgres:your_password@db:5432/surfing_data"
 

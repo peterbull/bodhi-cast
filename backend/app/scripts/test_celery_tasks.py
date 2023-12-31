@@ -1,5 +1,5 @@
 import click
-from app.main import noaa_update, noaa_sample, noaa_update_swell_only, noaa_sample_swell_only
+from app.main import noaa_sample, noaa_sample_swell_only, noaa_update, noaa_update_swell_only
 
 
 @click.group()
@@ -15,7 +15,7 @@ def run_noaa_update():
 
 
 @cli.command()
-@click.option('--num-samples', default=1, help='Number of samples to fetch`')
+@click.option("--num-samples", default=1, help="Number of samples to fetch`")
 def run_noaa_sample(num_samples):
     """
     Runs the NOAA sample task asynchronously using Celery.
@@ -27,7 +27,7 @@ def run_noaa_sample(num_samples):
 def run_noaa_update_swell_only():
     """Run the NOAA update task with swell_only flag set to True.
 
-    This function triggers the NOAA update task with the swell_only flag set to True. 
+    This function triggers the NOAA update task with the swell_only flag set to True.
     The task is executed asynchronously using Celery's delay() method.
     """
     noaa_update_swell_only.delay()
@@ -38,7 +38,7 @@ def run_noaa_sample_swell_only():
     """
     Runs the NOAA sample task asynchronously using Celery.
 
-    This function triggers the NOAA sample task with the swell_only flag set to True. 
+    This function triggers the NOAA sample task with the swell_only flag set to True.
     """
     noaa_sample_swell_only.delay()
 

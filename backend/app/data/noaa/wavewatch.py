@@ -1,19 +1,18 @@
-import requests
 import re
 import tempfile
-import xarray as xr
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
 import pytz
-from shapely.geometry import Point
+import requests
+import xarray as xr
+from bs4 import BeautifulSoup
 from geoalchemy2 import WKTElement
 from geoalchemy2.types import Geography
-
-from bs4 import BeautifulSoup
-
+from shapely.geometry import Point
 from sqlalchemy import text
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine.base import Engine
+from sqlalchemy.exc import SQLAlchemyError
 
 
 class Wavewatch:
@@ -26,10 +25,12 @@ class Wavewatch:
 
     Attributes:
         engine (str): The database engine to be used for committing the
-        DataFrame. table_name (str): The name of the table in the database to
-        which the DataFrame will be committed. date (str): The current date in
-        the format "%Y%m%d". url (str): The base URL for retrieving Wavewatch
-        data. url_list (list): A list of URLs for retrieving Wavewatch data.
+        DataFrame.
+        table_name (str): The name of the table in the database to which the
+        DataFrame will be committed.
+        date (str): The current date in the format "%Y%m%d".
+        url (str): The base URL for retrieving Wavewatch data.
+        url_list (list): A list of URLs for retrieving Wavewatch data.
 
     Methods:
         get_global_mean_urls(url: str) -> list:
@@ -53,6 +54,15 @@ class Wavewatch:
     """
 
     def __init__(self, engine: Engine, table_name: str):
+        """
+        Initialize the Wavewatch object.
+
+        Args:
+            engine (Engine): The database engine to be used for committing the
+            DataFrame.
+            table_name (str): The name of the table in the database to which
+            the DataFrame will be committed.
+        """
         self.engine = engine
         self.table_name = table_name
         self.date = datetime.now().strftime("%Y%m%d")
@@ -62,60 +72,73 @@ class Wavewatch:
     def get_global_mean_urls(self, url: str) -> list:
         """
         Retrieves the list of links for the average global model for all
-        forecast hours.
+        forecast hours at the first forecast time for the day (`00` Hours).
 
-        Parameters: url (str): The URL of the webpage to scrape.
+        Parameters:
+            url (str): The URL of the webpage to scrape.
 
-        Returns: urls (list): A list of links for the average global model.
+        Returns:
+            urls (list): A list of links for the average global model.
         """
         response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
-        pattern = re.compile(
-            r'gefs\.wave\.t00z\.mean\.global\.0p25\.f\d{3}\.grib2')
-        urls = [a.get('href') for a in soup.find_all('a', href=pattern)]
+        soup = BeautifulSoup(response.content, "html.parser")
+        pattern = re.compile(r"gefs\.wave\.t00z\.mean\.global\.0p25\.f\d{3}\.grib2")
+        urls = [a.get("href") for a in soup.find_all("a", href=pattern)]
         return urls
 
     def url_to_df(self, target: str, swell_only: bool = False) -> pd.DataFrame:
         """
         Fetches data from the specified URL and returns it as a pandas
-        DataFrame.
+        DataFrame. Xarray is used as an intermediary to utilize decoding with `cfgrib`.
 
         Args:
-            target (str): The target URL to fetch the data from. swell_only
-            (bool, optional): Flag indicating whether to include only swell
-            data. Defaults to False.
+            target (str): The target URL to fetch the data from.
+            swell_only (bool, optional): Flag indicating whether to include
+            only swell data. Defaults to False.
 
         Returns:
             pandas.DataFrame: The fetched data as a pandas DataFrame, with NaN
             swell values dropped and index reset.
         """
-        response = requests.get(f'{self.url}/{target}')
+        response = requests.get(f"{self.url}/{target}")
         if response.status_code == 200:
             with tempfile.NamedTemporaryFile() as tmp:
                 tmp.write(response.content)
                 tmp.flush()
 
-                with xr.open_dataset(tmp.name, engine='cfgrib') as ds:
+                with xr.open_dataset(tmp.name, engine="cfgrib") as ds:
                     data = ds.load()
                     df = data.to_dataframe()
                     # df = df.dropna(subset=['swh'])
-                    df.reset_index(
-                        level=['latitude', 'longitude'], inplace=True)
+                    df.reset_index(level=["latitude", "longitude"], inplace=True)
 
                     if swell_only:
-                        df = df.drop(columns=[
-                            'surface', 'swh', 'perpw', 'dirpw', 'shww', 'mpww',
-                            'wvdir', 'ws', 'wdir', 'swper'
-                        ])
+                        df = df.drop(
+                            columns=[
+                                "surface",
+                                "swh",
+                                "perpw",
+                                "dirpw",
+                                "shww",
+                                "mpww",
+                                "wvdir",
+                                "ws",
+                                "wdir",
+                                "swper",
+                            ]
+                        )
 
-                    df['longitude'] = df['longitude'].apply(
-                        lambda x: x - 360 if x > 180 else x).round(2)
-                    df['location'] = df.apply(lambda row: Point(
-                        row['longitude'], row['latitude']), axis=1)
-                    df['location'] = df['location'].apply(
-                        lambda loc: WKTElement(loc.wkt, srid=4326))
-                    df['step'] = df['step'].dt.total_seconds() / 3600.0
-                    df['step'] = df['step'].astype(str) + ' hours'
+                    df["longitude"] = (
+                        df["longitude"].apply(lambda x: x - 360 if x > 180 else x).round(2)
+                    )
+                    df["location"] = df.apply(
+                        lambda row: Point(row["longitude"], row["latitude"]), axis=1
+                    )
+                    df["location"] = df["location"].apply(
+                        lambda loc: WKTElement(loc.wkt, srid=4326)
+                    )
+                    df["step"] = df["step"].dt.total_seconds() / 3600.0
+                    df["step"] = df["step"].astype(str) + " hours"
                     return df
 
         else:
@@ -135,28 +158,35 @@ class Wavewatch:
         with self.engine.begin() as connection:
             try:
                 utc = pytz.utc
-                df['entry_updated'] = datetime.now(utc)
-                df.to_sql(self.table_name, con=connection,
-                          if_exists='append', index=False,
-                          dtype={'location': Geography(geometry_type='POINT',
-                                                       srid=4326)})
+                df["entry_updated"] = datetime.now(utc)
+                df.to_sql(
+                    self.table_name,
+                    con=connection,
+                    if_exists="append",
+                    index=False,
+                    dtype={"location": Geography(geometry_type="POINT", srid=4326)},
+                )
                 print("Successfully wrote grib2 file")
             except SQLAlchemyError as e:
                 print(f"An error occurred: {e}")
 
     def reindex_db(self) -> None:
         """
-        Create a GiST index on the 'location' column of the table in the database
-        if it doesn't already exist, then reindex the 'location' column.
+        Create a GiST index on the 'location' column of the table in the
+        database if it doesn't already exist, then reindex the 'location'
+        column.
 
         Raises:
-            SQLAlchemyError: If an error occurs while creating or reindexing the
-            index.
+            SQLAlchemyError: If an error occurs while creating or reindexing
+            the index.
         """
         with self.engine.begin() as connection:
             try:
-                connection.execute(text(
-                    "CREATE INDEX IF NOT EXISTS location_gist ON wave_forecast USING gist(location);"))
+                connection.execute(
+                    text(
+                        "CREATE INDEX IF NOT EXISTS location_gist ON wave_forecast USING gist(location);"
+                    )
+                )
 
                 print("Successfully created the index if it did not exist")
             except SQLAlchemyError as e:
@@ -192,8 +222,7 @@ class Wavewatch:
             df = self.url_to_df(url, swell_only)
             self.commit_df_to_db(df)
             count += 1
-            print(
-                f"Wrote grib file number {count} out of {len(self.url_list)}")
+            print(f"Wrote grib file number {count} out of {len(self.url_list)}")
             print("Updated")
         self.reindex_db()
 
@@ -222,7 +251,8 @@ class Wavewatch:
             self.commit_df_to_db(df)
             count += 1
             print(
-                f"""Wrote grib file number {count} out of {len(self.url_list)}
-                samples""")
+                f"""Wrote grib file number {count} out of {len(self.url_list[0:num_samples])}
+                samples"""
+            )
             print("Updated")
         self.reindex_db()

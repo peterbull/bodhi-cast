@@ -1,10 +1,8 @@
-from sqlalchemy import Column, Float, Integer, String, DateTime, Interval
-from sqlalchemy.sql import func
+from geoalchemy2 import Geography
+from sqlalchemy import Column, DateTime, Float, Integer, Interval, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.inspection import inspect
-
-from geoalchemy2 import Geography
-
+from sqlalchemy.sql import func
 
 Base = declarative_base()
 
@@ -12,9 +10,9 @@ Base = declarative_base()
 
 
 class WaveForecast(Base):
-    __tablename__ = 'wave_forecast'
+    __tablename__ = "wave_forecast"
     id = Column(Integer, primary_key=True)
-    location = Column(Geography('POINT', srid=4326))
+    location = Column(Geography("POINT", srid=4326))
     latitude = Column(Float)
     longitude = Column(Float)
     time = Column(DateTime(timezone=True))
