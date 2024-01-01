@@ -39,7 +39,12 @@ celery_app.conf.beat_schedule = {
         "args": (24,),
         # Runs daily at 7:00 UTC 2:00am EST
         "schedule": crontab(minute="0", hour="7"),
-    }
+    },
+    "delete-old-noaa-data-daily": {
+        "task": "app.main.delete_old_wave_forecasts",
+        # Runs daily at 9:00 UTC 4:00am EST
+        "schedule": crontab(minute="0", hour="9"),
+    },
 }
 
 # Add spots to spots table
