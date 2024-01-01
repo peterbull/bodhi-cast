@@ -1,5 +1,5 @@
 import click
-from app.main import noaa_sample, noaa_update
+from app.main import delete_old_wave_forecasts, noaa_sample, noaa_update
 
 """
 This script provides a command line interface (CLI) for running Celery tasks related to NOAA data processing. 
@@ -45,6 +45,11 @@ def run_noaa_sample(num_samples):
     This task fetches a specified number of samples from NOAA asynchronously.
     """
     noaa_sample.delay(num_samples)
+
+
+@cli.command()
+def purge_old_entries():
+    delete_old_wave_forecasts.delay()
 
 
 if __name__ == "__main__":

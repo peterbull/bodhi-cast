@@ -1,14 +1,15 @@
 from datetime import datetime, timedelta
 
 import redis
+from app.core.config import get_app_settings
 from app.data.noaa.wavewatch import Wavewatch
 from app.db.database import add_spots, create_tables, engine, get_db
-from app.models.models import Spots
+from app.models.models import Spots, WaveForecast
 from celery import Celery
 from celery.schedules import crontab
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
+from sqlalchemy import create_engine, delete, text
 from sqlalchemy.orm import Session
 
 create_tables()
@@ -76,6 +77,31 @@ def noaa_sample(num_samples=1):
 
     """
     Wavewatch(engine, "wave_forecast").run_sample(num_samples=num_samples)
+
+
+@celery_app.task
+def delete_old_wave_forecasts():
+    """
+    Deletes wave forecasts that are older than one day.
+
+    This function connects to the database, retrieves wave forecasts that have an entry_updated
+    timestamp older than one day, and deletes them from the database.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    now = datetime.now()
+    day_previous = now - timedelta(days=1)
+
+    engine = create_engine(get_app_settings().database_conn_string)
+
+    with Session(engine) as session:
+        stmt = delete(WaveForecast).where(WaveForecast.entry_updated < day_previous)
+        session.execute(stmt)
+        session.commit()
 
 
 # Routes
