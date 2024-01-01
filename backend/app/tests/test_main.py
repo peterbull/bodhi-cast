@@ -28,8 +28,9 @@ def test_get_forecasts_by_spot():
     It asserts that the response status code is 200 and the response data is a list.
     """
     current_date = datetime.datetime.now().strftime("%Y%m%d")
-
-    response = client.get(f"/forecasts/spots/{current_date}/40.7128/-74.0060")
+    lat = "36.83055459542353"
+    lng = "-75.96764801341773"
+    response = client.get(f"/forecasts/spots/{current_date}/{lat}/{lng}")
 
     assert response.status_code == 200
     data = response.json()
@@ -44,10 +45,9 @@ def test_get_forecasts_by_tile():
     It asserts that the response status code is 200 and the response data is a list.
     """
     current_date = datetime.datetime.now().strftime("%Y%m%d")
-    lat = "45.123"
-    lng = "-75.012"
-    zoom = "12"
-
+    lat = "36.83055459542353"
+    lng = "-75.96764801341773"
+    zoom = "15"
     response = client.get(f"/forecasts/tiles/{current_date}/{lat}/{lng}/{zoom}")
 
     assert response.status_code == 200
