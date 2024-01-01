@@ -90,6 +90,7 @@ class Wavewatch:
         """
         Fetches data from the specified URL and returns it as a pandas
         DataFrame. Xarray is used as an intermediary to utilize decoding with `cfgrib`.
+        Rows with no meteorological data are dropped to decrease extra load.
 
         Args:
             target (str): The target URL to fetch the data from.
@@ -109,9 +110,24 @@ class Wavewatch:
                 with xr.open_dataset(tmp.name, engine="cfgrib") as ds:
                     data = ds.load()
                     df = data.to_dataframe()
-                    # df = df.dropna(subset=['swh'])
                     df.reset_index(level=["latitude", "longitude"], inplace=True)
-
+                    df.drop(columns="surface", inplace=True)
+                    df.dropna(
+                        subset=[
+                            "swh",
+                            "perpw",
+                            "dirpw",
+                            "shww",
+                            "mpww",
+                            "wvdir",
+                            "ws",
+                            "wdir",
+                            "swper",
+                            "swell",
+                        ],
+                        how="all",
+                        inplace=True,
+                    )
                     if swell_only:
                         df = df.drop(
                             columns=[
