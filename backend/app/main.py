@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 
 import redis
@@ -136,30 +137,38 @@ def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session 
     Returns:
         list: A list of dictionaries representing the wave forecasts for the tile.
     """
-    date = datetime.strptime(date, "%Y%m%d").date()
-    # To do: Find an equation that returns proportionally at all zoom levels after deciding on
-    #        final map and corresponding projection and pixel size
-    # Current: A placeholder that will only work with values near the default `zoom`
-    zoom_factor = float(zoom) / 7.5
-    lat_min = float(lat) - (zoom_factor / 2)
-    lat_max = float(lat) + (zoom_factor / 2)
-    lng_min = float(lng) - zoom_factor
-    lng_max = float(lng) + zoom_factor
-    result = db.execute(
-        text(
-            """SELECT *
-        FROM wave_forecast
-        WHERE
-            location::geometry && ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326)
-            AND ST_Intersects(
-                location::geometry,
-                ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326));
-                """
-        ),
-        {"lng_min": lng_min, "lat_min": lat_min, "lng_max": lng_max, "lat_max": lat_max},
-    )
-    rows = result.all()
-    return [row._asdict() for row in rows]
+    # Create unique key for this set of params and try to get results from redis
+    key = f"forecasts_by_tile:{date}:{lat}:{lng}:{zoom}"
+    result = redis_client.get(key)
+
+    # If it is not cached in redis, run the query as normal
+    if result is not None:
+        return json.loads(result)
+    else:
+        date = datetime.strptime(date, "%Y%m%d").date()
+        # To do: Find an equation that returns proportionally at all zoom levels after deciding on
+        #        final map and corresponding projection and pixel size
+        # Current: A placeholder that will only work with values near the default `zoom`
+        zoom_factor = float(zoom) / 7.5
+        lat_min = float(lat) - (zoom_factor / 2)
+        lat_max = float(lat) + (zoom_factor / 2)
+        lng_min = float(lng) - zoom_factor
+        lng_max = float(lng) + zoom_factor
+        result = db.execute(
+            text(
+                """SELECT *
+            FROM wave_forecast
+            WHERE
+                location::geometry && ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326)
+                AND ST_Intersects(
+                    location::geometry,
+                    ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326));
+                    """
+            ),
+            {"lng_min": lng_min, "lat_min": lat_min, "lng_max": lng_max, "lat_max": lat_max},
+        )
+        rows = result.all()
+        return [row._asdict() for row in rows]
 
 
 @app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}/")
@@ -184,51 +193,60 @@ def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session =
     Returns:
         list: A list of dictionaries containing the forecast data for each valid time.
     """
-    date = datetime.strptime(date, "%Y%m%d").date()
-    next_day = date + timedelta(days=1)
-    spot_lat = float(spot_lat)
-    spot_lng = float(spot_lng)
 
-    sql = text(
-        """
-        WITH closest_point AS (
-            SELECT latitude, longitude
+    # Create unique key for this set of params and try to get results from redis
+    key = f"forecasts_by_spot:{date}:{spot_lat}:{spot_lng}"
+    result = redis_client.get(key)
+
+    # If it is not cached in redis, run the query as normal
+    if result is not None:
+        return json.loads(result)
+    else:
+        date = datetime.strptime(date, "%Y%m%d").date()
+        next_day = date + timedelta(days=1)
+        spot_lat = float(spot_lat)
+        spot_lng = float(spot_lng)
+
+        sql = text(
+            """
+            WITH closest_point AS (
+                SELECT latitude, longitude
+                FROM wave_forecast
+                WHERE
+                    valid_time >= :date
+                    AND time >= :date
+                    AND valid_time < :next_day
+                    AND time < :next_day
+                    AND swh IS NOT NULL
+                ORDER BY ST_Distance(
+                    ST_MakePoint(longitude, latitude),
+                    ST_MakePoint(:spot_lng, :spot_lat)
+                )
+                LIMIT 1
+            )
+            SELECT id, location, time, valid_time, COALESCE(swh, 0) as swh, COALESCE(perpw, 0) as perpw, COALESCE(dirpw, 0) as dirpw,
+                COALESCE(swell, 0) as swell, COALESCE(swper, 0) as swper, COALESCE(shww, 0) as shww,
+                COALESCE(mpww, 0) as mpww, COALESCE(wvdir, 0) as wvdir, COALESCE(ws, 0) as ws, COALESCE(wdir, 0) as wdir,
+            latitude, longitude
             FROM wave_forecast
             WHERE
                 valid_time >= :date
                 AND time >= :date
                 AND valid_time < :next_day
                 AND time < :next_day
-                AND swh IS NOT NULL
-            ORDER BY ST_Distance(
-                ST_MakePoint(longitude, latitude),
-                ST_MakePoint(:spot_lng, :spot_lat)
-            )
-            LIMIT 1
+                AND swell IS NOT NULL
+                AND latitude = (SELECT latitude FROM closest_point)
+                AND longitude = (SELECT longitude FROM closest_point)
+            ORDER BY valid_time;
+        """
         )
-        SELECT id, location, time, valid_time, COALESCE(swh, 0) as swh, COALESCE(perpw, 0) as perpw, COALESCE(dirpw, 0) as dirpw,
-            COALESCE(swell, 0) as swell, COALESCE(swper, 0) as swper, COALESCE(shww, 0) as shww,
-            COALESCE(mpww, 0) as mpww, COALESCE(wvdir, 0) as wvdir, COALESCE(ws, 0) as ws, COALESCE(wdir, 0) as wdir,
-           latitude, longitude
-        FROM wave_forecast
-        WHERE
-            valid_time >= :date
-            AND time >= :date
-            AND valid_time < :next_day
-            AND time < :next_day
-            AND swell IS NOT NULL
-            AND latitude = (SELECT latitude FROM closest_point)
-            AND longitude = (SELECT longitude FROM closest_point)
-        ORDER BY valid_time;
-    """
-    )
 
-    result = db.execute(
-        sql, {"date": date, "next_day": next_day, "spot_lat": spot_lat, "spot_lng": spot_lng}
-    )
+        result = db.execute(
+            sql, {"date": date, "next_day": next_day, "spot_lat": spot_lat, "spot_lng": spot_lng}
+        )
 
-    rows = result.all()
-    return [row._asdict() for row in rows]
+        rows = result.all()
+        return [row._asdict() for row in rows]
 
 
 # Get all spots
