@@ -27,6 +27,7 @@ click = "^8.1.7"
 geoalchemy2 = "^0.14.2"
 pytest = "^7.4.4"
 httpx = "^0.26.0"
+watchdog = {extras = ["watchmedo"], version = "^3.0.0"}
 
 
 
