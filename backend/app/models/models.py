@@ -1,7 +1,7 @@
 from geoalchemy2 import Geography
 from sqlalchemy import Column, DateTime, Float, Integer, Interval, String
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.inspection import inspect
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import func
 
 Base = declarative_base()
