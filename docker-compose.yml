@@ -62,7 +62,11 @@ services:
     build:
       context: ./backend
       dockerfile: backend.dockerfile
+    env_file:
+      - .env
     command: celery -A app.main.celery_app worker --loglevel=info
+    volumes:
+      - ./backend:/usr/src/app
     depends_on:
       - backend
       - redis
@@ -71,7 +75,11 @@ services:
     build:
       context: ./backend
       dockerfile: backend.dockerfile
+    env_file:
+      - .env
     command: celery -A app.main.celery_app beat --loglevel=info
+    volumes:
+      - ./backend:/usr/src/app
     depends_on:
       - redis
 

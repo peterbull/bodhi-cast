@@ -167,4 +167,8 @@ cartopy
 # dev snapshots of db
 db_snap.sql
 
+# React
 node_modules
+
+# Celery Beat
+celerybeat-*

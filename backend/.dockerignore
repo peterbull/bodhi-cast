@@ -26,6 +26,9 @@ backend/.coverage
 backend/htmlcov
 backend/docs/_build
 
+# CeleryBeat-specific
+backend/celerybeat-*
+
 # Logs and databases
 *.log
 *.sql
