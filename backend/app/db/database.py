@@ -1,10 +1,11 @@
+from app.core.config import get_app_settings
 from app.data.spots.spots import spots
 from app.models.models import Base, Spots
 from sqlalchemy import create_engine, exists
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = "postgresql+psycopg2://postgres:your_password@db:5432/surfing_data"
+DATABASE_URL = get_app_settings().database_conn_string
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
