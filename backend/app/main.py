@@ -112,7 +112,7 @@ def delete_old_wave_forecasts():
 # Routes
 @app.get("/")
 def read_root():
-    return {"Hello": "Surf"}
+    return {"Hello": "Bodhi"}
 
 
 # Get wave forecast data if points fall within a given bounding box
