@@ -39,24 +39,6 @@ function App() {
     fetchAllSpots();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchSwell = async () => {
-  //     try {
-  //       const date = "20231224";
-  //       const degrees = "5";
-  //       const res = await fetch(
-  //         `http://localhost:8000/forecasts/gridded/${degrees}/${date}`
-  //       );
-  //       const data = await res.json();
-  //       setSwellData(data);
-  //     } catch (error) {
-  //       console.error("Error fetching swell data:", error);
-  //     }
-  //   };
-
-  //   fetchSwell();
-  // }, []);
-
   useEffect(() => {
     if (currentSpot) {
       setSpotForecast([]);
@@ -80,25 +62,6 @@ function App() {
       fetchSpotForecast();
     }
   }, [currentSpot]);
-
-  // useEffect(() => {
-  //   if (currentSpot) {
-  //     const fetchTileData = async () => {
-  //       try {
-  //         const date = "20231224";
-  //         const res = await fetch(
-  //           `http://localhost:8000/forecasts/tiles/${date}/${currentSpot.latitude}/${currentSpot.longitude}/${zoom}`
-  //         );
-  //         const data = await res.json();
-  //         setTileData(data);
-  //       } catch (error) {
-  //         console.error(error);
-  //       }
-  //     };
-
-  //     fetchTileData();
-  //   }
-  // }, [currentSpot, zoom]);
 
   return (
     <ComponentMapProvider>
