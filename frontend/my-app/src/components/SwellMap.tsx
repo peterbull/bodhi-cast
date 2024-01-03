@@ -1,10 +1,8 @@
 import { MapContainer, TileLayer, Popup, Marker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import React, { useEffect } from "react";
-import { format } from "date-fns";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
-import { Icon, map } from "leaflet";
-import HourlyForecast from "./HourlyForecast";
+import { Icon } from "leaflet";
 import PrimaryWaveForecast from "./PrimaryWaveForecast";
 import SwellWaveForecast from "./SwellWaveForecast";
 import WindWaveForecast from "./WindWaveForecast";
@@ -13,7 +11,6 @@ import WindForecast from "./WindForecast";
 const SwellMap: React.FC<any> = ({
   currentSpot,
   spotForecast,
-  setSpotForecast,
   zoom,
   currentComponent,
   setCurrentComponent,

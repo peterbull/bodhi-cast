@@ -1,17 +1,16 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
 import globeSpecularMap from "../img/earth-water.png";
 import globeEarthTopology from "../img/earth-topology.png";
 import globeEarthNightSky from "../img/night-sky.png";
-// import { SwellData } from "../App";
-import * as THREE from "three";
+import { MeshPhongMaterial, TextureLoader, Color } from "three";
 
-const globeMaterial = new THREE.MeshPhongMaterial();
+const globeMaterial = new MeshPhongMaterial();
 globeMaterial.bumpScale = 10;
-new THREE.TextureLoader().load(globeSpecularMap, (texture) => {
+new TextureLoader().load(globeSpecularMap, (texture) => {
   globeMaterial.specularMap = texture;
-  globeMaterial.specular = new THREE.Color("grey");
+  globeMaterial.specular = new Color("grey");
   globeMaterial.shininess = 15;
 });
 
