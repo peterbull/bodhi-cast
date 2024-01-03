@@ -19,7 +19,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["http://localhost:3000"],  # Restrict to frontend
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
@@ -100,12 +100,12 @@ def delete_old_wave_forecasts():
         None
     """
     now = datetime.now()
-    day_previous = now - timedelta(days=1)
+    two_days_previous = now - timedelta(days=2)
 
     engine = create_engine(get_app_settings().database_conn_string)
 
     with Session(engine) as session:
-        stmt = delete(WaveForecast).where(WaveForecast.entry_updated < day_previous)
+        stmt = delete(WaveForecast).where(WaveForecast.entry_updated < two_days_previous)
         session.execute(stmt)
         session.commit()
 
