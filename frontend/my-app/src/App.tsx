@@ -13,9 +13,7 @@ function App() {
   useEffect(() => {
     const fetchAllSpots = async () => {
       try {
-        const res = await fetch(
-          `http${process.env.REACT_APP_SSL}://${process.env.REACT_APP_BACKEND_HOST}${process.env.REACT_APP_PORT_OPTIONAL}${process.env.REACT_APP_BACKEND_PORT}/spots`
-        );
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/spots`);
         const data = await res.json();
         setSpots(data);
       } catch (error) {
@@ -37,7 +35,7 @@ function App() {
             (now.getUTCMonth() + 1).toString().padStart(2, "0") +
             now.getUTCDate().toString().padStart(2, "0");
           const res = await fetch(
-            `http${process.env.REACT_APP_SSL}://${process.env.REACT_APP_BACKEND_HOST}${process.env.REACT_APP_PORT_OPTIONAL}${process.env.REACT_APP_BACKEND_PORT}/forecasts/spots/${date}/${currentSpot.latitude}/${currentSpot.longitude}/`
+            `${process.env.REACT_APP_BACKEND_URL}/forecasts/spots/${date}/${currentSpot.latitude}/${currentSpot.longitude}/`
           );
           const data = await res.json();
           setSpotForecast(data);
