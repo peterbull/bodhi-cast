@@ -1,10 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
-import globeSpecularMap from "../img/earth-water.png";
-import globeEarthTopology from "../img/earth-topology.png";
-import globeEarthNightSky from "../img/night-sky.png";
-import { MeshPhongMaterial, TextureLoader, Color } from "three";
 
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,
@@ -19,7 +15,7 @@ const GlobeSpots: React.FC<any> = ({
       globeEl.current.pointOfView({
         lat: currentSpot ? currentSpot.latitude : spots[0].latitude,
         lng: currentSpot ? currentSpot.longitude : spots[0].longitude,
-        altitude: 1.8,
+        altitude: 1.0,
       });
     }
   });
