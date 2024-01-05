@@ -3,7 +3,7 @@ FROM node:20-slim as build
 # # Production
 
 # # Build the react app
-# WORKDIR /app
+# WORKDIR /usr/src/app
 # COPY my-app/package.json my-app/package-lock.json ./
 # RUN npm install
 # COPY my-app/ ./

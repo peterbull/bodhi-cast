@@ -6,14 +6,6 @@ import globeEarthTopology from "../img/earth-topology.png";
 import globeEarthNightSky from "../img/night-sky.png";
 import { MeshPhongMaterial, TextureLoader, Color } from "three";
 
-const globeMaterial = new MeshPhongMaterial();
-globeMaterial.bumpScale = 10;
-new TextureLoader().load(globeSpecularMap, (texture) => {
-  globeMaterial.specularMap = texture;
-  globeMaterial.specular = new Color("grey");
-  globeMaterial.shininess = 15;
-});
-
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,
   currentSpot,
@@ -21,14 +13,6 @@ const GlobeSpots: React.FC<any> = ({
   spots,
 }) => {
   const globeEl = useRef<any>();
-  useEffect(() => {
-    if (globeEl.current) {
-      const directionalLight = globeEl.current
-        .lights()
-        .find((obj3d: any) => obj3d.type === "DirectionalLight");
-      directionalLight && directionalLight.position.set(1, 1, 1); // change light position to see the specularMap's effect
-    }
-  }, []);
 
   useEffect(() => {
     if (globeEl.current) {
@@ -44,16 +28,13 @@ const GlobeSpots: React.FC<any> = ({
     <>
       <Globe
         ref={globeEl}
-        globeMaterial={globeMaterial}
         globeImageUrl={globeImageUrl}
-        bumpImageUrl={globeEarthTopology}
-        backgroundImageUrl={globeEarthNightSky}
         labelsData={spots}
         labelLat="latitude"
         labelLng="longitude"
         labelText="spot_name"
         labelSize={0.0}
-        labelDotRadius={0.1}
+        labelDotRadius={0.4}
         labelColor={() => "rgba(164, 255, 61, 0.5)"}
         labelLabel={(spot: any) =>
           `<div>
