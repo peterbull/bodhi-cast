@@ -171,7 +171,7 @@ def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session 
         return [row._asdict() for row in rows]
 
 
-@app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}/")
+@app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}")
 def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
     """
     Retrieve wave forecasts for a specific spot based on date and coordinates.
