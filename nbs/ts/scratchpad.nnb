@@ -424,6 +424,13 @@
         {
             "language": "typescript",
             "source": [
+                "function bubbleSort(arr: number[]): void {\n  for (let i = 0; i < arr.length; ++i) {\n    for (let j = 0; j < arr.length - 1 - i; ++i) {\n      if (arr[j] > arr[j + 1]) {\n        const tmp = arr[j];\n        arr[j] = arr[j + 1];\n        arr[j + 1] = tmp;\n      }\n    }\n  }\n}\n"
+            ],
+            "outputs": []
+        },
+        {
+            "language": "typescript",
+            "source": [
                 ""
             ],
             "outputs": []

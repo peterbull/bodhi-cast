@@ -1,4 +1,5 @@
 import { render, act } from "@testing-library/react";
+import fetchMock from "jest-fetch-mock";
 import App from "./App";
 
 test("renders without crashing", () => {

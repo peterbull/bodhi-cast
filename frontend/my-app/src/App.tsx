@@ -1,28 +1,27 @@
 import "./App.css";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 
 import ComponentWrapper from "./components/ComponentWrapper";
 import { ComponentMapProvider } from "./contexts/ComponentMapProvider";
 
-export interface Coord {
-  lat: number;
-  lon: number;
-  swell: number;
-}
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
+};
 
-export interface SwellData {
-  time: string;
-  step: string;
-  maxSwell: number;
-  locations: Coord[];
-}
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 function App() {
-  const [swellData, setSwellData] = useState<SwellData[]>([]);
   const [spots, setSpots] = useState([]);
   const [currentSpot, setCurrentSpot] = useState<any>(null);
-  const [tileData, setTileData] = useState<any>([]);
-  const [zoom, setZoom] = useState<any>(15);
   const [spotForecast, setSpotForecast] = useState<any>([]);
 
   useEffect(() => {
@@ -67,11 +66,8 @@ function App() {
     <ComponentMapProvider>
       <ComponentWrapper
         spots={spots}
-        swellData={swellData}
         currentSpot={currentSpot}
         setCurrentSpot={setCurrentSpot}
-        zoom={zoom}
-        tileData={tileData}
         spotForecast={spotForecast}
       />
     </ComponentMapProvider>

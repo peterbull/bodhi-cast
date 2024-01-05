@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { ComponentMapContext } from "../contexts/ComponentMapProvider";
+import React, { useEffect, useRef } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
 import globeSpecularMap from "../img/earth-water.png";
@@ -54,7 +53,7 @@ const GlobeSpots: React.FC<any> = ({
         labelLng="longitude"
         labelText="spot_name"
         labelSize={0.0}
-        labelDotRadius={0.4}
+        labelDotRadius={0.1}
         labelColor={() => "rgba(164, 255, 61, 0.5)"}
         labelLabel={(spot: any) =>
           `<div>
