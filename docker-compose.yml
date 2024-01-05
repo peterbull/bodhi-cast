@@ -9,6 +9,7 @@ services:
         REACT_APP_BACKEND_HOST: ${REACT_APP_BACKEND_HOST}
         REACT_APP_BACKEND_PORT: ${REACT_APP_BACKEND_PORT}
         REACT_APP_PORT_OPTIONAL: ${REACT_APP_PORT_OPTIONAL}
+        REACT_APP_SSL: ${REACT_APP_SSL}
     env_file:
       - .env
     volumes:

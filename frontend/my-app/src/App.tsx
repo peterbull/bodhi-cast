@@ -14,7 +14,7 @@ function App() {
     const fetchAllSpots = async () => {
       try {
         const res = await fetch(
-          `http://${process.env.REACT_APP_BACKEND_HOST}${process.env.REACT_APP_PORT_OPTIONAL}${process.env.REACT_APP_BACKEND_PORT}/spots`
+          `http${process.env.REACT_APP_SSL}://${process.env.REACT_APP_BACKEND_HOST}${process.env.REACT_APP_PORT_OPTIONAL}${process.env.REACT_APP_BACKEND_PORT}/spots`
         );
         const data = await res.json();
         setSpots(data);
@@ -37,7 +37,7 @@ function App() {
             (now.getUTCMonth() + 1).toString().padStart(2, "0") +
             now.getUTCDate().toString().padStart(2, "0");
           const res = await fetch(
-            `http://${process.env.REACT_APP_BACKEND_HOST}${process.env.REACT_APP_PORT_OPTIONAL}${process.env.REACT_APP_BACKEND_PORT}/forecasts/spots/${date}/${currentSpot.latitude}/${currentSpot.longitude}/`
+            `http${process.env.REACT_APP_SSL}://${process.env.REACT_APP_BACKEND_HOST}${process.env.REACT_APP_PORT_OPTIONAL}${process.env.REACT_APP_BACKEND_PORT}/forecasts/spots/${date}/${currentSpot.latitude}/${currentSpot.longitude}/`
           );
           const data = await res.json();
           setSpotForecast(data);
