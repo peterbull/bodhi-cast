@@ -17,5 +17,7 @@ test("calls fetch with the correct url when rendered", async () => {
   render(<App />);
 
   expect(fetch).toHaveBeenCalledTimes(1);
-  expect(fetch).toHaveBeenCalledWith("http://localhost:8000/spots");
+  expect(fetch).toHaveBeenCalledWith(
+    `http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/spots`
+  );
 });
