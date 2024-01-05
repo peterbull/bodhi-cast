@@ -12,6 +12,7 @@ services:
       - .env
     volumes:
       - ./frontend/my-app:/usr/src/app
+      # - /etc/letsencrypt:/etc/letsencrypt
     ports:
       # - "3000:3000" # Development
       - "80:80" # Production
