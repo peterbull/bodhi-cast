@@ -21,6 +21,7 @@ const analytics = getAnalytics(app);
 
 function App() {
   const [spots, setSpots] = useState([]);
+  const [zoom, setZoom] = useState(15);
   const [currentSpot, setCurrentSpot] = useState<any>(null);
   const [spotForecast, setSpotForecast] = useState<any>([]);
 
@@ -68,6 +69,7 @@ function App() {
     <ComponentMapProvider>
       <ComponentWrapper
         spots={spots}
+        zoom={zoom}
         currentSpot={currentSpot}
         setCurrentSpot={setCurrentSpot}
         spotForecast={spotForecast}
