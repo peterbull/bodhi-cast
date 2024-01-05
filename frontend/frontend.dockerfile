@@ -22,11 +22,10 @@ FROM node:20-slim as build
 # Development
 
 # Build the react app
-WORKDIR /app
+WORKDIR /usr/src/app
 COPY my-app/package.json my-app/package-lock.json ./
 RUN npm install
-COPY my-app/ ./
+COPY ./my-app . 
 
 EXPOSE 3000
-CMD ["npm", "start"]
 
