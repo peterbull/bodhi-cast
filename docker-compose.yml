@@ -5,14 +5,17 @@ services:
     build:
       context: ./frontend
       dockerfile: frontend.dockerfile
+      args:
+        REACT_APP_BACKEND_HOST: ${REACT_APP_BACKEND_HOST}
+        REACT_APP_BACKEND_PORT: ${REACT_APP_BACKEND_PORT}
     env_file:
       - .env
     volumes:
       - ./frontend/my-app:/usr/src/app
     ports:
-      - "3000:3000" # Development
-      # - "80:80" # Production
-    command: "npm start"
+      # - "3000:3000" # Development
+      - "80:80" # Production
+    command: nginx -g 'daemon off;'
     depends_on:
       - backend
 
