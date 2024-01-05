@@ -1,10 +1,9 @@
-# HTTP Server
 server {
-    listen 80;
-    server_name peterbull.org, www.peterbull.org;
-    # Redirect all HTTP requests to HTTPS
-    return 301 https://$host$request_uri;
+    listen 80 default_server;
+    server_name _;
+    return 444;
 }
+
 
 # HTTPS Server
 server {
