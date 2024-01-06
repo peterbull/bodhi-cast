@@ -17,7 +17,6 @@ RUN npm run build
 # Serve the app with nginx
 FROM nginx:alpine
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
-COPY ./my-app/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

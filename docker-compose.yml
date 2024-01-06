@@ -12,6 +12,7 @@ services:
       - .env
     volumes:
       - ./frontend/my-app:/usr/src/app
+      - ./my-app/nginx.conf:/etc/nginx/conf.d/default.conf
       # - /etc/letsencrypt:/etc/letsencrypt
     ports:
       # - "3000:3000" # Development
