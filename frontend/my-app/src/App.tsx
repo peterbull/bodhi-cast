@@ -35,7 +35,7 @@ function App() {
             (now.getUTCMonth() + 1).toString().padStart(2, "0") +
             now.getUTCDate().toString().padStart(2, "0");
           const res = await fetch(
-            `${process.env.REACT_APP_BACKEND_URL}/forecasts/spots/${date}/${currentSpot.latitude}/${currentSpot.longitude}/`
+            `${process.env.REACT_APP_BACKEND_URL}/forecasts/spots/${date}/${currentSpot.latitude}/${currentSpot.longitude}`
           );
           const data = await res.json();
           setSpotForecast(data);
