@@ -1,0 +1,19 @@
+version: "3.1"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: frontend.dev.dockerfile
+    volumes:
+      - ./frontend/my-app:/usr/src/app
+      - ./frontend/my-app/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "3000:3000"
+    command: npm start
+
+  backend:
+    command: >
+      sh -c "python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 -m
+      uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 &
+      watchmedo shell-command --patterns='*.py' --recursive --command='pytest' /usr/src/app"
