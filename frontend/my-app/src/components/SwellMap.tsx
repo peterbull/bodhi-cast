@@ -34,6 +34,7 @@ const SwellMap: React.FC<any> = ({
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
 
+    // Return to globe map on zoom out
     useEffect(() => {
       const zoomend = () => {
         const currentZoom = map.getZoom();
@@ -64,7 +65,7 @@ const SwellMap: React.FC<any> = ({
           <MapEvents />
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+            attribution="Tiles &copy; Esri"
           />
           <Marker
             position={spotCoords}
@@ -87,6 +88,14 @@ const SwellMap: React.FC<any> = ({
       <div className="w-full overflow-x-auto">
         {currentSpot && currentSpot.latitude && (
           <>
+            <div className="flex justify-center items-center h-full">
+              <button
+                onClick={() => setCurrentComponent("GlobeSpots")}
+                className="my-2 btn-blue"
+              >
+                Return To World Map
+              </button>
+            </div>
             <h1 className="text-3xl font-thin text-center">
               {currentSpot.spot_name}
             </h1>
