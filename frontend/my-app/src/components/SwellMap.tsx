@@ -60,7 +60,7 @@ const SwellMap: React.FC<any> = ({
 
   return (
     <div className="flex flex-col">
-      <div className="w-full">
+      <div className="w-full overflow-x-hidden">
         <MapContainer center={spotCoords} zoom={zoom} key={currentComponent}>
           <MapEvents />
           <TileLayer
@@ -85,21 +85,21 @@ const SwellMap: React.FC<any> = ({
           </Marker>
         </MapContainer>
       </div>
-      <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto bg-gray-900">
         {currentSpot && currentSpot.latitude && (
           <>
-            <div className="flex justify-center items-center h-full">
+            <div className="flex justify-center items-center h-full pt-4">
               <button
                 onClick={() => setCurrentComponent("GlobeSpots")}
-                className="my-2 btn-blue"
+                className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2"
               >
-                Return To World Map
+                RETURN TO MAP
               </button>
             </div>
-            <h1 className="text-3xl font-thin text-center">
+            <h1 className="text-[#03e9f4] text-3xl font-thin text-center">
               {currentSpot.spot_name}
             </h1>
-            <h3 className="text-xl font-extralight text-center">
+            <h3 className="text-[#03e9f4] text-xl font-extralight text-center">
               {currentSpot.street_address}
             </h3>
           </>
@@ -107,35 +107,35 @@ const SwellMap: React.FC<any> = ({
 
         {spotForecast.length > 0 ? (
           <>
-            <table className="mx-auto text-center divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="mx-auto text-center divide-y divide-gray-500">
+              <thead>
                 <tr>
                   <th
                     colSpan={1}
-                    className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
                   ></th>
                   <th
                     colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
                   >
                     Primary Waves
                   </th>
                   <th
                     colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
                   >
                     Secondary Swell
                   </th>
                   <th
                     colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
                   >
                     Wind Waves
                   </th>
                   <th
                     colSpan={2}
                     className="w-1/5 px-6 py-3 text-center text-xs font-medium
-                    text-gray-500 uppercase tracking-wider"
+                    text-gray-400 uppercase tracking-wider"
                   >
                     Wind Report
                   </th>
@@ -146,7 +146,7 @@ const SwellMap: React.FC<any> = ({
                   .fill(null)
                   .map((_, index) => (
                     <tr
-                      className="text-center text-s font-thin border-0 bg-white divide-gray-200"
+                      className="text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
                       key={index}
                     >
                       <td className="py-6 font-normal">{timeKeys[index]}</td>
