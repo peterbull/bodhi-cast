@@ -34,6 +34,7 @@ const SwellMap: React.FC<any> = ({
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
 
+    // Return to globe map on zoom out
     useEffect(() => {
       const zoomend = () => {
         const currentZoom = map.getZoom();
@@ -58,13 +59,13 @@ const SwellMap: React.FC<any> = ({
   };
 
   return (
-    <div className="flex">
-      <div className="w-1/2 h-screen">
+    <div className="flex flex-col">
+      <div className="w-full overflow-x-hidden">
         <MapContainer center={spotCoords} zoom={zoom} key={currentComponent}>
           <MapEvents />
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+            attribution="Tiles &copy; Esri"
           />
           <Marker
             position={spotCoords}
@@ -84,13 +85,21 @@ const SwellMap: React.FC<any> = ({
           </Marker>
         </MapContainer>
       </div>
-      <div className="w-1/2 h-screen bg-gray-50">
+      <div className="w-full overflow-x-auto bg-gray-900">
         {currentSpot && currentSpot.latitude && (
           <>
-            <h1 className="text-3xl font-thin text-center">
+            <div className="flex justify-center items-center h-full pt-4">
+              <button
+                onClick={() => setCurrentComponent("GlobeSpots")}
+                className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2"
+              >
+                RETURN TO MAP
+              </button>
+            </div>
+            <h1 className="text-[#03e9f4] text-3xl font-thin text-center">
               {currentSpot.spot_name}
             </h1>
-            <h3 className="text-xl font-extralight text-center">
+            <h3 className="text-[#03e9f4] text-xl font-extralight text-center">
               {currentSpot.street_address}
             </h3>
           </>
@@ -98,35 +107,35 @@ const SwellMap: React.FC<any> = ({
 
         {spotForecast.length > 0 ? (
           <>
-            <table className="divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="mx-auto text-center divide-y divide-gray-500">
+              <thead>
                 <tr>
                   <th
                     colSpan={1}
-                    className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
                   ></th>
                   <th
                     colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
                   >
                     Primary Waves
                   </th>
                   <th
                     colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
                   >
                     Secondary Swell
                   </th>
                   <th
                     colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
                   >
                     Wind Waves
                   </th>
                   <th
                     colSpan={2}
                     className="w-1/5 px-6 py-3 text-center text-xs font-medium
-                    text-gray-500 uppercase tracking-wider"
+                    text-gray-400 uppercase tracking-wider"
                   >
                     Wind Report
                   </th>
@@ -137,7 +146,7 @@ const SwellMap: React.FC<any> = ({
                   .fill(null)
                   .map((_, index) => (
                     <tr
-                      className="text-center text-s font-thin border-0 bg-white divide-gray-200"
+                      className="text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
                       key={index}
                     >
                       <td className="py-6 font-normal">{timeKeys[index]}</td>

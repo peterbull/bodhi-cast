@@ -22,7 +22,7 @@ const WindWaveForecast: React.FC<any> = ({ spotForecast, hourlyIndex }) => {
         >
           <path
             d="M6.903 11.059 3.5 0 .097 11.059A1.5 1.5 0 0 0 1.531 13h3.938a1.5 1.5 0 0 0 1.434-1.941Z"
-            fill="#171717"
+            fill="#03e9f4"
           ></path>
         </svg>
       </td>
