@@ -58,8 +58,8 @@ const SwellMap: React.FC<any> = ({
   };
 
   return (
-    <div className="flex">
-      <div className="w-1/2 h-screen">
+    <div className="flex flex-col">
+      <div className="w-full">
         <MapContainer center={spotCoords} zoom={zoom} key={currentComponent}>
           <MapEvents />
           <TileLayer
@@ -84,7 +84,7 @@ const SwellMap: React.FC<any> = ({
           </Marker>
         </MapContainer>
       </div>
-      <div className="w-1/2 h-screen bg-gray-50">
+      <div className="w-full overflow-x-auto">
         {currentSpot && currentSpot.latitude && (
           <>
             <h1 className="text-3xl font-thin text-center">
@@ -98,7 +98,7 @@ const SwellMap: React.FC<any> = ({
 
         {spotForecast.length > 0 ? (
           <>
-            <table className="divide-y divide-gray-200">
+            <table className="mx-auto text-center divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th
