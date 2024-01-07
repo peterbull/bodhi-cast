@@ -31,9 +31,9 @@ function App() {
         try {
           const now = new Date();
           const date =
-            now.getUTCFullYear().toString() +
-            (now.getUTCMonth() + 1).toString().padStart(2, "0") +
-            now.getUTCDate().toString().padStart(2, "0");
+            now.getFullYear().toString() +
+            (now.getMonth() + 1).toString().padStart(2, "0") +
+            now.getDate().toString().padStart(2, "0");
           const res = await fetch(
             `${process.env.REACT_APP_BACKEND_URL}/forecasts/spots/${date}/${currentSpot.latitude}/${currentSpot.longitude}`
           );
