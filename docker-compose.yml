@@ -47,7 +47,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+      - "${POSTGRES_EXTERNAL_PORT}:${POSTGRES_PORT}"
     command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements"]
 
   redis:
