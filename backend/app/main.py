@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime, timedelta
 
 import redis
@@ -26,10 +27,15 @@ app.add_middleware(
 )
 
 # Configure redis
-redis_client = redis.Redis(host="redis", port=6379, db=0)
+redis_password = os.getenv("REDIS_PASSWORD")
+redis_client = redis.Redis(host="redis", port=6379, db=0, password=redis_password)
 
 # Configure celery
-celery_app = Celery("tasks", broker="redis://redis:6379/0", backend="redis://redis:6379/0")
+celery_app = Celery(
+    "tasks",
+    broker=f"redis://:{redis_password}@redis:6379/0",
+    backend=f"redis://:{redis_password}@redis:6379/0",
+)
 
 celery_app.conf.broker_connection_retry_on_startup = True
 
