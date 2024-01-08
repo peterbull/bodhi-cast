@@ -8,6 +8,10 @@
   padding: 0;
 }
 
+body {
+  @apply bg-gray-900;
+}
+
 #root {
   height: 100vh;
 }

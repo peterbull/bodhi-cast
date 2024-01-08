@@ -173,7 +173,9 @@ const SwellMap: React.FC<any> = ({
           </>
         ) : (
           <div className="flex justify-center items-center h-half h-screen transform -translate-y-16 animate-pulse">
-            <p className="text-center text-s font-thin">Loading...</p>
+            <p className="text-[#03e9f4] text-center text-s font-thin">
+              Loading...
+            </p>
           </div>
         )}
       </div>
