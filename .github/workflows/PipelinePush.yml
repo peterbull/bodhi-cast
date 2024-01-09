@@ -18,6 +18,6 @@ jobs:
           ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f ~/bodhi-cast/docker-compose.yml down"'
           ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f ~/bodhi-cast/docker-compose.yml up --build -d"'
           ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "mkdir -p ~/bodhi-cast/logs"'
-          ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f ~/bodhi-cast/docker-compose.yml logs -f > ~/bodhi-cast/logs/$(date +'%Y%m%d_%H%M%S').log"'
+          ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f ~/bodhi-cast/docker-compose.yml logs -f > ~/bodhi-cast/logs/$(date +'%Y%m%d_%H%M%S').log &"'
           ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker image prune -f"'
           rm private_key
