@@ -117,6 +117,14 @@ def delete_old_wave_forecasts():
         session.commit()
 
 
+# Datetime conversion class for writing json to redis
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super(DateTimeEncoder, self).default(obj)
+
+
 # Routes
 @app.get("/")
 def read_root():
@@ -253,7 +261,11 @@ def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session =
         )
 
         rows = result.all()
-        return [row._asdict() for row in rows]
+        forecasts = [row._asdict() for row in rows]
+
+        redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=86400)
+
+        return forecasts
 
 
 # Get all spots
