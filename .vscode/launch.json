@@ -18,10 +18,10 @@
             "name": "Launch Chrome against localhost client",
             "request": "launch",
             // "preLaunchTask": "npm: start",
-            "type": "chrome",
+            "type": "pwa-chrome",
             "url": "http://localhost:3000/",
-            "program": "${workspaceFolder}/frontend/my-app/App.js",
-            "webRoot": "${workspaceFolder}",
+            "webRoot": "${workspaceFolder}/frontend/my-app",
+            "sourceMaps": true,
             "skipFiles": [
                 "<node_internals>/**/*.js",
                 "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
@@ -68,14 +68,20 @@
             ]
         },
         {
-            "name": "Docker: Attach to React",
-            "type": "node",
+            "name": "Docker: Launch Chrome against Localhost",
+            "type": "pwa-chrome",
             "request": "attach",
-            "port": 3000,
             "address": "localhost",
-            "localRoot": "${workspaceFolder}/frontend",
-            "remoteRoot": "/app",
-            // "protocol": "inspector",
-        },
+            "port": 9229,
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/frontend/my-app",
+            "sourceMaps": true,
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
+                "${workspaceFolder}/frontend/my-app/node_modules/**/*.mjs",
+                "**/build/*"
+            ]
+        }
     ]
 }
