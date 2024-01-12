@@ -28,8 +28,7 @@ const D3Overlay: React.FC<any> = ({ currentSpot }) => {
       .attr("cx", center.x)
       .attr("cy", center.y)
       .attr("r", 40) // radius of the circle
-      .style("fill", "red")
-      .raise(); // bring the circle to the front in draw order
+      .style("fill", "red");
 
     map.on("viewreset", reset);
 
