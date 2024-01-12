@@ -17,5 +17,6 @@ jobs:
           ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "git clone https://github.com/peterbull/bodhi-cast.git ~/bodhi-cast || (cd ~/bodhi-cast && git pull origin main)"'
           ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f ~/bodhi-cast/docker-compose.yml down"'
           ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f ~/bodhi-cast/docker-compose.yml up --build -d"'
+          ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "mkdir -p ~/bodhi-cast/logs"'
           ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker image prune -f"'
           rm private_key

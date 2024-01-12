@@ -3,7 +3,6 @@ import os
 from datetime import datetime, timedelta
 
 import redis
-import requests
 from app.core.config import get_app_settings
 from app.data.noaa.wavewatch import Wavewatch
 from app.db.database import add_spots, create_tables, engine, get_db
@@ -51,13 +50,8 @@ celery_app.conf.beat_schedule = {
     },
     "delete-old-noaa-data-daily": {
         "task": "app.main.delete_old_wave_forecasts",
-        # Runs daily at 12:00 UTC 7:00am EST
-        "schedule": crontab(minute="0", hour="12"),
-    },
-    "prime-redis-daily": {
-        "task": "app.main.get_forecasts_for_all_spots",
-        # Runs daily at 10 UTC 5:00am ESST
-        "schedule": crontab(minute="0", hour="12"),
+        # Runs daily at 10:00 UTC 5:00am EST
+        "schedule": crontab(minute="0", hour="10"),
     },
 }
 
@@ -121,18 +115,6 @@ def delete_old_wave_forecasts():
         stmt = delete(WaveForecast).where(WaveForecast.entry_updated < two_days_previous)
         session.execute(stmt)
         session.commit()
-
-
-@celery_app.task
-def get_forecasts_for_all_spots():
-    db: Session = next(get_db())
-    spots = db.query(Spots).all()
-    date = datetime.now().strftime("%Y%m%d")
-    for spot in spots:
-        url = f"http://localhost:8000/forecasts/tiles/{date}/{spot.latitude}/{spot.longitude}/12"
-        response = requests.get(url)
-        print(f"{spot.spot_name} - {response.status_code}")
-    return "Successfully primed redis cache"
 
 
 # Datetime conversion class for writing json to redis
