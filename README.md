@@ -4,12 +4,16 @@
 
 - [ ] Add user auth
 - [ ] Add user spot creation pin drop
+- [ ] Add zoom to areas with no spots on globe component
+
 
 ### Backend
 
 - [ ] Add forecast data for regular weather
 - [x] Change data fetching utils to classes
-- [ ] Add tests for all endpoints
-- [ ] Set up gh actions for testing
+- [x] Add tests for all endpoints
 - [ ] Add API auth
 - [ ] Add user spot creation endpoint
+
+
+
