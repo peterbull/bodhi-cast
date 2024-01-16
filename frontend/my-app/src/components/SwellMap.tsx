@@ -8,6 +8,7 @@ import SwellWaveForecast from "./SwellWaveForecast";
 import WindWaveForecast from "./WindWaveForecast";
 import WindForecast from "./WindForecast";
 import D3SwellVis from "./D3SwellVis";
+import WaveSim from "./WaveSim";
 
 const SwellMap: React.FC<any> = ({
   currentSpot,
@@ -180,6 +181,7 @@ const SwellMap: React.FC<any> = ({
             </p>
           </div>
         )}
+        <WaveSim />
       </div>
     </div>
   );
