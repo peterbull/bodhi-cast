@@ -1,6 +1,7 @@
 ## To Do:
 
-### Frontend
+## Long-Term:
+### Frontend:
 
 - [ ] Add user auth
 - [ ] Add user spot creation pin drop
@@ -10,7 +11,7 @@
 - [ ]  
 
 
-### Backend
+### Backend:
 
 - [ ] Get tide forecast
 - [ ] Get shore wind forecast
@@ -20,3 +21,8 @@
 - [ ] Set up gh actions for testing
 - [ ] Add API auth
 - [ ] Add user spot creation endpoint
+
+
+### Week Ending 240116
+
+- [ ] Add basic wave visualization component in three.js using `swh` data
