@@ -103,6 +103,7 @@ function AnimationCanvas() {
   return (
     <Canvas camera={{ position: [100, 10, 0], fov: 75 }}>
       <Suspense fallback={null}>
+        <axesHelper args={[5]} />
         <Points />
       </Suspense>
       <CameraControls />
@@ -110,7 +111,7 @@ function AnimationCanvas() {
   );
 }
 
-function WaveSim() {
+function SwellSim() {
   return (
     <div className="anim pb-40 h-[500px]">
       <Suspense fallback={<div>Loading...</div>}>
@@ -120,4 +121,4 @@ function WaveSim() {
   );
 }
 
-export default WaveSim;
+export default SwellSim;
