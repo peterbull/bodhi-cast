@@ -21,8 +21,18 @@ swell height * period * 0.1
 
 [Python Wave Math Package](https://github.com/mpiannucci/surfpy/blob/master/surfpy)
 
+**Sine Wave with Frequency and Amplitude Formula**
+
+
+$$g(x) = A \sin(f (x + \Theta))$$
+
+$f$ controls frequency
+$A$ controls amplitude
+
 
 ### Additional Weather Data
 
 [NOAA Weather API](https://api.tidesandcurrents.noaa.gov/api/prod/)
+
+
 

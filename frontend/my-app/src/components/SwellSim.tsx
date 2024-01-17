@@ -32,20 +32,20 @@ function Points() {
   let a = 3;
   const graph = useCallback(
     (x: any, z: any) => {
-      return Math.sin(f * (x ** 2 + z ** 2 + t)) * a;
+      return Math.cos(f * (x + z ** 2 - t)) * a;
     },
     [t, f, a]
   );
 
   const count = 100;
-  const sep = 3;
+  const sep = 2;
   let positions = useMemo(() => {
     let positions = [];
 
     for (let xi = 0; xi < count; xi++) {
       for (let zi = 0; zi < count; zi++) {
         let x = sep * (xi - count / 2);
-        let z = sep * (zi - count / 2);
+        let z = sep * zi;
         let y = graph(x, z);
         positions.push(x, y, z);
       }
@@ -63,7 +63,7 @@ function Points() {
     for (let xi = 0; xi < count; xi++) {
       for (let zi = 0; zi < count; zi++) {
         let x = sep * (xi - count / 2);
-        let z = sep * (zi - count / 2);
+        let z = sep * zi;
 
         positions[i + 1] = graph(x, z);
         i += 3;
@@ -88,7 +88,7 @@ function Points() {
       <pointsMaterial
         attach="material"
         map={imgTex}
-        color={0x00aaff}
+        color={0x03e9f4}
         size={0.5}
         sizeAttenuation
         transparent={false}
