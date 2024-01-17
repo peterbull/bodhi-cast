@@ -184,7 +184,7 @@ const SwellMap: React.FC<any> = ({
         )}
 
         <WaveSim />
-        <SwellSim />
+        <SwellSim spotForecast={spotForecast} />
       </div>
     </div>
   );
