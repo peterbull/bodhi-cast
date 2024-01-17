@@ -174,6 +174,7 @@ const SwellMap: React.FC<any> = ({
                   ))}
               </tbody>
             </table>
+            <SwellSim spotForecast={spotForecast} />
           </>
         ) : (
           <div className="flex justify-center items-center h-half h-screen transform -translate-y-16 animate-pulse">
@@ -182,9 +183,6 @@ const SwellMap: React.FC<any> = ({
             </p>
           </div>
         )}
-
-        <WaveSim />
-        <SwellSim spotForecast={spotForecast} />
       </div>
     </div>
   );
