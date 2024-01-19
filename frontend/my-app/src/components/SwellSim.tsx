@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import circleImg from "../img/circle.png";
-import { Suspense, useCallback, useMemo, useRef } from "react";
+import { Suspense, useCallback, useMemo, useRef, useEffect } from "react";
 
 function CameraControls() {
   const {
@@ -11,6 +11,14 @@ function CameraControls() {
   } = useThree();
 
   const controlsRef = useRef<any>();
+
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.target.set(0, 0, 50);
+      controlsRef.current.update();
+    }
+  }, []);
+
   useFrame(() => controlsRef.current.update());
 
   return (

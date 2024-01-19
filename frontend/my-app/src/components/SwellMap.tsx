@@ -8,7 +8,6 @@ import SwellWaveForecast from "./SwellWaveForecast";
 import WindWaveForecast from "./WindWaveForecast";
 import WindForecast from "./WindForecast";
 import D3SwellVis from "./D3SwellVis";
-import WaveSim from "./WaveSim";
 import SwellSim from "./SwellSim";
 
 const SwellMap: React.FC<any> = ({
@@ -70,7 +69,7 @@ const SwellMap: React.FC<any> = ({
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             attribution="Tiles &copy; Esri"
           />
-          <D3SwellVis currentSpot={currentSpot} />
+          {/* <D3SwellVis currentSpot={currentSpot} /> */}
           <Marker
             position={spotCoords}
             icon={
