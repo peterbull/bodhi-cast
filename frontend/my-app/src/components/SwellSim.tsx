@@ -25,8 +25,8 @@ function CameraControls() {
     <OrbitControls
       ref={controlsRef}
       args={[camera, domElement]}
-      autoRotate
-      autoRotateSpeed={-0.2}
+      // autoRotate
+      // autoRotateSpeed={-0.2}
     />
   );
 }
@@ -106,7 +106,7 @@ function Points({ spotForecast }: any) {
         attach="material"
         map={imgTex}
         color={0x03e9f4}
-        size={0.5}
+        size={0.8}
         sizeAttenuation
         transparent={false}
         alphaTest={0.5}
@@ -118,7 +118,7 @@ function Points({ spotForecast }: any) {
 
 function AnimationCanvas({ spotForecast }: any) {
   return (
-    <Canvas camera={{ position: [100, 10, 0], fov: 75 }}>
+    <Canvas camera={{ position: [10, 10, 0], fov: 50 }}>
       <Suspense fallback={null}>
         <axesHelper args={[5]} />
         <Points spotForecast={spotForecast} />
@@ -130,7 +130,7 @@ function AnimationCanvas({ spotForecast }: any) {
 
 const SwellSim: React.FC<any> = ({ spotForecast }) => {
   return (
-    <div className="anim pb-40 h-[500px]">
+    <div className="anim pb-10 h-[300px]">
       <Suspense fallback={<div>Loading...</div>}>
         <AnimationCanvas spotForecast={spotForecast} />
       </Suspense>
