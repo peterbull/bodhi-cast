@@ -26,6 +26,6 @@
 - [ ] Add API auth
 - [ ] Add user spot creation endpoint
 
-### Week Ending 240116
+### Week Ending 240121
 
-- [ ] Add basic wave visualization component in three.js using `swh` data
+- [x] Add basic wave visualization component in three.js using `swh` data
