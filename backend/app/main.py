@@ -161,6 +161,7 @@ def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session 
         return json.loads(result)
     else:
         date = datetime.strptime(date, "%Y%m%d").date()
+        next_day = date + timedelta(days=1)
         # To do: Find an equation that returns proportionally at all zoom levels after deciding on
         #        final map and corresponding projection and pixel size
         # Current: A placeholder that will only work with values near the default `zoom`
@@ -171,19 +172,35 @@ def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session 
         lng_max = float(lng) + zoom_factor
         result = db.execute(
             text(
-                """SELECT *
+                """SELECT swh
             FROM wave_forecast
             WHERE
                 location::geometry && ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326)
                 AND ST_Intersects(
                     location::geometry,
-                    ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326));
+                    ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326))
+                AND valid_time >= :date
+                AND time >= :date
+                AND valid_time < :next_day
+                AND time < :next_day
+                AND swh IS NOT NULL;
                     """
             ),
-            {"lng_min": lng_min, "lat_min": lat_min, "lng_max": lng_max, "lat_max": lat_max},
+            {
+                "lng_min": lng_min,
+                "lat_min": lat_min,
+                "lng_max": lng_max,
+                "lat_max": lat_max,
+                "date": date,
+                "next_day": next_day,
+            },
         )
         rows = result.all()
-        return [row._asdict() for row in rows]
+        forecasts = [row._asdict() for row in rows]
+
+        redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=86400)
+
+        return forecasts
 
 
 @app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}")

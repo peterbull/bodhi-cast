@@ -4,9 +4,9 @@ import * as d3 from "d3";
 import * as d3Geo from "d3-geo";
 import L from "leaflet";
 
-const D3Overlay: React.FC<any> = ({ currentSpot }) => {
+const D3Overlay: React.FC<any> = ({ currentSpot, tileForecast }) => {
   const map = useMap();
-
+  console.log(tileForecast);
   useEffect(() => {
     const svg = d3
       .select(map.getPanes().overlayPane)

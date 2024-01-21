@@ -9,6 +9,7 @@ function App() {
   const [zoom, setZoom] = useState(15);
   const [currentSpot, setCurrentSpot] = useState<any>(null);
   const [spotForecast, setSpotForecast] = useState<any>([]);
+  const [tileForecast, setTileForecast] = useState<any>([]);
 
   useEffect(() => {
     const fetchAllSpots = async () => {
@@ -48,6 +49,30 @@ function App() {
     }
   }, [currentSpot]);
 
+  useEffect(() => {
+    if (currentSpot) {
+      setSpotForecast([]);
+      const fetchTileForecast = async () => {
+        try {
+          const now = new Date();
+          const date =
+            now.getFullYear().toString() +
+            (now.getMonth() + 1).toString().padStart(2, "0") +
+            now.getDate().toString().padStart(2, "0");
+          const res = await fetch(
+            `${process.env.REACT_APP_BACKEND_URL}/forecasts/tiles/${date}/${currentSpot.latitude}/${currentSpot.longitude}/${zoom}`
+          );
+          const data = await res.json();
+          setTileForecast(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      fetchTileForecast();
+    }
+  }, [currentSpot, zoom]);
+
   return (
     <ComponentMapProvider>
       <ComponentWrapper
@@ -56,6 +81,7 @@ function App() {
         currentSpot={currentSpot}
         setCurrentSpot={setCurrentSpot}
         spotForecast={spotForecast}
+        tileForecast={tileForecast}
       />
     </ComponentMapProvider>
   );
