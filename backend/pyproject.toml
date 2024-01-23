@@ -3,7 +3,7 @@ name = "bodhi-cast"
 version = "0.1.0"
 description = ""
 authors = ["LAPTOP-VCGCOL4V <petercbull@gmail.com>"]
-readme = "README.md"
+readme = ""
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -31,6 +31,7 @@ watchdog = {extras = ["watchmedo"], version = "^3.0.0"}
 odc-stac = "^0.3.8"
 pystac-client = "^0.7.5"
 jinja2 = "^3.1.2"
+graphviz = "^0.20.1"
 
 
 
