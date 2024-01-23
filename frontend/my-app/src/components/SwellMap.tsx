@@ -76,7 +76,12 @@ const SwellMap: React.FC<any> = ({
   return (
     <div className="flex flex-col">
       <div className="w-full overflow-x-hidden">
-        <MapContainer center={spotCoords} zoom={zoom} key={currentComponent}>
+        <MapContainer
+          center={spotCoords}
+          zoom={zoom}
+          key={currentComponent}
+          scrollWheelZoom={false}
+        >
           <MapEvents />
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"

@@ -46,7 +46,7 @@ function Points({ spotForecast }: any) {
   const graph = useCallback(
     (z: any) => {
       // Wave parameters
-      const waveSpeed = 0.004; // Adjust this for faster or slower wave propagation
+      const waveSpeed = 0.0065; // Adjust this for faster or slower wave propagation
       const waveFrequency = 1 / spotForecast[0].swper; // Adjust this for tighter or looser waves
       const waveAmplitude = spotForecast[0].swh * feetFactor; // Adjust this for higher or lower waves
 
@@ -76,7 +76,7 @@ function Points({ spotForecast }: any) {
   }, [count, sep, graph]);
 
   useFrame(() => {
-    t += 0.5;
+    t += 1;
 
     const positions = bufferRef.current.array;
 
