@@ -19,6 +19,13 @@ function CameraControls() {
     }
   }, []);
 
+  useEffect(() => {
+    controlsRef.current.enabled = false;
+    domElement.addEventListener("click", () => {
+      controlsRef.current.enabled = true;
+    });
+  }, [domElement]);
+
   useFrame(() => controlsRef.current.update());
 
   return (
@@ -34,17 +41,17 @@ function CameraControls() {
 function Points({ spotForecast }: any) {
   const imgTex = useLoader(THREE.TextureLoader, circleImg);
   const bufferRef = useRef<any>();
-  console.log(spotForecast);
+  const feetFactor = 3.28084;
   let t = 0;
   const graph = useCallback(
     (z: any) => {
       // Wave parameters
       const waveSpeed = 0.004; // Adjust this for faster or slower wave propagation
       const waveFrequency = 1 / spotForecast[0].swper; // Adjust this for tighter or looser waves
-      const waveAmplitude = spotForecast[0].swh; // Adjust this for higher or lower waves
+      const waveAmplitude = spotForecast[0].swh * feetFactor; // Adjust this for higher or lower waves
 
       // Ocean-like wave equation: A sine function for wave propagation along the z-axis
-      let y = waveAmplitude * Math.sin(waveFrequency * z - waveSpeed * t);
+      let y = waveAmplitude * Math.sin(waveFrequency * z + waveSpeed * t);
 
       return y > 0 ? y : 0;
     },
@@ -69,14 +76,13 @@ function Points({ spotForecast }: any) {
   }, [count, sep, graph]);
 
   useFrame(() => {
-    t += 1;
+    t += 0.5;
 
     const positions = bufferRef.current.array;
 
     let i = 0;
     for (let xi = 0; xi < count; xi++) {
       for (let zi = 0; zi < count; zi++) {
-        let x = sep * (xi - count / 2);
         let z = sep * zi;
 
         positions[i + 1] = graph(z);
@@ -115,7 +121,7 @@ function Points({ spotForecast }: any) {
 
 function AnimationCanvas({ spotForecast }: any) {
   return (
-    <Canvas camera={{ position: [10, 10, 0], fov: 50 }}>
+    <Canvas camera={{ position: [10, 20, 0], fov: 50 }}>
       <Suspense fallback={null}>
         <axesHelper args={[5]} />
         <Points spotForecast={spotForecast} />
@@ -127,7 +133,7 @@ function AnimationCanvas({ spotForecast }: any) {
 
 const SwellSim: React.FC<any> = ({ spotForecast }) => {
   return (
-    <div className="anim pb-10 h-[300px]">
+    <div className="anim pb-10 h-[300px] mx-48">
       <Suspense fallback={<div>Loading...</div>}>
         <AnimationCanvas spotForecast={spotForecast} />
       </Suspense>
