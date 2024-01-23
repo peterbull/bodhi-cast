@@ -36,25 +36,22 @@ function Points({ spotForecast }: any) {
   const bufferRef = useRef<any>();
   console.log(spotForecast);
   let t = 0;
-  let f = 0.001;
-  let a = 1.5;
   const graph = useCallback(
-    (x: any, z: any) => {
-      // Assuming t is time and it's being updated elsewhere in your useFrame or animation loop
+    (z: any) => {
       // Wave parameters
-      const waveSpeed = 0.002; // Adjust this for faster or slower wave propagation
+      const waveSpeed = 0.004; // Adjust this for faster or slower wave propagation
       const waveFrequency = 1 / spotForecast[0].swper; // Adjust this for tighter or looser waves
       const waveAmplitude = spotForecast[0].swh; // Adjust this for higher or lower waves
 
       // Ocean-like wave equation: A sine function for wave propagation along the z-axis
-      const y = waveAmplitude * Math.sin(waveFrequency * z - waveSpeed * t);
+      let y = waveAmplitude * Math.sin(waveFrequency * z - waveSpeed * t);
 
-      return y;
+      return y > 0 ? y : 0;
     },
     [t, spotForecast] // Only t is a dependency here since other variables are constants
   );
 
-  const count = 100;
+  const count = 200;
   const sep = 1;
   let positions = useMemo(() => {
     let positions = [];
@@ -63,7 +60,7 @@ function Points({ spotForecast }: any) {
       for (let zi = 0; zi < count; zi++) {
         let x = sep * (xi - count / 2);
         let z = sep * zi;
-        let y = graph(x, z);
+        let y = graph(z);
         positions.push(x, y, z);
       }
     }
@@ -72,7 +69,7 @@ function Points({ spotForecast }: any) {
   }, [count, sep, graph]);
 
   useFrame(() => {
-    t += 15;
+    t += 1;
 
     const positions = bufferRef.current.array;
 
@@ -82,7 +79,7 @@ function Points({ spotForecast }: any) {
         let x = sep * (xi - count / 2);
         let z = sep * zi;
 
-        positions[i + 1] = graph(x, z);
+        positions[i + 1] = graph(z);
         i += 3;
       }
     }
