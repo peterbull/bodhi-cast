@@ -1,8 +1,15 @@
-import { MapContainer, TileLayer, Popup, Marker, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Popup,
+  Marker,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
-import { Icon } from "leaflet";
+import { Icon, map } from "leaflet";
 import PrimaryWaveForecast from "./PrimaryWaveForecast";
 import SwellWaveForecast from "./SwellWaveForecast";
 import WindWaveForecast from "./WindWaveForecast";
@@ -35,6 +42,12 @@ const SwellMap: React.FC<any> = ({
 
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
+
+    useMapEvents({
+      click: () => {
+        map.scrollWheelZoom.enable();
+      },
+    });
 
     // Return to globe map on zoom out
     useEffect(() => {
