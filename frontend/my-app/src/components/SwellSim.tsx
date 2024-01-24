@@ -133,7 +133,7 @@ function AnimationCanvas({ spotForecast }: any) {
 
 const SwellSim: React.FC<any> = ({ spotForecast }) => {
   return (
-    <div className="anim pb-10 h-[300px] mx-48">
+    <div className="anim pb-10 h-[300px]">
       <Suspense fallback={<div>Loading...</div>}>
         <AnimationCanvas spotForecast={spotForecast} />
       </Suspense>
