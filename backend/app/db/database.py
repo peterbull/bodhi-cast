@@ -6,7 +6,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = get_app_settings().database_conn_string
-print(f"DATABASE_URL: {DATABASE_URL}")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

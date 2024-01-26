@@ -1,10 +1,13 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
+from sqlalchemy import create_engine
 
-from backend.app.db.database import engine
+from app.data.noaa.wavewatch import Wavewatch
 
-from backend.app.data.noaa.wavewatch import Wavewatch
+DATABASE_URL = "postgresql+psycopg2://airflow:airflow@postgres:5432/airflow"
+
+engine = create_engine(DATABASE_URL)
 
 default_args = {
     'owner': 'airflow',
