@@ -27,94 +27,94 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# Configure redis
-redis_password = os.getenv("REDIS_PASSWORD")
-redis_client = redis.Redis(host="redis", port=6379, db=0, password=redis_password)
+# # Configure redis
+# redis_password = os.getenv("REDIS_PASSWORD")
+redis_client = redis.Redis(host="redis", port=6379, db=0)
 
-# Configure celery
-celery_app = Celery(
-    "tasks",
-    broker=f"redis://:{redis_password}@redis:6379/0",
-    backend=f"redis://:{redis_password}@redis:6379/0",
-)
+# # Configure celery
+# celery_app = Celery(
+#     "tasks",
+#     broker=f"redis://:{redis_password}@redis:6379/0",
+#     backend=f"redis://:{redis_password}@redis:6379/0",
+# )
 
-celery_app.conf.broker_connection_retry_on_startup = True
+# celery_app.conf.broker_connection_retry_on_startup = True
 
-# Schedule celery tasks with celery-beat
-celery_app.conf.beat_schedule = {
-    "fetch-transform-commit-noaa-data-daily": {
-        "task": "app.main.noaa_sample",
-        "args": (24,),
-        # Runs daily at 7:00 UTC 2:00am EST
-        "schedule": crontab(minute="0", hour="7"),
-    },
-    "delete-old-noaa-data-daily": {
-        "task": "app.main.delete_old_wave_forecasts",
-        # Runs daily at 10:00 UTC 5:00am EST
-        "schedule": crontab(minute="0", hour="10"),
-    },
-}
+# # Schedule celery tasks with celery-beat
+# celery_app.conf.beat_schedule = {
+#     "fetch-transform-commit-noaa-data-daily": {
+#         "task": "app.main.noaa_sample",
+#         "args": (24,),
+#         # Runs daily at 7:00 UTC 2:00am EST
+#         "schedule": crontab(minute="0", hour="7"),
+#     },
+#     "delete-old-noaa-data-daily": {
+#         "task": "app.main.delete_old_wave_forecasts",
+#         # Runs daily at 10:00 UTC 5:00am EST
+#         "schedule": crontab(minute="0", hour="10"),
+#     },
+# }
 
 # Add spots to spots table
 add_spots()
 
 
-# Define celery tasks
+# # Define celery tasks
 
 
-@celery_app.task
-def noaa_update():
-    """
-    Updates the Wavewatch data for wave_forecast.
+# @celery_app.task
+# def noaa_update():
+#     """
+#     Updates the Wavewatch data for wave_forecast.
 
-    This function fetches all available forecast periods, which forecast
-    out 16 days. This can be about 23 gigs of data so keep storage and compute in mind when running.
-    """
-    Wavewatch(engine, "wave_forecast").run()
-
-
-@celery_app.task
-def noaa_sample(num_samples=1):
-    """
-    Updates the Wavewatch data for wave_forecast by number of samples.
-
-    Parameters:
-    num_samples (int): The number of forecast samples to fetch. Each sample represents a forecast
-    for a specific time interval. Default value is 1.
-
-    Details:
-    - For the first 10 days of a forecast, data is provided at 3-hour intervals.
-    (1 Day == 8 Samples)
-    - From day 11 to day 16, data is provided at 6-hour intervals.
-    (1 Day == 4 Samples)
-
-    """
-    Wavewatch(engine, "wave_forecast").run_sample(num_samples=num_samples)
+#     This function fetches all available forecast periods, which forecast
+#     out 16 days. This can be about 23 gigs of data so keep storage and compute in mind when running.
+#     """
+#     Wavewatch(engine, "wave_forecast").run()
 
 
-@celery_app.task
-def delete_old_wave_forecasts():
-    """
-    Deletes wave forecasts that are older than one day.
+# @celery_app.task
+# def noaa_sample(num_samples=1):
+#     """
+#     Updates the Wavewatch data for wave_forecast by number of samples.
 
-    This function connects to the database, retrieves wave forecasts that have an entry_updated
-    timestamp older than one day, and deletes them from the database.
+#     Parameters:
+#     num_samples (int): The number of forecast samples to fetch. Each sample represents a forecast
+#     for a specific time interval. Default value is 1.
 
-    Args:
-        None
+#     Details:
+#     - For the first 10 days of a forecast, data is provided at 3-hour intervals.
+#     (1 Day == 8 Samples)
+#     - From day 11 to day 16, data is provided at 6-hour intervals.
+#     (1 Day == 4 Samples)
 
-    Returns:
-        None
-    """
-    now = datetime.now()
-    two_days_previous = now - timedelta(days=2)
+#     """
+#     Wavewatch(engine, "wave_forecast").run_sample(num_samples=num_samples)
 
-    engine = create_engine(get_app_settings().database_conn_string)
 
-    with Session(engine) as session:
-        stmt = delete(WaveForecast).where(WaveForecast.entry_updated < two_days_previous)
-        session.execute(stmt)
-        session.commit()
+# @celery_app.task
+# def delete_old_wave_forecasts():
+#     """
+#     Deletes wave forecasts that are older than one day.
+
+#     This function connects to the database, retrieves wave forecasts that have an entry_updated
+#     timestamp older than one day, and deletes them from the database.
+
+#     Args:
+#         None
+
+#     Returns:
+#         None
+#     """
+#     now = datetime.now()
+#     two_days_previous = now - timedelta(days=2)
+
+#     engine = create_engine(get_app_settings().database_conn_string)
+
+#     with Session(engine) as session:
+#         stmt = delete(WaveForecast).where(WaveForecast.entry_updated < two_days_previous)
+#         session.execute(stmt)
+#         session.commit()
 
 
 # Datetime conversion class for writing json to redis
