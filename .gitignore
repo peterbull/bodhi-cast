@@ -172,3 +172,5 @@ node_modules
 
 # Celery Beat
 celerybeat-*
+
+scratch.txt
