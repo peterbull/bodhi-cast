@@ -303,16 +303,5 @@ def get_all_spots(db: Session = Depends(get_db)):
     return [spot.as_dict() for spot in spots]
 
 
-# Celery Worker Status
 
 
-@app.get("/worker-status")
-def get_worker_status():
-    """
-    Retrieve the status of the worker.
-
-    Returns:
-        dict: A dictionary containing the number of active, scheduled, and reserved tasks.
-    """
-    i = celery_app.control.inspect()
-    return {"active": i.active(), "scheduled": i.scheduled(), "reserved": i.reserved()}

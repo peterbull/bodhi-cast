@@ -6,7 +6,7 @@ authors = ["LAPTOP-VCGCOL4V <petercbull@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<3.12"
 fastapi = "^0.104.1"
 requests = "^2.31.0"
 asyncpg = "^0.29.0"
