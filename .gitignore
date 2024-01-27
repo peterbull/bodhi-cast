@@ -173,4 +173,7 @@ node_modules
 # Celery Beat
 celerybeat-*
 
+# Airflow
+airflow/logs/*
+
 scratch.txt
