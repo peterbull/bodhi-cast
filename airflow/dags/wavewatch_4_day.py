@@ -21,13 +21,13 @@ default_args = {
 }
 
 dag = DAG(
-    'wavewatch_sample_dag',
+    'wavewatch_4_day',
     default_args=default_args,
     description='N',
-    schedule_interval=None,
+    schedule_interval='0 6 * * *',
 )
 
-def wavewatch_sample(num_samples=1):
+def wavewatch_sample(num_samples):
     """
     Updates the Wavewatch data for wave_forecast by number of samples.
 
@@ -45,8 +45,8 @@ def wavewatch_sample(num_samples=1):
     Wavewatch(engine, "wave_forecast").run_sample(num_samples=num_samples)
 
 t1 = PythonOperator(
-    task_id='noaa_sample_task',
+    task_id='wavewatch_4_day',
     python_callable=wavewatch_sample,
-    op_kwargs={'num_samples': 1},
+    op_kwargs={'num_samples': 32},
     dag=dag,
 )
