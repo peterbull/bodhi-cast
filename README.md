@@ -22,6 +22,8 @@
 - [ ] Add API auth
 - [ ] Add user spot creation endpoint
 
+### Airflow:
+
 ### Week Ending 240121
 
 - [x] Add basic wave visualization component in three.js using `swh` data
@@ -35,4 +37,3 @@
   - [ ] Configure DAGs for production
   - [ ] Set up env for production
   - [ ] Add auto tests for data verification as DAGs
-  - [ ]
