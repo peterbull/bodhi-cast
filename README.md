@@ -30,10 +30,14 @@
 
 ### Week Ending 240128
 
-- [ ] Migrate data pipeline to airflow
-  - [x] Downgrade to SQLAlchemy 1.4
-  - [x] Merge Docker compose services with airflow
-  - [x] Extend airflow image to correctly install ECCodes for use of cfgrib engine in data processing
-  - [ ] Configure DAGs for production
-  - [ ] Set up env for production
-  - [ ] Add auto tests for data verification as DAGs
+- [x] Migrate data pipeline to airflow
+- [x] Downgrade to SQLAlchemy 1.4
+- [x] Merge Docker compose services with airflow
+- [x] Extend airflow image to correctly install ECCodes for use of cfgrib engine in data processing
+
+### Week Ending 240204
+
+- [ ] Set up kafka for streams
+- [ ] Configure DAGs for production
+- [ ] Set up env for production
+- [ ] Add auto tests for data verification as DAGs
