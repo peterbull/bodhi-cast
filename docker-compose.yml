@@ -51,7 +51,7 @@ x-airflow-common: &airflow-common
   # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.8.1}
   build:
     context: .
-    dockerfile: airflow.extension.dockerfile
+    dockerfile: ${AIRFLOW_PROJ_DIR:-.}/airflow.extension.dockerfile
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -319,6 +319,24 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+
+  zookeeper:
+    image: "bitnami/zookeeper:latest"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: "bitnami/kafka:latest"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
 
 volumes:
   postgres-db-volume:
