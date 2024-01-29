@@ -41,4 +41,5 @@ RUN apt-get update && apt-get install -y python3-pip && \
 USER airflow
 WORKDIR /home/airflow
 
-RUN pip install 
+COPY airflow/requirements.txt . 
+RUN pip install -r requirements.txt 
