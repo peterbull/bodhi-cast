@@ -1,7 +1,7 @@
 import logging
 import re
-from datetime import datetime, timedelta
 
+import pendulum
 import requests
 from airflow.decorators import task
 from bs4 import BeautifulSoup
@@ -9,15 +9,17 @@ from confluent_kafka import Producer
 
 from airflow import DAG
 
+start_date = pendulum.datetime(2024, 1, 1)
+
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2024, 1, 1),
+    "start_date": start_date,
     "email": ["your-email@example.com"],
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 1,
-    "retry_delay": timedelta(minutes=5),
+    "retry_delay": pendulum.duration(minutes=5),
 }
 
 
@@ -92,7 +94,7 @@ with DAG(
     forecast_intervals = ["00", "06", "12", "18"]
     # Fetch just the first model of the day due to storage size on disk
     epoch = forecast_intervals[0]
-    date = datetime.now().strftime("%Y%m%d")  # Current Time UTC
+    date = pendulum.now("UTC").strftime("%Y%m%d")  # Current Time UTC
 
     gefs_wave_urls = get_gefs_wave_urls(epoch, date)
     send_to_kafka = send_urls_to_kafka(gefs_wave_urls, epoch, date)
