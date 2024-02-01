@@ -42,8 +42,11 @@ def send_urls_to_kafka(urls, epoch, date):
     producer = Producer(conf)
     topic = f"gefs_urls_{epoch}_{date}"
 
-    # List to store delivery reports
     delivery_reports = []
+
+    """Create and check delivery report
+    Airflow will otherwise always return `success` at the end of the producer flush, 
+    even if it fails to write"""
 
     def delivery_report(err, msg):
         if err is not None:
