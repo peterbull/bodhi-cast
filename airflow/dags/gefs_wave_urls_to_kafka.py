@@ -41,19 +41,24 @@ def send_urls_to_kafka(urls, epoch, date):
     producer = Producer(conf)
     topic = f"gefs_urls_{epoch}_{date}"
 
-    # Send each URL as a separate message to the Kafka topic
     for url in urls:
-        producer.produce(topic, url)
+        try:
+            producer.produce(topic, url)
+            print(url)
+        except Exception as e:
+            print(f"Failed to send message to Kafka: {e}")
 
-    # Wait forv outstanding messages to be delivered and report delivery errors
-    producer.flush()
+    try:
+        producer.flush()
+    except Exception as e:
+        print(f"Failed to flush messages to Kafka: {e}")
 
 
 with DAG(
-    "get_gefs_wave_urls",
+    "gefs_wave_urls_to_kafka",
     default_args=default_args,
     description="Get GEFS wave forecast grib2 file urls",
-    schedule_interval=None,
+    schedule=None,
     catchup=False,
 ) as dag:
     # Available forecasts
@@ -64,3 +69,6 @@ with DAG(
 
     gefs_wave_urls = get_gefs_wave_urls(epoch, date)
     send_to_kafka = send_urls_to_kafka(gefs_wave_urls, epoch, date)
+
+if __name__ == "__main__":
+    dag.test()
