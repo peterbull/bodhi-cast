@@ -1,3 +1,4 @@
+import logging
 import re
 from datetime import datetime, timedelta
 
@@ -41,17 +42,40 @@ def send_urls_to_kafka(urls, epoch, date):
     producer = Producer(conf)
     topic = f"gefs_urls_{epoch}_{date}"
 
+    # List to store delivery reports
+    delivery_reports = []
+
+    def delivery_report(err, msg):
+        if err is not None:
+            delivery_reports.append((False, f"Message delivery failed: {err}"))
+            logging.error(f"Message delivery failed: {err}")
+        else:
+            delivery_reports.append(
+                (True, f"Message delivered to {msg.topic()} [{msg.partition()}]")
+            )
+            logging.info(f"Message delivered to {msg.topic()} [{msg.partition()}]")
+
     for url in urls:
         try:
-            producer.produce(topic, url)
-            print(url)
+            producer.produce(topic, url, callback=delivery_report)
         except Exception as e:
-            print(f"Failed to send message to Kafka: {e}")
+            logging.error(f"Failed to send message to Kafka: {e}")
 
     try:
         producer.flush()
     except Exception as e:
-        print(f"Failed to flush messages to Kafka: {e}")
+        logging.error(f"Failed to flush messages to Kafka: {e}")
+
+    # Check delivery reports
+    for success, report in delivery_reports:
+        if not success:
+            logging.error(report)
+
+    # If all messages were successfully delivered, delivery_reports will only contain True values
+    if all(success for success, report in delivery_reports):
+        logging.info("All messages were successfully delivered to Kafka.")
+    else:
+        logging.error("Some messages failed to be delivered to Kafka.")
 
 
 with DAG(
