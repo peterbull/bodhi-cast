@@ -29,6 +29,16 @@ default_args = {
 
 @task
 def get_gefs_wave_urls(epoch, date):
+    """
+    Retrieves the URLs of mean ensemble wave models for a given epoch and date.
+
+    Args:
+        epoch (str): The epoch(hour) of the wave models.
+        date (str): The date of the wave models.
+
+    Returns:
+        list: A list of URLs of mean ensemble wave models.
+    """
     url = f"https://nomads.ncep.noaa.gov/pub/data/nccf/com/gens/prod/gefs.{date}/{epoch}/wave/gridded/"
     # Pattern for mean ensemble wave models at epoch:
     pattern = re.compile(r".*\.mean\.global\.0p25\.f\d{3}\.grib2")
@@ -72,38 +82,15 @@ def send_urls_to_kafka(urls, topic):
     except Exception as e:
         logging.error(f"Failed to flush messages to Kafka: {e}")
 
-    # Check delivery reports
     for success, report in delivery_reports:
         if not success:
             logging.error(report)
 
-    # If all messages were successfully delivered, delivery_reports will only contain True values
     if all(success for success, report in delivery_reports):
         logging.info("All messages were successfully delivered to Kafka.")
     else:
         logging.error("Some messages failed to be delivered to Kafka.")
 
-
-def alter_topic_retention(bootstrap_servers, topic, retention_ms):
-    # Create an AdminClient
-    admin_client = AdminClient({"bootstrap.servers": bootstrap_servers})
-
-    # Create a ConfigResource for the topic
-    config_resource = ConfigResource(ConfigResource.Type.TOPIC, topic)
-
-    # Set the new retention time
-    config_resource.set_config("retention.ms", str(retention_ms))
-
-    # Update the topic configuration
-    fs = admin_client.alter_configs([config_resource])
-
-    # Wait for the operation to finish
-    for res in fs.values():
-        res.result()
-
-
-# Usage
-alter_topic_retention("localhost:9092", "my_topic", 86400000)
 
 with DAG(
     "gefs_wave_urls_to_kafka",

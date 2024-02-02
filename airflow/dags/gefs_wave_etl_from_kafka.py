@@ -1,7 +1,6 @@
 import logging
 import os
 import tempfile
-from datetime import datetime
 
 import pandas as pd
 import pendulum
@@ -149,12 +148,15 @@ def df_to_db(df, engine, table_name):
                 index=False,
                 dtype={"location": Geography(geometry_type="POINT", srid=4326)},
             )
-            print("Successfully wrote grib2 file")
+            entry_id = df["valid_time"].unique()
+            entry_id = entry_id[0].strftime("%Y-%m-%d %H:%M:%S")
+            print(f"Successfully wrote grib2 file for {entry_id}")
         except SQLAlchemyError as e:
             print(f"An error occurred: {e}")
 
 
 def process_url(url, engine, table_name):
+    logging.info(f"Processing URL: {url}")
     df = url_to_df(url)
     df_to_db(df, engine, table_name)
 
@@ -166,6 +168,7 @@ def process_urls(urls, engine, table_name):
         process_url(url, engine, table_name)
 
 
+# revisit to refactor based on https://airflow.apache.org/docs/apache-airflow/2.8.1/best-practices.html#top-level-python-code
 with DAG(
     "gefs_wave_etl_from_kafka",
     default_args=default_args,
