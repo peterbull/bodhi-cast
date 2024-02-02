@@ -5,12 +5,9 @@ from datetime import datetime
 
 import pandas as pd
 import pendulum
-import pytz
 import requests
 import xarray as xr
 from airflow.decorators import task
-from airflow.utils.task_group import TaskGroup
-from bs4 import BeautifulSoup
 from confluent_kafka import Consumer, KafkaException
 from geoalchemy2 import WKTElement
 from geoalchemy2.types import Geography
@@ -144,8 +141,7 @@ def df_to_db(df, engine, table_name):
     """
     with engine.begin() as connection:
         try:
-            utc = pytz.utc  # todo: convert to pendulum
-            df["entry_updated"] = datetime.now(utc)
+            df["entry_updated"] = pendulum.now("UTC")
             df.to_sql(
                 table_name,
                 con=connection,

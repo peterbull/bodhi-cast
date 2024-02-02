@@ -7,10 +7,13 @@ import requests
 from airflow.decorators import task
 from bs4 import BeautifulSoup
 from confluent_kafka import Producer
+from confluent_kafka.admin import AdminClient, ConfigResource
 
 from airflow import DAG
 
 start_date = pendulum.datetime(2024, 1, 1)
+
+topic = "gefs_wave_urls"
 
 default_args = {
     "owner": "airflow",
@@ -37,11 +40,10 @@ def get_gefs_wave_urls(epoch, date):
 
 
 @task
-def send_urls_to_kafka(urls):
+def send_urls_to_kafka(urls, topic):
     # producer configuration
     conf = {"bootstrap.servers": "kafka:9092"}
     producer = Producer(conf)
-    topic = "gefs_wave_urls"
 
     delivery_reports = []
 
@@ -82,6 +84,27 @@ def send_urls_to_kafka(urls):
         logging.error("Some messages failed to be delivered to Kafka.")
 
 
+def alter_topic_retention(bootstrap_servers, topic, retention_ms):
+    # Create an AdminClient
+    admin_client = AdminClient({"bootstrap.servers": bootstrap_servers})
+
+    # Create a ConfigResource for the topic
+    config_resource = ConfigResource(ConfigResource.Type.TOPIC, topic)
+
+    # Set the new retention time
+    config_resource.set_config("retention.ms", str(retention_ms))
+
+    # Update the topic configuration
+    fs = admin_client.alter_configs([config_resource])
+
+    # Wait for the operation to finish
+    for res in fs.values():
+        res.result()
+
+
+# Usage
+alter_topic_retention("localhost:9092", "my_topic", 86400000)
+
 with DAG(
     "gefs_wave_urls_to_kafka",
     default_args=default_args,
@@ -96,7 +119,7 @@ with DAG(
     date = pendulum.now("UTC").strftime("%Y%m%d")  # Current Time UTC
 
     gefs_wave_urls = get_gefs_wave_urls(epoch, date)
-    send_to_kafka = send_urls_to_kafka(gefs_wave_urls)
+    send_to_kafka = send_urls_to_kafka(gefs_wave_urls, topic=topic)
 
 if __name__ == "__main__":
     dag.test()
