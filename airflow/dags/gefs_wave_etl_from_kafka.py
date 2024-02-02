@@ -36,6 +36,9 @@ default_args = {
 }
 
 
+# Will need to revisit this in the future. This is very basic fault handling,
+# where a single url runs through at a time, such that if there is a failure,
+# it will not be committed to the offset and a retry will resume at the correct message
 @task
 def consume_from_kafka(topic, engine, table_name, bs=1):
     """
@@ -62,11 +65,9 @@ def consume_from_kafka(topic, engine, table_name, bs=1):
 
     c.subscribe([topic])
 
-    # messages = []
-
     try:
         for _ in range(bs):
-            msg = c.poll(6.0)
+            msg = c.poll(9.0)
             if msg is None:
                 logging.info(f"No more messages in topic {topic}")
                 break
@@ -74,7 +75,6 @@ def consume_from_kafka(topic, engine, table_name, bs=1):
                 logging.error(f"Error consuming from topic {topic}: {msg.error()}")
                 raise KafkaException(msg.error())
             else:
-                # messages.append(msg.value().decode("utf-8"))
                 message = msg.value().decode("utf-8")
                 logging.info(f"Beginning processing of {message}")
                 df = url_to_df(message)
@@ -173,28 +173,14 @@ def df_to_db(df, engine, table_name):
             print(f"An error occurred: {e}")
 
 
-# def process_url(url, engine, table_name):
-#     logging.info(f"Processing URL: {url}")
-#     df = url_to_df(url)
-#     df_to_db(df, engine, table_name)
-
-
-# needed to add this because urls is returned as XComArg
-# @task
-# def process_urls(urls, engine, table_name):
-#     for url in urls:
-#         process_url(url, engine, table_name)
-
-
-# revisit to refactor based on https://airflow.apache.org/docs/apache-airflow/2.8.1/best-practices.html#top-level-python-code
 with DAG(
     "gefs_wave_etl_from_kafka",
     default_args=default_args,
     description="Get GEFS grib2 urls from topic and batch process to postgis",
-    schedule=None,
+    schedule_interval="40 7 * * *",
     catchup=False,
 ) as dag:
-    data = consume_from_kafka(topic=topic, engine=engine, table_name=table_name, bs=1)
+    data = consume_from_kafka(topic=topic, engine=engine, table_name=table_name, bs=4)
 
 if __name__ == "__main__":
     dag.test()

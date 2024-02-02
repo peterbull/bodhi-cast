@@ -92,11 +92,12 @@ def send_urls_to_kafka(urls, topic):
         logging.error("Some messages failed to be delivered to Kafka.")
 
 
+# revisit to refactor based on https://airflow.apache.org/docs/apache-airflow/2.8.1/best-practices.html#top-level-python-code
 with DAG(
     "gefs_wave_urls_to_kafka",
     default_args=default_args,
     description="Get GEFS wave forecast grib2 file urls",
-    schedule=None,
+    schedule_interval="30 7 * * *",
     catchup=False,
 ) as dag:
     # Available forecasts
