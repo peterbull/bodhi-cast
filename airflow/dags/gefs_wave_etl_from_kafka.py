@@ -145,6 +145,7 @@ def df_to_db(df, engine, table_name):
         except SQLAlchemyError as e:
             print(f"An error occurred: {e}")
 
+
 with DAG(
     "gefs_wave_etl_from_kafka",
     default_args=default_args,
@@ -152,3 +153,4 @@ with DAG(
     schedule=None,
     catchup=False,
 ) as dag:
+    pass
