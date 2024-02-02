@@ -198,7 +198,7 @@ def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session 
         rows = result.all()
         forecasts = [row._asdict() for row in rows]
 
-        redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=86400)
+        redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=timedelta(hours=1))
 
         return forecasts
 
@@ -280,7 +280,7 @@ def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session =
         rows = result.all()
         forecasts = [row._asdict() for row in rows]
 
-        redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=86400)
+        redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=timedelta(hours=1))
 
         return forecasts
 
@@ -301,7 +301,3 @@ def get_all_spots(db: Session = Depends(get_db)):
     """
     spots = db.query(Spots).all()
     return [spot.as_dict() for spot in spots]
-
-
-
-
