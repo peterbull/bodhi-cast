@@ -1,5 +1,6 @@
 import logging
 import re
+from urllib.parse import urljoin
 
 import pendulum
 import requests
@@ -25,14 +26,12 @@ default_args = {
 
 @task
 def get_gefs_wave_urls(epoch, date):
-    url = (
-        f"https://nomads.ncep.noaa.gov/pub/data/nccf/com/gens/prod/gefs.{date}/{epoch}/wave/gridded"
-    )
+    url = f"https://nomads.ncep.noaa.gov/pub/data/nccf/com/gens/prod/gefs.{date}/{epoch}/wave/gridded/"
     # Pattern for mean ensemble wave models at epoch:
     pattern = re.compile(r".*\.mean\.global\.0p25\.f\d{3}\.grib2")
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
-    urls = [a.get("href") for a in soup.find_all("a", href=pattern)]
+    urls = [urljoin(url, a.get("href")) for a in soup.find_all("a", href=pattern)]
 
     return urls
 
