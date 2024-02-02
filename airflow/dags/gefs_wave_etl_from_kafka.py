@@ -37,10 +37,24 @@ default_args = {
 
 
 @task
-def consume_from_kafka(topic, bs=1):
+def consume_from_kafka(topic, engine, table_name, bs=1):
+    """
+    Consume messages from a Kafka topic.
+
+    Args:
+        topic (str): The name of the Kafka topic to consume from.
+        bs (int, optional): The batch size of messages to consume at once. Defaults to 1.
+
+    Returns:
+        list: A list of consumed messages.
+
+    Raises:
+        KafkaException: If there is an error consuming from the Kafka topic.
+    """
     conf = {
         "bootstrap.servers": "kafka:9092",
         "group.id": "airflow-consumers",
+        "enable.auto.commit": False,
         "auto.offset.reset": "earliest",  # consume from the start of topic
     }
 
@@ -48,7 +62,7 @@ def consume_from_kafka(topic, bs=1):
 
     c.subscribe([topic])
 
-    messages = []
+    # messages = []
 
     try:
         for _ in range(bs):
@@ -60,13 +74,17 @@ def consume_from_kafka(topic, bs=1):
                 logging.error(f"Error consuming from topic {topic}: {msg.error()}")
                 raise KafkaException(msg.error())
             else:
-                messages.append(msg.value().decode("utf-8"))
-                logging.info(f"Consumed message from {topic}")
+                # messages.append(msg.value().decode("utf-8"))
+                message = msg.value().decode("utf-8")
+                logging.info(f"Beginning processing of {message}")
+                df = url_to_df(message)
+                df_to_db(df, engine, table_name)
+                # Commit the offset after succesful processing
+                c.commit()
+                logging.info(f"Consumed and processed message from {topic}")
     finally:
         c.close()
         logging.info("Consumer closed")
-        logging.info(f"{messages}")
-    return messages
 
 
 def url_to_df(url):
@@ -155,17 +173,17 @@ def df_to_db(df, engine, table_name):
             print(f"An error occurred: {e}")
 
 
-def process_url(url, engine, table_name):
-    logging.info(f"Processing URL: {url}")
-    df = url_to_df(url)
-    df_to_db(df, engine, table_name)
+# def process_url(url, engine, table_name):
+#     logging.info(f"Processing URL: {url}")
+#     df = url_to_df(url)
+#     df_to_db(df, engine, table_name)
 
 
 # needed to add this because urls is returned as XComArg
-@task
-def process_urls(urls, engine, table_name):
-    for url in urls:
-        process_url(url, engine, table_name)
+# @task
+# def process_urls(urls, engine, table_name):
+#     for url in urls:
+#         process_url(url, engine, table_name)
 
 
 # revisit to refactor based on https://airflow.apache.org/docs/apache-airflow/2.8.1/best-practices.html#top-level-python-code
@@ -176,8 +194,7 @@ with DAG(
     schedule=None,
     catchup=False,
 ) as dag:
-    urls = consume_from_kafka(topic=topic)
-    process_urls(urls, engine=engine, table_name=table_name)
+    data = consume_from_kafka(topic=topic, engine=engine, table_name=table_name, bs=1)
 
 if __name__ == "__main__":
     dag.test()
