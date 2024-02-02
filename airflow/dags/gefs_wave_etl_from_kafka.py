@@ -9,6 +9,7 @@ import pytz
 import requests
 import xarray as xr
 from airflow.decorators import task
+from airflow.utils.task_group import TaskGroup
 from bs4 import BeautifulSoup
 from confluent_kafka import Consumer, KafkaException
 from geoalchemy2 import WKTElement
@@ -23,6 +24,7 @@ DATABASE_URL = os.environ.get("AIRFLOW__DATABASE__SQL_ALCHEMY_CONN")
 engine = create_engine(DATABASE_URL)
 
 table_name = "wave_forecast"
+topic = "gefs_wave_urls"
 
 start_date = pendulum.datetime(2024, 1, 1)
 
@@ -39,7 +41,7 @@ default_args = {
 
 
 @task
-def consume_from_kafka(topic, max_messages=1):
+def consume_from_kafka(topic, bs=1):
     conf = {
         "bootstrap.servers": "kafka:9092",
         "group.id": "airflow-consumers",
@@ -50,17 +52,28 @@ def consume_from_kafka(topic, max_messages=1):
 
     c.subscribe([topic])
 
+    messages = []
+
     try:
-        for _ in range(max_messages):
-            msg = c.poll(1.0)
-    except KeyboardInterrupt:
-        pass
+        for _ in range(bs):
+            msg = c.poll(6.0)
+            if msg is None:
+                logging.info(f"No more messages in topic {topic}")
+                break
+            if msg.error():
+                logging.error(f"Error consuming from topic {topic}: {msg.error()}")
+                raise KafkaException(msg.error())
+            else:
+                messages.append(msg.value().decode("utf-8"))
+                logging.info(f"Consumed message from {topic}")
     finally:
         c.close()
+        logging.info("Consumer closed")
+        logging.info(f"{messages}")
+    return messages
 
 
-@task
-def url_to_df(url, target):
+def url_to_df(url):
     """
     Fetches data from the specified URL and returns it as a pandas
     DataFrame. Xarray is used as an intermediary to utilize decoding with `cfgrib`.
@@ -73,7 +86,7 @@ def url_to_df(url, target):
         pandas.DataFrame: The fetched data as a pandas DataFrame, with NaN
         swell values dropped and index reset.
     """
-    response = requests.get(f"{url}/{target}")
+    response = requests.get(f"{url}")
     if response.status_code == 200:
         with tempfile.NamedTemporaryFile() as tmp:
             tmp.write(response.content)
@@ -118,7 +131,6 @@ def url_to_df(url, target):
         print(f"Failed to get data: {response.status_code}")
 
 
-@task
 def df_to_db(df, engine, table_name):
     """
     Commit a DataFrame to the database.
@@ -146,6 +158,18 @@ def df_to_db(df, engine, table_name):
             print(f"An error occurred: {e}")
 
 
+def process_url(url, engine, table_name):
+    df = url_to_df(url)
+    df_to_db(df, engine, table_name)
+
+
+# needed to add this because urls is returned as XComArg
+@task
+def process_urls(urls, engine, table_name):
+    for url in urls:
+        process_url(url, engine, table_name)
+
+
 with DAG(
     "gefs_wave_etl_from_kafka",
     default_args=default_args,
@@ -153,4 +177,8 @@ with DAG(
     schedule=None,
     catchup=False,
 ) as dag:
-    pass
+    urls = consume_from_kafka(topic=topic)
+    process_urls(urls, engine=engine, table_name=table_name)
+
+if __name__ == "__main__":
+    dag.test()
