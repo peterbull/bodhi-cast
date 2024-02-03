@@ -107,7 +107,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
     ports:
       - "80:80"
-    command: nginx -g 'daemon off;'
+    command: nginx -g 'daemon off;' -g 'error_log /var/log/nginx/error.log debug;'
     depends_on:
       backend:
         condition: service_healthy
