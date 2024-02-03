@@ -37,7 +37,7 @@
 
 ### Week Ending 240204
 
-- [ ] Set up kafka for streams
-- [ ] Configure DAGs for production
-- [ ] Set up env for production
+- [x] Set up kafka for streams
+- [x] Configure DAGs for production
+- [x] Set up env for production
 - [ ] Add auto tests for data verification as DAGs
