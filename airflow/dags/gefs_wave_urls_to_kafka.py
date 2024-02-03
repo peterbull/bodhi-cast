@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 from urllib.parse import urljoin
 
@@ -10,6 +11,9 @@ from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, ConfigResource
 
 from airflow import DAG
+
+sasl_username = os.environ.get("KAFKA_CLIENT_USER")
+sasl_password = os.environ.get("KAFKA_CLIENT_PASSWORD")
 
 start_date = pendulum.datetime(2024, 1, 1)
 
@@ -51,8 +55,14 @@ def get_gefs_wave_urls(epoch, date):
 
 @task
 def send_urls_to_kafka(urls, topic):
-    # producer configuration
-    conf = {"bootstrap.servers": "kafka:9092"}
+    conf = {
+        "bootstrap.servers": "kafka:9092",
+        "security.protocol": "SASL_PLAINTEXT",
+        "sasl.mechanisms": "PLAIN",
+        "sasl.username": sasl_username,
+        "sasl.password": sasl_password,
+    }
+
     producer = Producer(conf)
 
     delivery_reports = []

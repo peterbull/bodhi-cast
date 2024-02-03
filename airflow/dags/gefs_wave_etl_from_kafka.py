@@ -16,6 +16,10 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from airflow import DAG
 
+sasl_username = os.environ.get("KAFKA_CLIENT_USER")
+sasl_password = os.environ.get("KAFKA_CLIENT_PASSWORD")
+
+
 DATABASE_URL = os.environ.get("AIRFLOW__DATABASE__SQL_ALCHEMY_CONN")
 engine = create_engine(DATABASE_URL)
 
@@ -59,6 +63,10 @@ def consume_from_kafka(topic, engine, table_name, bs=1):
         "group.id": "airflow-consumers",
         "enable.auto.commit": False,
         "auto.offset.reset": "earliest",  # consume from the start of topic
+        "security.protocol": "SASL_PLAINTEXT",
+        "sasl.mechanisms": "PLAIN",
+        "sasl.username": sasl_username,
+        "sasl.password": sasl_password,
     }
 
     c = Consumer(conf)
@@ -180,7 +188,7 @@ with DAG(
     schedule_interval="40 7 * * *",
     catchup=False,
 ) as dag:
-    data = consume_from_kafka(topic=topic, engine=engine, table_name=table_name, bs=4)
+    data = consume_from_kafka(topic=topic, engine=engine, table_name=table_name, bs=1)
 
 if __name__ == "__main__":
     dag.test()
