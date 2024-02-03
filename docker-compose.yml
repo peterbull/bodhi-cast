@@ -141,7 +141,7 @@ services:
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     expose:
-      - 6379
+      - ${REDIS_PORT}
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
@@ -328,6 +328,9 @@ services:
     image: "bitnami/zookeeper:latest"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+      # - ZOO_ENABLE_AUTH=yes
+      # - ZOO_SERVER_USERS=${ZOO_SERVER_USERS}
+      # - ZOO_SERVER_PASSWORDS=${ZOO_SERVER_PASSWORDS}
     ports:
       - "2181:2181"
 
