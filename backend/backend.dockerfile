@@ -3,7 +3,7 @@ FROM python:3.10.12-slim
 
 
 # Install system dependencies required for psycopg2 and wget
-RUN apt-get update && apt-get install -y libpq-dev gcc wget && \
+RUN apt-get update && apt-get install -y libpq-dev gcc wget curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Miniconda

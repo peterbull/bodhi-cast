@@ -104,6 +104,7 @@ services:
       airflow-webserver:
         condition: service_healthy
       backend:
+        condition: service_healthy
 
   backend:
     build:
@@ -116,9 +117,16 @@ services:
       - ./backend:/usr/src/app
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   postgres:
     image: postgis/postgis
@@ -144,6 +152,8 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     expose:
       - ${REDIS_PORT}
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
@@ -367,5 +377,6 @@ services:
 
 volumes:
   postgres-db-volume:
+  redis_data:
   kafka_data:
     driver: local
