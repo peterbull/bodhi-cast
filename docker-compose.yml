@@ -101,7 +101,9 @@ services:
       - "80:80"
     command: nginx -g 'daemon off;'
     depends_on:
-      - backend
+      airflow-webserver:
+        condition: service_healthy
+      backend:
 
   backend:
     build:
