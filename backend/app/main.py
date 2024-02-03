@@ -23,13 +23,13 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],  # Only allow get
+    allow_methods=["*"],
     allow_headers=["*"],  # Allows all headers
 )
 
 # # Configure redis
-# redis_password = os.getenv("REDIS_PASSWORD")
-redis_client = redis.Redis(host="redis", port=6379, db=0)
+redis_password = os.getenv("REDIS_PASSWORD")
+redis_client = redis.Redis(host="redis", port=6379, db=0, password=redis_password)
 
 # # Configure celery
 # celery_app = Celery(
