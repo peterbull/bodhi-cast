@@ -16,9 +16,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from airflow import DAG
 
-sasl_username = os.environ.get("KAFKA_CLIENT_USER")
-sasl_password = os.environ.get("KAFKA_CLIENT_PASSWORD")
-
+sasl_username = os.environ.get("KAFKA_DEFAULT_USERS")
+sasl_password = os.environ.get("KAFKA_DEFAULT_PASSWORDS")
 
 DATABASE_URL = os.environ.get("AIRFLOW__DATABASE__SQL_ALCHEMY_CONN")
 engine = create_engine(DATABASE_URL)
@@ -44,7 +43,9 @@ default_args = {
 # where a single url runs through at a time, such that if there is a failure,
 # it will not be committed to the offset and a retry will resume at the correct message
 @task
-def consume_from_kafka(topic, engine, table_name, bs=1):
+def consume_from_kafka(
+    topic, engine, table_name, bs=1, sasl_username=sasl_username, sasl_password=sasl_password
+):
     """
     Consume messages from a Kafka topic.
 
@@ -188,7 +189,14 @@ with DAG(
     schedule_interval="40 7 * * *",
     catchup=False,
 ) as dag:
-    data = consume_from_kafka(topic=topic, engine=engine, table_name=table_name, bs=1)
+    data = consume_from_kafka(
+        topic=topic,
+        engine=engine,
+        table_name=table_name,
+        bs=1,
+        sasl_username=sasl_username,
+        sasl_password=sasl_password,
+    )
 
 if __name__ == "__main__":
     dag.test()

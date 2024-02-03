@@ -200,6 +200,8 @@ services:
       # Required to handle warm shutdown of the celery workers properly
       # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
+      KAFKA_DEFAULT_USERS: ${KAFKA_DEFAULT_USERS:-user}
+      KAFKA_DEFAULT_PASSWORDS: ${KAFKA_DEFAULT_PASSWORDS:-password}
     restart: always
     depends_on:
       <<: *airflow-common-depends-on

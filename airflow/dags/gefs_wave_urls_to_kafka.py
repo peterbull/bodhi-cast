@@ -12,8 +12,8 @@ from confluent_kafka.admin import AdminClient, ConfigResource
 
 from airflow import DAG
 
-sasl_username = os.environ.get("KAFKA_CLIENT_USER")
-sasl_password = os.environ.get("KAFKA_CLIENT_PASSWORD")
+sasl_username = os.environ.get("KAFKA_DEFAULT_USERS")
+sasl_password = os.environ.get("KAFKA_DEFAULT_PASSWORDS")
 
 start_date = pendulum.datetime(2024, 1, 1)
 
@@ -54,7 +54,7 @@ def get_gefs_wave_urls(epoch, date):
 
 
 @task
-def send_urls_to_kafka(urls, topic):
+def send_urls_to_kafka(urls, topic, sasl_username=sasl_username, sasl_password=sasl_password):
     conf = {
         "bootstrap.servers": "kafka:9092",
         "security.protocol": "SASL_PLAINTEXT",
@@ -115,9 +115,10 @@ with DAG(
     # Fetch just the first model of the day due to storage size on disk
     epoch = forecast_intervals[0]
     date = pendulum.now("UTC").strftime("%Y%m%d")  # Current Time UTC
-
     gefs_wave_urls = get_gefs_wave_urls(epoch, date)
-    send_to_kafka = send_urls_to_kafka(gefs_wave_urls, topic=topic)
+    send_to_kafka = send_urls_to_kafka(
+        gefs_wave_urls, topic=topic, sasl_username=sasl_username, sasl_password=sasl_password
+    )
 
 if __name__ == "__main__":
     dag.test()
