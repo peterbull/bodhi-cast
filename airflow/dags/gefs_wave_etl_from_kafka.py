@@ -193,7 +193,7 @@ with DAG(
         topic=topic,
         engine=engine,
         table_name=table_name,
-        bs=1,
+        bs=8,
         sasl_username=sasl_username,
         sasl_password=sasl_password,
     )

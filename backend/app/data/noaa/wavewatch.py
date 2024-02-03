@@ -14,6 +14,8 @@ from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import SQLAlchemyError
 
+# Class is deprecated for the moment in favor of using the airflow dag
+
 
 class Wavewatch:
     """
