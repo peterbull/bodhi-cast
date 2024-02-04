@@ -11,7 +11,6 @@ const GlobeSpots: React.FC<any> = ({
   const globeEl = useRef<any>();
   const [nearbySpots, setNearbySpots] = useState<any>([]);
   const [spotClick, setSpotClick] = useState<any>([]);
-  const [enableZoom, setEnableZoom] = useState(false);
 
   useEffect(() => {
     if (globeEl.current) {
@@ -20,9 +19,11 @@ const GlobeSpots: React.FC<any> = ({
         lng: currentSpot ? currentSpot.longitude : spots[0].longitude,
         altitude: 2.0,
       });
-      globeEl.current.controls().enableZoom = enableZoom;
+      globeEl.current.controls().enableZoom = false;
+      globeEl.current.controls().autoRotate = true;
+      globeEl.current.controls().autoRotateSpeed = 0.5;
     }
-  }, [enableZoom, currentSpot, spots]);
+  }, [currentSpot, spots]);
 
   useEffect(() => {
     const fetchNearbySpots = async () => {
@@ -43,7 +44,7 @@ const GlobeSpots: React.FC<any> = ({
 
   return spots.length > 0 ? (
     <>
-      <div className="w-1/2 bg-gray-900">
+      <div className="bg-gray-900">
         <div>
           <Globe
             ref={globeEl}
@@ -64,7 +65,6 @@ const GlobeSpots: React.FC<any> = ({
             onGlobeClick={({ lat, lng }: any) => {
               console.log(`Clicked at latitude: ${lat}, longitude: ${lng}`);
               setSpotClick([lat, lng]);
-              setEnableZoom(true);
             }}
             onLabelClick={(label: any) => {
               globeEl.current.pointOfView(
