@@ -145,8 +145,28 @@ const GlobeSpots: React.FC<any> = ({
                     className="justify-left text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
                     key={spot.index}
                   >
-                    <td>{spot.spot_name}</td>
-                    <td>{spot.street_address}</td>
+                    <td className="hover:text-[#95f2f7] hover:font-normal cursor-pointer">
+                      {spot.spot_name}
+                    </td>
+                    <td
+                      className="hover:text-[#95f2f7] hover:font-normal cursor-pointer"
+                      onClick={() => {
+                        globeEl.current.pointOfView(
+                          {
+                            lat: spot.latitude,
+                            lng: spot.longitude,
+                            altitude: 0.2,
+                          },
+                          2500
+                        );
+                        setCurrentSpot(spot);
+                        setTimeout(() => {
+                          setCurrentComponent("SwellMap");
+                        }, 2500);
+                      }}
+                    >
+                      {spot.street_address}
+                    </td>
                   </tr>
                 ))}
               </tbody>
