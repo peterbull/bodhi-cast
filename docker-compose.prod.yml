@@ -191,13 +191,7 @@ services:
     <<: *airflow-common
     command: scheduler
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "--fail",
-          "${AIRFLOW__WEBSERVER__BASE_URL/scheduler/health",
-        ]
+      test: ["CMD", "curl", "--fail", "${AIRFLOW__WEBSERVER__BASE_URL/health"]
       interval: 30s
       timeout: 10s
       retries: 5
