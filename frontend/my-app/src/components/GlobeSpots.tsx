@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
-import { withSize } from "react-sizeme";
 
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,
@@ -12,6 +11,7 @@ const GlobeSpots: React.FC<any> = ({
   const globeEl = useRef<any>();
   const [nearbySpots, setNearbySpots] = useState<any>([]);
   const [spotClick, setSpotClick] = useState<any>([]);
+  const [enableZoom, setEnableZoom] = useState(false);
 
   useEffect(() => {
     if (globeEl.current) {
@@ -20,9 +20,9 @@ const GlobeSpots: React.FC<any> = ({
         lng: currentSpot ? currentSpot.longitude : spots[0].longitude,
         altitude: 2.0,
       });
-      globeEl.current.controls().enableZoom = false;
+      globeEl.current.controls().enableZoom = enableZoom;
     }
-  });
+  }, [enableZoom, currentSpot, spots]);
 
   useEffect(() => {
     const fetchNearbySpots = async () => {
@@ -64,6 +64,7 @@ const GlobeSpots: React.FC<any> = ({
             onGlobeClick={({ lat, lng }: any) => {
               console.log(`Clicked at latitude: ${lat}, longitude: ${lng}`);
               setSpotClick([lat, lng]);
+              setEnableZoom(true);
             }}
             onLabelClick={(label: any) => {
               globeEl.current.pointOfView(
