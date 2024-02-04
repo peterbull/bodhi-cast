@@ -69,6 +69,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__WEBSERVER__PROXY_FIX_X_PROTO: 1
     AIRFLOW__WEBSERVER__PROXY_FIX_X_PORT: 1
     AIRFLOW__WEBSERVER__PROXY_FIX_X_PREFIX: 1
+    AIRFLOW__SMTP__SMTP_MAIL_FROM: ${AIRFLOW__SMTP__SMTP_MAIL_FROM:-}
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
     # See https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/logging-monitoring/check-health.html#scheduler-health-check-server

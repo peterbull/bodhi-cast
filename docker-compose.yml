@@ -57,18 +57,10 @@ x-airflow-common: &airflow-common
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+${POSTGRES_DB_DRIVER}://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_SERVER}/${POSTGRES_DB}
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_SERVER}/${POSTGRES_DB}
     AIRFLOW__CELERY__BROKER_URL: redis://:${REDIS_PASSWORD}@redis:${REDIS_PORT}/0
-    AIRFLOW__WEBSERVER__BASE_URL: http://api.peterbull.org/airflow
-    AIRFLOW__CELERY__FLOWER_URL_PREFIX: /flower
     AIRFLOW__CORE__FERNET_KEY: ""
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__CORE__LOAD_EXAMPLES: "true"
     AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
-    AIRFLOW__WEBSERVER__ENABLE_PROXY_FIX: True
-    AIRFLOW__WEBSERVER__PROXY_FIX_X_FOR: 1
-    AIRFLOW__WEBSERVER__PROXY_FIX_X_HOST: 1
-    AIRFLOW__WEBSERVER__PROXY_FIX_X_PROTO: 1
-    AIRFLOW__WEBSERVER__PROXY_FIX_X_PORT: 1
-    AIRFLOW__WEBSERVER__PROXY_FIX_X_PREFIX: 1
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
     # See https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/logging-monitoring/check-health.html#scheduler-health-check-server
