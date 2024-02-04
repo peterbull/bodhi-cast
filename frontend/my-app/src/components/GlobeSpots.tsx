@@ -11,6 +11,26 @@ const GlobeSpots: React.FC<any> = ({
   const globeEl = useRef<any>();
   const [nearbySpots, setNearbySpots] = useState<any>([]);
   const [spotClick, setSpotClick] = useState<any>([]);
+  const [globeSize, setGlobeSize] = useState({ width: 700, height: 700 });
+
+  useEffect(() => {
+    const updateGlobeSize = () => {
+      if (globeEl.current && globeEl.current.parentElement) {
+        const { width, height } =
+          globeEl.current.parentElement.getBoundingClientRect();
+        setGlobeSize({ width, height });
+      }
+    };
+
+    // Call updateGlobeSize on mount and add a resize listener
+    updateGlobeSize();
+    window.addEventListener("resize", updateGlobeSize);
+
+    // Clean up the resize listener on component unmount
+    return () => {
+      window.removeEventListener("resize", updateGlobeSize);
+    };
+  }, []);
 
   useEffect(() => {
     if (globeEl.current) {
@@ -44,12 +64,18 @@ const GlobeSpots: React.FC<any> = ({
 
   return spots.length > 0 ? (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col bg-gray-900">
+        <h1 className="text-[#03e9f4] text-4xl text-center pt-10 pb-2 shadow-neon">
+          BODHI CAST
+        </h1>
+        <h3 className="text-[#03e9f4] font-thin text-center uppercase">
+          Riding the Data Wave to Your Next Break
+        </h3>
         <div className="bg-gray-900 overflow-x-hidden">
           <div>
             <Globe
               ref={globeEl}
-              height={700}
+              height={globeSize.height}
               globeImageUrl={globeImageUrl}
               backgroundColor="rgb(17 24 39)"
               labelsData={spots}
@@ -85,17 +111,21 @@ const GlobeSpots: React.FC<any> = ({
             />
           </div>
         </div>
-        <div className="flex">
+        <div>
+          <p className="text-[#03e9f4] font-thin text-center">
+            CLICK A LOCATION TO SEE NEARBY SPOTS
+          </p>
+        </div>
+        <div className="flex pt-8">
           <div className="flex-auto w-2/3">
-            <h1 className="text-[#03e9f4] text-3xl text-thin text-center">
-              Nearby Spots
+            <h1 className="text-[#03e9f4] text-2xl font-thin text-center">
+              NEARBY SPOTS
             </h1>
           </div>
           <div className="flex-auto w-1/3">
-            <button className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2">
+            <button className="text-[#03e9f4] border-2 border-[#03e9f4] rounded px-6 py-2">
               ADD A SPOT
             </button>
-            Add A Spot
           </div>
         </div>
       </div>
