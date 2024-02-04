@@ -77,7 +77,7 @@ x-airflow-common: &airflow-common
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
-    PYTHONPATH: "/opt/airflow/backend:${PYTHONPATH}"
+    PYTHONPATH: "/opt/airflow/backend:${PYTHONPATH:-}"
   volumes:
     - ./backend:/opt/airflow/backend
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
@@ -191,7 +191,7 @@ services:
     <<: *airflow-common
     command: scheduler
     healthcheck:
-      test: ["CMD", "curl", "--fail", "${AIRFLOW__WEBSERVER__BASE_URL/health"]
+      test: ["CMD", "curl", "--fail", "${AIRFLOW__WEBSERVER__BASE_URL}/health"]
       interval: 30s
       timeout: 10s
       retries: 5
