@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
 
@@ -9,6 +9,8 @@ const GlobeSpots: React.FC<any> = ({
   spots,
 }) => {
   const globeEl = useRef<any>();
+  const [nearbySpots, setNearbySpots] = useState<any>([]);
+  const [spotClick, setSpotClick] = useState<any>([]);
 
   useEffect(() => {
     if (globeEl.current) {
@@ -20,8 +22,25 @@ const GlobeSpots: React.FC<any> = ({
     }
   });
 
+  useEffect(() => {
+    const fetchNearbySpots = async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/spots`);
+        const data = await res.json();
+        setNearbySpots(data);
+        console.log(`Nearby Spots updated: ${data}`);
+      } catch (error) {
+        console.error("Error fetching nearby spot data:", error);
+      }
+    };
+
+    if (spotClick.length > 0) {
+      fetchNearbySpots();
+    }
+  }, [spotClick]);
+
   return spots.length > 0 ? (
-    <>
+    <div>
       <Globe
         ref={globeEl}
         globeImageUrl={globeImageUrl}
@@ -37,6 +56,10 @@ const GlobeSpots: React.FC<any> = ({
           <b>${spot.spot_name}</b>
         </div>`
         }
+        onGlobeClick={({ lat, lng }: any) => {
+          console.log(`Clicked at latitude: ${lat}, longitude: ${lng}`);
+          setSpotClick([lat, lng]);
+        }}
         onLabelClick={(label: any) => {
           globeEl.current.pointOfView(
             {
@@ -52,7 +75,7 @@ const GlobeSpots: React.FC<any> = ({
           }, 2500);
         }}
       />
-    </>
+    </div>
   ) : (
     <p>Loading...</p>
   );
