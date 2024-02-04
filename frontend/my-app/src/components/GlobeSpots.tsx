@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
+import { table } from "console";
 
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,
@@ -11,7 +12,7 @@ const GlobeSpots: React.FC<any> = ({
   const globeEl = useRef<any>();
   const [nearbySpots, setNearbySpots] = useState<any>([]);
   const [spotClick, setSpotClick] = useState<any>([]);
-  const [globeSize, setGlobeSize] = useState({ width: 700, height: 700 });
+  const [globeSize, setGlobeSize] = useState({ width: 700, height: 600 });
 
   useEffect(() => {
     const updateGlobeSize = () => {
@@ -117,15 +118,39 @@ const GlobeSpots: React.FC<any> = ({
           </p>
         </div>
         <div className="flex pt-8">
-          <div className="flex-auto w-2/3">
-            <h1 className="text-[#03e9f4] text-2xl font-thin text-center">
-              NEARBY SPOTS
-            </h1>
-          </div>
-          <div className="flex-auto w-1/3">
+          <div className="text-[#03e9f4] font-thin flex-auto text-center">
             <button className="text-[#03e9f4] border-2 border-[#03e9f4] rounded px-6 py-2">
               ADD A SPOT
             </button>
+
+            <h1 className="text-2xl text-center pt-4">NEARBY SPOTS</h1>
+            <table className="mx-auto text-center divide-y divide-gray-500">
+              <thead>
+                <th
+                  colSpan={1}
+                  className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                >
+                  NAME
+                </th>
+                <th
+                  colSpan={1}
+                  className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                >
+                  LOCATION
+                </th>
+              </thead>
+              <tbody>
+                {nearbySpots.map((spot: any) => (
+                  <tr
+                    className="justify-left text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
+                    key={spot.index}
+                  >
+                    <td>{spot.spot_name}</td>
+                    <td>{spot.street_address}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
