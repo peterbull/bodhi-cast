@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import tempfile
 
 import pandas as pd
@@ -73,9 +74,13 @@ def consume_from_kafka(
     c = Consumer(conf)
 
     c.subscribe([topic])
-
     try:
-        for _ in range(bs):
+        pattern = re.compile(
+            r"https://nomads\.ncep\.noaa\.gov/pub/data/nccf/com/gens/prod/gefs\.(\d{8})/00/"
+        )
+
+        processed_count = 0
+        while True:
             msg = c.poll(9.0)
             if msg is None:
                 logging.info(f"No more messages in topic {topic}")
@@ -85,12 +90,21 @@ def consume_from_kafka(
                 raise KafkaException(msg.error())
             else:
                 message = msg.value().decode("utf-8")
-                logging.info(f"Beginning processing of {message}")
-                df = url_to_df(message)
-                df_to_db(df, engine, table_name)
-                # Commit the offset after succesful processing
-                c.commit()
-                logging.info(f"Consumed and processed message from {topic}")
+                match = pattern.match(message)
+                date = match.group(1)
+                current_date = pendulum.now().format("YYYYMMDD")
+                if date == current_date and processed_count < bs:
+                    logging.info(f"Beginning processing of {message}")
+                    df = url_to_df(message)
+                    df_to_db(df, engine, table_name)
+                    # Commit the offset after successful processing
+                    c.commit()
+                    logging.info(f"Consumed and processed message from {topic}")
+                    processed_count += 1
+                else:
+                    c.commit()
+                    logging.info(f"Skipping processing and updating offset for: {message}")
+
     finally:
         c.close()
         logging.info("Consumer closed")
