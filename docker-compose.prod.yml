@@ -143,6 +143,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      # Enable query logging
+      LOG_STATEMENT: "all"
+      # Enable logging of duration of statements
+      LOG_DURATION: "on"
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
     ports:
