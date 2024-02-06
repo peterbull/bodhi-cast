@@ -109,9 +109,9 @@ def consume_from_kafka(
 
 
 with DAG(
-    "gefs_wave_etl_from_kafka",
+    "debug_wave_etl_kafka_consumption",
     default_args=default_args,
-    description="Get GEFS grib2 urls from topic and batch process to postgis",
+    description="Debug Versionn of Get GEFS grib2 urls from topic and batch process to postgis",
     schedule_interval="*/6 * * * *",
     catchup=False,
 ) as dag:

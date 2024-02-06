@@ -197,7 +197,7 @@ def df_to_db(df, engine, table_name):
 
 
 with DAG(
-    "gefs_wave_etl_from_kafka",
+    "debug_gefs_wave_etl_from_kafka",
     default_args=default_args,
     description="Get GEFS grib2 urls from topic and batch process to postgis",
     schedule_interval="0 */3 * * *",

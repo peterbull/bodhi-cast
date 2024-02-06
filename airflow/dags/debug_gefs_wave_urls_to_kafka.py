@@ -104,7 +104,7 @@ def send_urls_to_kafka(urls, topic, sasl_username=sasl_username, sasl_password=s
 
 # revisit to refactor based on https://airflow.apache.org/docs/apache-airflow/2.8.1/best-practices.html#top-level-python-code
 with DAG(
-    "gefs_wave_urls_to_kafka",
+    "debug_gefs_wave_urls_to_kafka",
     default_args=default_args,
     description="Get GEFS wave forecast grib2 file urls",
     schedule_interval="*/5 * * * *",

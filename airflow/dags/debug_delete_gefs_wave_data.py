@@ -36,7 +36,7 @@ def delete_old_gefs_wave_data(engine, table_name):
 
 
 with DAG(
-    "delete_old_gefs_wave_data",
+    "debug_delete_gefs_wave_data",
     "Deletes old GEFS wave data that is older than a specified cutoff date",
     default_args=default_args,
     schedule="0 */4 * * *",
