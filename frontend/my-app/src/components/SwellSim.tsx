@@ -47,7 +47,11 @@ function Points({ spotForecast }: any) {
     (z: any) => {
       // Wave parameters
       const waveSpeed = 0.002; // Adjust this for faster or slower wave propagation
-      const waveFrequency = 1 / spotForecast[0].swper; // Adjust this for tighter or looser waves
+      const waveFrequency =
+        1 /
+        (spotForecast[0].swper > 0
+          ? spotForecast[0].swper
+          : spotForecast[0].perpw); // Adjust this for tighter or looser waves
       const waveAmplitude = spotForecast[0].swh * feetFactor; // Adjust this for higher or lower waves
 
       // Ocean-like wave equation: A sine function for wave propagation along the z-axis

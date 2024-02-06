@@ -181,7 +181,6 @@ def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session =
                 AND time >= :date
                 AND valid_time < :next_day
                 AND time < :next_day
-                AND swell IS NOT NULL
                 AND latitude = (SELECT latitude FROM closest_point)
                 AND longitude = (SELECT longitude FROM closest_point)
             ORDER BY valid_time;
