@@ -15,7 +15,7 @@ from airflow import DAG
 sasl_username = os.environ.get("KAFKA_DEFAULT_USERS")
 sasl_password = os.environ.get("KAFKA_DEFAULT_PASSWORDS")
 
-start_date = pendulum.datetime(2024, 1, 1)
+start_date = pendulum.datetime(2024, 2, 6)
 
 topic = "gefs_wave_urls"
 
@@ -107,7 +107,7 @@ with DAG(
     "debug_gefs_wave_urls_to_kafka",
     default_args=default_args,
     description="Get GEFS wave forecast grib2 file urls",
-    schedule_interval="*/5 * * * *",
+    schedule_interval=None,
     catchup=False,
 ) as dag:
     # Available forecasts

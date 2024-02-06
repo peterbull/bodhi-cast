@@ -26,7 +26,7 @@ engine = create_engine(DATABASE_URL)
 table_name = "wave_forecast"
 topic = "gefs_wave_urls"
 
-start_date = pendulum.datetime(2024, 1, 1)
+start_date = pendulum.datetime(2024, 2, 6)
 
 default_args = {
     "owner": "airflow",

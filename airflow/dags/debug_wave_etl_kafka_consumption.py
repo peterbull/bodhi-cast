@@ -112,7 +112,7 @@ with DAG(
     "debug_wave_etl_kafka_consumption",
     default_args=default_args,
     description="Debug Versionn of Get GEFS grib2 urls from topic and batch process to postgis",
-    schedule_interval="*/6 * * * *",
+    schedule_interval=None,
     catchup=False,
 ) as dag:
     data = consume_from_kafka(
