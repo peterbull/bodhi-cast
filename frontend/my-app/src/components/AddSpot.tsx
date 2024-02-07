@@ -19,6 +19,9 @@ const AddSpot: React.FC<any> = ({
 }) => {
   const spotCoords: [number, number] = [spotClick[0], spotClick[1]];
   const [scrollWheelZoom, setScrollWheelZoom] = useState(false);
+  const [spotName, setSpotName] = useState("");
+  const [spotLocation, setSpotLocation] = useState("");
+
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
 
@@ -29,6 +32,15 @@ const AddSpot: React.FC<any> = ({
       },
     });
     return null;
+  };
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    console.log(`Name: ${spotName}, Address: ${spotLocation}`);
+  };
+
+  const handleButtonClick = (e: any) => {
+    e.target.blur();
   };
 
   return (
@@ -64,13 +76,12 @@ const AddSpot: React.FC<any> = ({
         <div className="flex justify-center items-center h-full pt-4">
           <button
             onClick={() => setCurrentComponent("GlobeSpots")}
-            className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2"
+            className="text-[#03e9f4] border-2 border-[#03e9f4] rounded px-6 py-2"
           >
             RETURN TO MAP
           </button>
         </div>
         <div className="text-[#03e9f4] font-thin text-center">
-          <h1 className="text-3xl">{`placeholder`}</h1>
           <p className="pt-4">
             Current Selection:{" "}
             {spotClick.length > 0
@@ -79,6 +90,37 @@ const AddSpot: React.FC<any> = ({
               : `None`}
           </p>
         </div>
+        <form
+          className="text-[#03e9f4] font-thin flex justify-center bg-gray-900 items-center pt-4"
+          onSubmit={handleSubmit}
+        >
+          <label className="px-4">
+            Spot Name:
+            <input
+              className="border-[#03e9f4] focus:outline-none border-2 rounded bg-gray-900"
+              type="text"
+              placeholder="Spot Name"
+              value={spotName}
+              onChange={(e) => setSpotName(e.target.value)}
+            />
+          </label>
+          <label className="px-4">
+            Location:
+            <input
+              className="border-[#03e9f4] focus:outline-none border-2 rounded bg-gray-900"
+              type="text"
+              placeholder="Spot Location"
+              value={spotLocation}
+              onChange={(e) => setSpotLocation(e.target.value)}
+            />
+          </label>
+          <input
+            type="submit"
+            value="Submit"
+            className="border-2 border-[#03e9f4] focus:outline-none focus:text-[#95f2f7] hover:text-[#95f2f7] hover:font-normal focus:bg-[#00f2ffbd] rounded px-6"
+            onClick={handleButtonClick}
+          />
+        </form>
       </div>
     </>
   );
