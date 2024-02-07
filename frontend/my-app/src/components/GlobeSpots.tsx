@@ -63,6 +63,21 @@ const GlobeSpots: React.FC<any> = ({
     }
   }, [spotClick]);
 
+  const globeZoom = (data: any, altitude: any, ms: any) => {
+    globeEl.current.pointOfView(
+      {
+        lat: data.latitude,
+        lng: data.longitude,
+        altitude: altitude,
+      },
+      ms
+    );
+    setCurrentSpot(data);
+    setTimeout(() => {
+      setCurrentComponent("SwellMap");
+    }, ms);
+  };
+
   return spots.length > 0 ? (
     <>
       <div className="flex flex-col bg-gray-900">
@@ -119,54 +134,37 @@ const GlobeSpots: React.FC<any> = ({
         </div>
         <div className="flex pt-8">
           <div className="text-[#03e9f4] font-thin flex-auto text-center">
-            <button className="text-[#03e9f4] border-2 border-[#03e9f4] rounded px-6 py-2">
+            <button className="border-2 border-[#03e9f4] rounded px-6 py-2">
               ADD A SPOT
             </button>
-
+            <p className="pt-4">
+              Current Selection:{" "}
+              {spotClick.length > 0
+                ? `${spotClick[0].toFixed(2)},${" "}
+              ${spotClick[1].toFixed(2)}`
+                : `None`}
+            </p>
             <h1 className="text-2xl text-center pt-4">NEARBY SPOTS</h1>
             <table className="mx-auto text-center divide-y divide-gray-500">
               <thead>
-                <th
-                  colSpan={1}
-                  className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                >
-                  NAME
-                </th>
-                <th
-                  colSpan={1}
-                  className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                >
-                  LOCATION
-                </th>
+                <tr className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th colSpan={1}>NAME</th>
+                  <th colSpan={1}>LOCATION</th>
+                  <th colSpan={1}>LAT</th>
+                  <th colSpan={1}>LON</th>
+                </tr>
               </thead>
               <tbody>
                 {nearbySpots.map((spot: any) => (
                   <tr
-                    className="justify-left text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
-                    key={spot.index}
+                    className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal cursor-pointer justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
+                    key={spot.id}
+                    onClick={() => globeZoom(spot, 0.2, 2500)}
                   >
-                    <td className="hover:text-[#95f2f7] hover:font-normal cursor-pointer">
-                      {spot.spot_name}
-                    </td>
-                    <td
-                      className="hover:text-[#95f2f7] hover:font-normal cursor-pointer"
-                      onClick={() => {
-                        globeEl.current.pointOfView(
-                          {
-                            lat: spot.latitude,
-                            lng: spot.longitude,
-                            altitude: 0.2,
-                          },
-                          2500
-                        );
-                        setCurrentSpot(spot);
-                        setTimeout(() => {
-                          setCurrentComponent("SwellMap");
-                        }, 2500);
-                      }}
-                    >
-                      {spot.street_address}
-                    </td>
+                    <td className="py-2 px-2">{spot.spot_name}</td>
+                    <td className="py-2 px-2">{spot.street_address}</td>
+                    <td className="py-2 px-2">{spot.latitude.toFixed(2)}</td>
+                    <td className="py-2 px-2">{spot.longitude.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
