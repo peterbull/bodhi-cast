@@ -11,7 +11,7 @@ const GlobeSpots: React.FC<any> = ({
 }) => {
   const globeEl = useRef<any>();
   const [nearbySpots, setNearbySpots] = useState<any>([]);
-  const [spotClick, setSpotClick] = useState<any>([]);
+  const [spotClick, setSpotClick] = useState<any>([0, 0]);
   const [globeSize, setGlobeSize] = useState({ width: 700, height: 600 });
 
   useEffect(() => {
@@ -134,7 +134,22 @@ const GlobeSpots: React.FC<any> = ({
         </div>
         <div className="flex pt-8">
           <div className="text-[#03e9f4] font-thin flex-auto text-center">
-            <button className="border-2 border-[#03e9f4] rounded px-6 py-2">
+            <button
+              className="border-2 border-[#03e9f4] rounded px-6 py-2"
+              onClick={() => {
+                globeEl.current.pointOfView(
+                  {
+                    lat: spotClick[0],
+                    lng: spotClick[1],
+                    altitude: 0.2,
+                  },
+                  2500
+                );
+                setTimeout(() => {
+                  setCurrentComponent("AddSpot");
+                }, 2500);
+              }}
+            >
               ADD A SPOT
             </button>
             <p className="pt-4">
@@ -157,14 +172,22 @@ const GlobeSpots: React.FC<any> = ({
               <tbody>
                 {nearbySpots.map((spot: any) => (
                   <tr
-                    className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal cursor-pointer justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
+                    className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
                     key={spot.id}
                     onClick={() => globeZoom(spot, 0.2, 2500)}
                   >
-                    <td className="py-2 px-2">{spot.spot_name}</td>
-                    <td className="py-2 px-2">{spot.street_address}</td>
-                    <td className="py-2 px-2">{spot.latitude.toFixed(2)}</td>
-                    <td className="py-2 px-2">{spot.longitude.toFixed(2)}</td>
+                    <td className="py-2 px-2 cursor-pointer">
+                      {spot.spot_name}
+                    </td>
+                    <td className="py-2 px-2 cursor-pointer">
+                      {spot.street_address}
+                    </td>
+                    <td className="py-2 px-2 cursor-pointer">
+                      {spot.latitude.toFixed(2)}
+                    </td>
+                    <td className="py-2 px-2 cursor-pointer">
+                      {spot.longitude.toFixed(2)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
