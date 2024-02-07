@@ -97,7 +97,7 @@ const AddSpot: React.FC<any> = ({
           <label className="px-4">
             Spot Name:
             <input
-              className="border-[#03e9f4] focus:outline-none border-2 rounded bg-gray-900"
+              className="border-[#03e9f4] focus:outline-none border-2 rounded bg-gray-900 pl-1"
               type="text"
               placeholder="Spot Name"
               value={spotName}
@@ -107,7 +107,7 @@ const AddSpot: React.FC<any> = ({
           <label className="px-4">
             Location:
             <input
-              className="border-[#03e9f4] focus:outline-none border-2 rounded bg-gray-900"
+              className="border-[#03e9f4] focus:outline-none border-2 rounded bg-gray-900 pl-1"
               type="text"
               placeholder="Spot Location"
               value={spotLocation}
