@@ -10,6 +10,7 @@ function App() {
   const [currentSpot, setCurrentSpot] = useState<any>(null);
   const [spotForecast, setSpotForecast] = useState<any>([]);
   const [tileForecast, setTileForecast] = useState<any>([]);
+  const [spotClick, setSpotClick] = useState<any>([0, 0]);
 
   useEffect(() => {
     const fetchAllSpots = async () => {
@@ -82,6 +83,8 @@ function App() {
         setCurrentSpot={setCurrentSpot}
         spotForecast={spotForecast}
         tileForecast={tileForecast}
+        spotClick={spotClick}
+        setSpotClick={setSpotClick}
       />
     </ComponentMapProvider>
   );

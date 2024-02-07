@@ -14,7 +14,6 @@ import PrimaryWaveForecast from "./PrimaryWaveForecast";
 import SwellWaveForecast from "./SwellWaveForecast";
 import WindWaveForecast from "./WindWaveForecast";
 import WindForecast from "./WindForecast";
-import D3SwellVis from "./D3SwellVis";
 import SwellSim from "./SwellSim";
 
 const SwellMap: React.FC<any> = ({

@@ -8,10 +8,11 @@ const GlobeSpots: React.FC<any> = ({
   currentSpot,
   setCurrentSpot,
   spots,
+  spotClick,
+  setSpotClick,
 }) => {
   const globeEl = useRef<any>();
   const [nearbySpots, setNearbySpots] = useState<any>([]);
-  const [spotClick, setSpotClick] = useState<any>([0, 0]);
   const [globeSize, setGlobeSize] = useState({ width: 700, height: 600 });
 
   useEffect(() => {
