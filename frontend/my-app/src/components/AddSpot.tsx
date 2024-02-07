@@ -14,23 +14,27 @@ import { Icon } from "leaflet";
 
 const AddSpot: React.FC<any> = ({ spotClick, setSpotClick }) => {
   const spotCoords: [number, number] = [spotClick[0], spotClick[1]];
+  const [scrollWheelZoom, setScrollWheelZoom] = useState(false);
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
 
     useMapEvents({
-      click: () => {
-        map.scrollWheelZoom.enable();
+      click: (e) => {
+        setScrollWheelZoom(true);
+        setSpotClick([e.latlng.lat, e.latlng.lng]);
       },
     });
     return null;
   };
 
-  console.log("placeholder");
-
   return (
     <div className="flex flex-col">
       <div className="w-full overflow-x-hidden">
-        <MapContainer center={spotCoords} zoom={8} scrollWheelZoom={false}>
+        <MapContainer
+          center={spotCoords}
+          zoom={8}
+          scrollWheelZoom={scrollWheelZoom}
+        >
           <MapEvents onClick={useMapEvents} />
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
