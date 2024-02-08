@@ -36,6 +36,7 @@ ipykernel = "^6.29.0"
 pygrib = "^2.1.5"
 confluent-kafka = "^2.3.0"
 isort = "^5.13.2"
+noaa-coops = "^0.3.2"
 
 
 
