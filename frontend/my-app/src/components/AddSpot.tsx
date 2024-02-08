@@ -21,6 +21,7 @@ const AddSpot: React.FC<any> = ({
   const [scrollWheelZoom, setScrollWheelZoom] = useState(false);
   const [spotName, setSpotName] = useState("");
   const [spotLocation, setSpotLocation] = useState("");
+  const [validSubmission, setValidSubmission] = useState(true);
 
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
@@ -34,9 +35,39 @@ const AddSpot: React.FC<any> = ({
     return null;
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit: any = async (e: any) => {
     e.preventDefault();
-    console.log(`Name: ${spotName}, Address: ${spotLocation}`);
+
+    if (!spotName || !spotLocation) {
+      console.log("Name and location must not be empty");
+      setValidSubmission(false);
+      return;
+    }
+
+    const data = {
+      lat: spotClick[0],
+      lng: spotClick[1],
+      spot_name: spotName,
+      street_address: spotLocation,
+    };
+
+    const response = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/addspot`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (response.ok) {
+      console.log("Surfs up");
+      setValidSubmission(true);
+    } else {
+      console.log("Wipeout");
+    }
   };
 
   const handleButtonClick = (e: any) => {
@@ -121,6 +152,11 @@ const AddSpot: React.FC<any> = ({
             onClick={handleButtonClick}
           />
         </form>
+        {!validSubmission && (
+          <p className="text-[#d6d6d6] text-center font-thin">
+            Name and location must not be empty
+          </p>
+        )}
       </div>
     </>
   );
