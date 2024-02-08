@@ -9,12 +9,11 @@ import {
 import "leaflet/dist/leaflet.css";
 import React, { useEffect, useState } from "react";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
-import { Icon, map } from "leaflet";
+import { Icon } from "leaflet";
 import PrimaryWaveForecast from "./PrimaryWaveForecast";
 import SwellWaveForecast from "./SwellWaveForecast";
 import WindWaveForecast from "./WindWaveForecast";
 import WindForecast from "./WindForecast";
-import D3SwellVis from "./D3SwellVis";
 import SwellSim from "./SwellSim";
 
 const SwellMap: React.FC<any> = ({
