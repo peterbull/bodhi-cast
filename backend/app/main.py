@@ -7,6 +7,7 @@ from app.db.database import add_spots, create_tables, get_db
 from app.models.models import Spots
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
