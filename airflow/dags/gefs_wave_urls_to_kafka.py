@@ -150,14 +150,17 @@ with DAG(
     "gefs_wave_urls_to_kafka",
     default_args=default_args,
     description="Get GEFS wave forecast grib2 file urls",
-    schedule_interval="30 7 * * *",
+    schedule_interval="30 07 * * *",
     catchup=False,
 ) as dag:
+
     # Available forecasts
     forecast_intervals = ["00", "06", "12", "18"]
+
     # Fetch just the first model of the day due to storage size on disk
     epoch = forecast_intervals[0]
     date = pendulum.now("UTC").strftime("%Y%m%d")  # Current Time UTC
+
     gefs_wave_urls = get_gefs_wave_urls(epoch, date)
     send_to_kafka = send_urls_to_kafka(
         gefs_wave_urls, topic=topic, sasl_username=sasl_username, sasl_password=sasl_password

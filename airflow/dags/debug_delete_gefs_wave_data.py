@@ -46,7 +46,7 @@ with DAG(
     "debug_delete_gefs_wave_data_limit_1",
     "Deletes a single random row in the wavewatch table",
     default_args=default_args,
-    schedule="0 */4 * * *",
+    schedule=None,
     catchup=False,
 ) as dag:
     data = delete_old_gefs_wave_data(engine=engine, table_name=table_name)
