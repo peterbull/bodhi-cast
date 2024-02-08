@@ -7,6 +7,7 @@ from app.db.database import add_spots, create_tables, get_db
 from app.models.models import Spots
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -215,3 +216,24 @@ def get_all_spots(db: Session = Depends(get_db)):
     """
     spots = db.query(Spots).all()
     return [spot.as_dict() for spot in spots]
+
+
+# Write new spots
+class SpotCreate(BaseModel):
+    lat: float
+    lng: float
+    spot_name: str
+    street_address: str
+
+
+@app.post("/addspot")
+def create_spot(spot: SpotCreate, db: Session = Depends(get_db)):
+    new_spot = Spots(
+        latitude=spot.lat,
+        longitude=spot.lng,
+        spot_name=spot.spot_name,
+        street_address=spot.street_address,
+    )
+    db.add(new_spot)
+    db.commit()
+    return {"message": "Spot successfully created"}
