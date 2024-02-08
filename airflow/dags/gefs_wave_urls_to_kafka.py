@@ -129,8 +129,10 @@ def verify_messages(topic, sasl_username=sasl_username, sasl_password=sasl_passw
                 break
             msg = c.poll(9.0)
             logging.info(f"current message {msg}")
-            if count == msg_expected and msg is None:
+            if count >= msg_expected and msg is None:
                 break
+            if count >= msg_expected:
+                raise Exception(f"Message count exceeds expected {msg_expected}")
             if msg is None:
                 raise Exception(f"Verification failed, no messages in {topic}!")
             if msg.error():
@@ -138,8 +140,6 @@ def verify_messages(topic, sasl_username=sasl_username, sasl_password=sasl_passw
             else:
                 count += 1
                 print("Received message: {}".format(msg.value().decode("utf-8")))
-            if count >= msg_expected:
-                raise Exception(f"Message count exceeds expected {msg_expected}")
 
     finally:
         c.close()
