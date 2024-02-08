@@ -150,7 +150,7 @@ with DAG(
     "gefs_wave_urls_to_kafka",
     default_args=default_args,
     description="Get GEFS wave forecast grib2 file urls",
-    schedule_interval="30 07 * * *",
+    schedule_interval="30 7 * * *",
     catchup=False,
 ) as dag:
 

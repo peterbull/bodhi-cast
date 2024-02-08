@@ -45,7 +45,6 @@ default_args = {
 # Will need to revisit this in the future. This is very basic fault handling,
 # where a single url runs through at a time, such that if there is a failure,
 # it will not be committed to the offset and a retry will resume at the correct message
-@task
 def consume_from_kafka(
     topic, engine, table_name, bs=1, sasl_username=sasl_username, sasl_password=sasl_password
 ):
