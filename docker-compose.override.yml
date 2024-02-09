@@ -58,8 +58,12 @@ services:
     ports:
       - "5678:5678"
 
-  # airflow-worker:
-  #   <<: *airflow-common
-  #   command: python -m debugpy --listen 0.0.0.0:5679 -m celery worker
-  #   ports:
-  #     - "5679:5679"
+  airflow-worker:
+    # command: >
+    #   bash -c "python -m debugpy --listen 0.0.0.0:5679 --wait-for-client -m celery
+    #   -A airflow.executors.celery_executor:app worker"
+    command: >
+      bash -c "python -m debugpy --listen 0.0.0.0:5679 -m celery
+      -A airflow.executors.celery_executor:app worker"
+    ports:
+      - "5679:5679"
