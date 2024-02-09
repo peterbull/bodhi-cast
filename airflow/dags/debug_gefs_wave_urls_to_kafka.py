@@ -15,7 +15,7 @@ from airflow import DAG
 sasl_username = os.environ.get("KAFKA_DEFAULT_USERS")
 sasl_password = os.environ.get("KAFKA_DEFAULT_PASSWORDS")
 
-start_date = pendulum.datetime(2024, 1, 1)
+start_date = pendulum.datetime(2025, 1, 1)
 
 topic = "gefs_wave_urls"
 

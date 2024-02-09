@@ -9,7 +9,7 @@ from airflow import DAG
 DATABASE_URL = os.environ.get("AIRFLOW__DATABASE__SQL_ALCHEMY_CONN")
 engine = create_engine(DATABASE_URL)
 table_name = "wave_forecast"
-start_date = pendulum.datetime(2024, 1, 1)
+start_date = pendulum.datetime(2025, 1, 1)
 
 default_args = {
     "owner": "airflow",
