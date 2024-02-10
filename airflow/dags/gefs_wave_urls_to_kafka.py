@@ -7,7 +7,7 @@ import pendulum
 import requests
 from airflow.decorators import task
 from bs4 import BeautifulSoup
-from confluent_kafka import Producer
+from confluent_kafka import Consumer, KafkaException, Producer
 from confluent_kafka.admin import AdminClient, ConfigResource
 
 from airflow import DAG
@@ -49,7 +49,6 @@ def get_gefs_wave_urls(epoch, date):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
     urls = [urljoin(url, a.get("href")) for a in soup.find_all("a", href=pattern)]
-
     return urls
 
 
@@ -97,9 +96,53 @@ def send_urls_to_kafka(urls, topic, sasl_username=sasl_username, sasl_password=s
             logging.error(report)
 
     if all(success for success, report in delivery_reports):
-        logging.info("All messages were successfully delivered to Kafka.")
+        logging.info(f"All {len(urls)} messages were successfully delivered to Kafka.")
     else:
         logging.error("Some messages failed to be delivered to Kafka.")
+
+
+@task
+def verify_messages(topic, sasl_username=sasl_username, sasl_password=sasl_password):
+    c = Consumer(
+        {
+            "bootstrap.servers": "kafka:9092",
+            "enable.auto.commit": True,
+            "group.id": "airflow-url-verify",
+            "auto.offset.reset": "earliest",  # consume from the start of topic
+            "security.protocol": "SASL_PLAINTEXT",
+            "sasl.mechanisms": "PLAIN",
+            "sasl.username": sasl_username,
+            "sasl.password": sasl_password,
+        }
+    )
+
+    c.subscribe([topic])
+
+    count = 0
+    start_time = pendulum.now()
+    msg_expected = 105
+    try:
+        logging.info("beginning loop")
+        while True:
+            if pendulum.now() - start_time > pendulum.duration(minutes=3):
+                print("Timeout reached")
+                break
+            msg = c.poll(9.0)
+            logging.info(f"current message {msg}")
+            if count >= msg_expected and msg is None:
+                break
+            if count >= msg_expected:
+                raise Exception(f"Message count exceeds expected {msg_expected}")
+            if msg is None:
+                raise Exception(f"Verification failed, no messages in {topic}!")
+            if msg.error():
+                raise KafkaException(msg.error())
+            else:
+                count += 1
+                print("Received message: {}".format(msg.value().decode("utf-8")))
+
+    finally:
+        c.close()
 
 
 # revisit to refactor based on https://airflow.apache.org/docs/apache-airflow/2.8.1/best-practices.html#top-level-python-code
@@ -109,15 +152,22 @@ with DAG(
     description="Get GEFS wave forecast grib2 file urls",
     schedule_interval="30 7 * * *",
     catchup=False,
+    is_paused_upon_creation=False,
 ) as dag:
+
     # Available forecasts
     forecast_intervals = ["00", "06", "12", "18"]
+
     # Fetch just the first model of the day due to storage size on disk
     epoch = forecast_intervals[0]
     date = pendulum.now("UTC").strftime("%Y%m%d")  # Current Time UTC
+
     gefs_wave_urls = get_gefs_wave_urls(epoch, date)
     send_to_kafka = send_urls_to_kafka(
         gefs_wave_urls, topic=topic, sasl_username=sasl_username, sasl_password=sasl_password
+    )
+    send_to_kafka >> verify_messages(
+        topic=topic, sasl_username=sasl_username, sasl_password=sasl_password
     )
 
 if __name__ == "__main__":

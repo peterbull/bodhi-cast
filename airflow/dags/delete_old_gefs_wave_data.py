@@ -42,6 +42,7 @@ with DAG(
     default_args=default_args,
     schedule="0 6 * * *",
     catchup=False,
+    is_paused_upon_creation=False,
 ) as dag:
     data = delete_old_gefs_wave_data(engine=engine, table_name=table_name, days=2)
 

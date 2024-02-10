@@ -82,6 +82,21 @@
                 "${workspaceFolder}/frontend/my-app/node_modules/**/*.mjs",
                 "**/build/*"
             ]
+        },
+        {
+            "name": "Docker: Airflow Worker",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "port": 5679,
+                "host": "localhost",
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}/airflow",
+                    "remoteRoot": "/opt/airflow"
+                }
+            ]
         }
     ]
 }

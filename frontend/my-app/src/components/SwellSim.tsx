@@ -2,7 +2,14 @@ import * as THREE from "three";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import circleImg from "../img/circle.png";
-import { Suspense, useCallback, useMemo, useRef, useEffect } from "react";
+import {
+  Suspense,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+  useState,
+} from "react";
 
 function CameraControls() {
   const {
@@ -42,11 +49,15 @@ function Points({ spotForecast }: any) {
   const imgTex = useLoader(THREE.TextureLoader, circleImg);
   const bufferRef = useRef<any>();
   const feetFactor = 3.28084;
+
   let t = 0;
+  const waveSpeed =
+    1 /
+    (spotForecast[0].swper > 0 ? spotForecast[0].swper : spotForecast[0].perpw);
   const graph = useCallback(
     (z: any) => {
       // Wave parameters
-      const waveSpeed = 0.002; // Adjust this for faster or slower wave propagation
+      // const waveSpeed = 0.0005; // Adjust this for faster or slower wave propagation
       const waveFrequency =
         1 /
         (spotForecast[0].swper > 0
@@ -55,11 +66,17 @@ function Points({ spotForecast }: any) {
       const waveAmplitude = spotForecast[0].swh * feetFactor; // Adjust this for higher or lower waves
 
       // Ocean-like wave equation: A sine function for wave propagation along the z-axis
-      let y = waveAmplitude * Math.sin(waveFrequency * z + waveSpeed * t);
+      let y = waveAmplitude * Math.sin(waveFrequency * z + (waveSpeed + t) / 2);
+      // console.log(`y: ${y}`);
+      // console.log(`waveAmplitude: ${waveAmplitude}`);
+      // console.log(`waveFrequency: ${waveFrequency}`);
+      // console.log(`z: ${z}`);
+      // console.log(`waveSpeed: ${waveSpeed}`);
+      // console.log(`t: ${t}`);
 
       return y > 0 ? y : 0;
     },
-    [t, spotForecast] // Only t is a dependency here since other variables are constants
+    [t, waveSpeed, spotForecast]
   );
 
   const count = 200;
@@ -79,8 +96,10 @@ function Points({ spotForecast }: any) {
     return new Float32Array(positions);
   }, [count, sep, graph]);
 
-  useFrame(() => {
-    t += 15;
+  useFrame((state) => {
+    const elapsedTime = state.clock.getElapsedTime();
+    // t += 15;
+    t = elapsedTime;
 
     const positions = bufferRef.current.array;
 

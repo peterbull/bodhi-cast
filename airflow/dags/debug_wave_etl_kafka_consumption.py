@@ -8,6 +8,7 @@ import pendulum
 import requests
 import xarray as xr
 from airflow.decorators import task
+from airflow.sensors.external_task import ExternalTaskSensor
 from confluent_kafka import Consumer, KafkaException
 from geoalchemy2 import WKTElement
 from geoalchemy2.types import Geography
@@ -26,7 +27,7 @@ engine = create_engine(DATABASE_URL)
 table_name = "wave_forecast"
 topic = "gefs_wave_urls"
 
-start_date = pendulum.datetime(2024, 1, 1)
+start_date = pendulum.datetime(2025, 1, 1)
 
 default_args = {
     "owner": "airflow",
@@ -43,7 +44,6 @@ default_args = {
 # Will need to revisit this in the future. This is very basic fault handling,
 # where a single url runs through at a time, such that if there is a failure,
 # it will not be committed to the offset and a retry will resume at the correct message
-@task
 def consume_from_kafka(
     topic, engine, table_name, bs=1, sasl_username=sasl_username, sasl_password=sasl_password
 ):
@@ -113,16 +113,34 @@ with DAG(
     default_args=default_args,
     description="Debug Versionn of Get GEFS grib2 urls from topic and batch process to postgis",
     schedule_interval=None,
+    # schedule_interval="46 13 * * *",
     catchup=False,
 ) as dag:
-    data = consume_from_kafka(
-        topic=topic,
-        engine=engine,
-        table_name=table_name,
-        bs=8,
-        sasl_username=sasl_username,
-        sasl_password=sasl_password,
+
+    # ExternalTaskSensor to wait for gefs_wave_urls_to_kafka DAG to complete
+    wait_for_gefs_wave_urls_to_kafka = ExternalTaskSensor(
+        task_id="wait_for_gefs_wave_urls_to_kafka",
+        external_dag_id="gefs_wave_urls_to_kafka",
+        external_task_id=None,  # `None` will wait for the entire task to complete
+        timeout=7200,  # Timeout before failing task
+        poke_interval=60,  # Seconds to wait between checks
+        mode="reschedule",  # Reschedule for long waits to free up worker slots
     )
+
+    @task
+    def consume_and_process_from_kafka():
+        consume_from_kafka(
+            topic=topic,
+            engine=engine,
+            table_name=table_name,
+            bs=8,
+            sasl_username=sasl_username,
+            sasl_password=sasl_password,
+        )
+
+    data = consume_and_process_from_kafka()
+
+    wait_for_gefs_wave_urls_to_kafka >> data
 
 if __name__ == "__main__":
     dag.test()
