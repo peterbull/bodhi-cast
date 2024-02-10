@@ -70,6 +70,7 @@ def consume_from_kafka(
         "sasl.mechanisms": "PLAIN",
         "sasl.username": sasl_username,
         "sasl.password": sasl_password,
+        "max.poll.interval.ms": 900000,
     }
 
     c = Consumer(conf)
