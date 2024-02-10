@@ -5,11 +5,7 @@
 ### Frontend:
 
 - [ ] Add user auth
-- [ ] Add user spot creation pin drop
-- [ ] Add zoom to areas with no spots on globe component
-- [ ] Add brief instructions on pages where needed
-- [ ] Change marker system on globe component
-- [ ] Add zoom to areas with no spots on globe component
+- [x] Add user spot creation pin drop
 - [ ] Add brief instructions on pages where needed
 - [ ] Change marker system on globe component
 
@@ -20,7 +16,7 @@
 - [x] Change data fetching utils to classes
 - [x] Add tests for all endpoints
 - [ ] Add API auth
-- [ ] Add user spot creation endpoint
+- [x] Add user spot creation endpoint
 
 ### Airflow:
 
@@ -40,4 +36,4 @@
 - [x] Set up kafka for streams
 - [x] Configure DAGs for production
 - [x] Set up env for production
-- [ ] Add auto tests for data verification as DAGs
+- [x] Add auto tests for data verification as DAGs
