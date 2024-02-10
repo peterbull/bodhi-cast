@@ -34,17 +34,25 @@ Clone the Bodhi-Cast repository from GitHub:
 git clone https://github.com/peterbull/bodhi-cast
 ```
 
-Navigate to the project directory:
+Navigate to the project directory and create env file:
 
 ```bash
 cd bodhi-cast
+cp .env.example .env
 ```
 
 Build and run the docker containers:
+(_This will run the app with the docker override file that includes debug for `backend` and `airflow-worker`_)
 
 ```bash
 docker compose up --build
 ```
+
+### Default Locations
+
+- **Frontend:** Access the Bodhi-Cast user interface at [http://localhost:3001](http://localhost:3001). This is where you can explore surf spots, view forecasts, and interact with the animated visualizations.
+- **Backend:** The backend API can be accessed at [http://localhost:8000](http://localhost:8000). This serves as the backbone of Bodhi-Cast, handling data processing, forecasting, and API requests.
+- **Airflow Webserver:** For managing and monitoring your workflows, visit the Airflow webserver at [http://localhost:8080](http://localhost:8080). This tool is crucial for orchestrating the data pipeline tasks that power the forecasts in Bodhi-Cast.
 
 ## To Do:
 
