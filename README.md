@@ -41,6 +41,13 @@ cd bodhi-cast
 cp .env.example .env
 ```
 
+Install npm packages for frontend
+(_Doing this locally accounts for host machine differences to prevent volume conflicts_)
+
+```bash
+npm install ./frontend/my-app --prefix ./frontend/my-app
+```
+
 Build and run the docker containers:
 (_This will run the app with the docker override file that includes debug for `backend` and `airflow-worker`_)
 
@@ -53,6 +60,12 @@ docker compose up --build
 - **Frontend:** Access the Bodhi-Cast user interface at [http://localhost:3001](http://localhost:3001). This is where you can explore surf spots, view forecasts, and interact with the animated visualizations.
 - **Backend:** The backend API can be accessed at [http://localhost:8000](http://localhost:8000). This serves as the backbone of Bodhi-Cast, handling data processing, forecasting, and API requests.
 - **Airflow Webserver:** For managing and monitoring your workflows, visit the Airflow webserver at [http://localhost:8080](http://localhost:8080). This tool is crucial for orchestrating the data pipeline tasks that power the forecasts in Bodhi-Cast.
+
+_No data will be available until `gefs_wave_urls_from_kafka` and `gefs_wave_etl_from_kafka` are enabled in the airflow webserver._
+![alt text](assets/imgs/enable-dags.png)
+_Default username and password are both `airflow`_
+
+_Enabling them will begin processing the latest swell data and writing to your local `postgis` service._
 
 ## To Do:
 
