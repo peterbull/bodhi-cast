@@ -152,6 +152,7 @@ with DAG(
     description="Get GEFS wave forecast grib2 file urls",
     schedule_interval="30 7 * * *",
     catchup=False,
+    is_paused_upon_creation=False,
 ) as dag:
 
     # Available forecasts

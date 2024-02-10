@@ -203,6 +203,7 @@ with DAG(
     description="Get GEFS grib2 urls from topic and batch process to postgis",
     schedule_interval="30 7 * * *",
     catchup=False,
+    is_paused_upon_creation=False,
 ) as dag:
 
     # ExternalTaskSensor to wait for gefs_wave_urls_to_kafka DAG to complete
