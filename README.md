@@ -1,3 +1,51 @@
+# Bodhi-Cast
+
+Welcome to Bodhi-Cast, an innovative open-source application designed for surf enthusiasts and professionals around the globe. Bodhi-Cast offers comprehensive swell and surf forecasting, enabling users to explore and analyze surf conditions anywhere in the world.
+
+## Introduction
+
+Bodhi-Cast is more than just a surf forecasting app; it's your go-to platform for discovering and assessing surf spots with ease and precision. With the ability to select any location from a map, users can add surf spots and receive detailed forecasts including primary swell, secondary swell, wind waves, and wind speed/direction.
+
+Bodhi-Cast brings surf data to life with animated visualizations. Utilizing Three.js, the app generates captivating animations that depict wave height and period based on the primary swell, offering a quick and visually engaging way to evaluate surf conditions at a glance.
+
+## Features
+
+- **Global Surf Spot Discovery:** Choose any location on the map to explore surf conditions.
+  ![alt text](assets/imgs/landing-page.png)
+- **Comprehensive Data Forecasts:** Get detailed information on primary and secondary swells, wind waves, and wind speed/direction.
+  ![alt text](assets/imgs/swell-table.png)
+- **Animated Wave Visualizations:** Visualize surf data with animated representations of wave height and period, powered by Three.js.
+  ![alt text](assets/imgs/swell-vis.png)
+
+## Getting Started
+
+Setting up Bodhi-Cast in your local development environment is straightforward, thanks to Docker and Docker Compose. Follow the steps below to get started.
+
+### Prerequisites
+
+- A Windows, Mac, or Linux environment.
+- Docker and Docker Compose installed on your machine.
+
+### Installation
+
+Clone the Bodhi-Cast repository from GitHub:
+
+```bash
+git clone https://github.com/peterbull/bodhi-cast
+```
+
+Navigate to the project directory:
+
+```bash
+cd bodhi-cast
+```
+
+Build and run the docker containers:
+
+```bash
+docker compose up --build
+```
+
 ## To Do:
 
 ## Long-Term:
@@ -37,3 +85,7 @@
 - [x] Configure DAGs for production
 - [x] Set up env for production
 - [x] Add auto tests for data verification as DAGs
+
+```
+
+```
