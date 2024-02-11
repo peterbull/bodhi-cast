@@ -5,3 +5,4 @@ ecmwflibs==0.5.3
 GeoAlchemy2==0.14.3
 xarray==2023.1.0
 debugpy
+noaa-coops==0.3.2
