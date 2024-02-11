@@ -46,6 +46,7 @@ class Spots(Base):
 class StationInventory(Base):
     __tablename__ = "station_inventory"
     id = Column(Integer, primary_key=True)
+    station_id = Column(Integer)
     latitude = Column(Float)
     longitude = Column(Float)
     has_water_level = Column(Boolean)
