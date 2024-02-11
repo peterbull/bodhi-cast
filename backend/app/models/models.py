@@ -1,5 +1,5 @@
 from geoalchemy2 import Geography
-from sqlalchemy import Column, DateTime, Float, Integer, Interval, String
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, Interval, String
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import func
@@ -41,3 +41,15 @@ class Spots(Base):
 
     def as_dict(self):
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
+
+
+class StationInventory(Base):
+    __tablename__ = "station_inventory"
+    id = Column(Integer, primary_key=True)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    has_water_level = Column(Boolean)
+    has_wind = Column(Boolean)
+    has_air_temperature = Column(Boolean)
+    location = Column(Geography("POINT", srid=4326))
+    entry_updated = Column(DateTime(timezone=True), onupdate=func.now())
