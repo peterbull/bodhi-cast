@@ -4,10 +4,12 @@ import os
 import pendulum
 from airflow.decorators import task
 from app.models.models import StationInventory
+from geoalchemy2 import WKTElement
 from noaa_coops import Station, get_stations_from_bbox
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import select
 
 from airflow import DAG
 
@@ -91,4 +93,30 @@ with DAG(
             db.close()
             logging.info("All stations successfully committed to db")
 
-    data = batch_update_stations(data_mapping)
+    @task
+    def pts_from_lat_lng():
+        # Add postgis points for each row
+        db = Session()
+        try:
+            rows = db.query(StationInventory).filter(StationInventory.location.is_(None))
+
+            for row in rows:
+                point = "POINT({} {})".format(row.longitude, row.latitude)
+
+                db.execute(
+                    update(StationInventory)
+                    .where(StationInventory.station_id == row.station_id)
+                    .values(location=WKTElement(point, srid=4326))
+                )
+            db.commit()
+            logging.info(f"Updated {point}")
+        except Exception as e:
+            logging.error(f"Error creating point: {e}")
+        finally:
+            db.close()
+            logging.info("Database session closed")
+
+    new_stations = batch_update_stations(data_mapping)
+    updated_db_entries = pts_from_lat_lng()
+
+    new_stations >> updated_db_entries
