@@ -15,7 +15,7 @@ DATABASE_URL = os.environ.get("AIRFLOW__DATABASE__SQL_ALCHEMY_CONN")
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
-start_date = pendulum.datetime(2025, 1, 1)
+start_date = pendulum.datetime(2024, 1, 1)
 
 default_args = {
     "owner": "airflow",
@@ -46,14 +46,13 @@ def update_station_inventory(db, station_inventory, station, data_mapping):
             setattr(station_inventory, mapped_field, True)
 
     db.add(station_inventory)
-    db.commit()
 
 
 with DAG(
     "update_noaa_station_inventory",
     default_args=default_args,
     description="Cycle through NOAA COOPS station list and append any new stations and inventory data to postgis table",
-    schedule="@daily",
+    schedule=None,
     catchup=False,
 ) as dag:
 
@@ -64,21 +63,32 @@ with DAG(
     }
 
     @task
-    def batch_update_stations(Session, data_mapping):
+    def batch_update_stations(data_mapping):
         db = Session()
-        # Get a list of all station ids available from NOAA COOPS
-        stations = get_stations_from_bbox(lat_coords=[-90, 90], lon_coords=[-180, 180])
+        try:
+            # Get a list of all station ids available from NOAA COOPS
+            stations = get_stations_from_bbox(lat_coords=[-90, 90], lon_coords=[-180, 180])
 
-        # Get ids of stations currently in db
-        station_ids = db.query(StationInventory.station_id).all()
-        station_ids_list = [id[0] for id in station_ids]
+            # Get ids of stations currently in db
+            station_ids = db.query(StationInventory.station_id).all()
+            station_ids_list = [id[0] for id in station_ids]
 
-        # Create a list of available stations not in db
-        new_stations = [station for station in stations if int(station) not in station_ids_list]
+            # Create a list of available stations not in db
+            new_stations = [station for station in stations if int(station) not in station_ids_list]
 
-        for x in new_stations:
-            x = Station(id=x)
-            station_inventory = StationInventory()
-            update_station_inventory(db, station_inventory, x, data_mapping)
+            for x in new_stations:
+                x = Station(id=x)
+                station_inventory = StationInventory()
+                if x.data_inventory:
+                    update_station_inventory(db, station_inventory, x, data_mapping)
+                    db.commit()
+                    logging.info(f"Added station number: {x.id}")
+                else:
+                    logging.info(f"No data inventory for station: {x.id}")
+        except Exception as e:
+            logging.error(f"Error updating station inventory: {e}")
+        finally:
+            db.close()
+            logging.info("All stations successfully committed to db")
 
-    data = batch_update_stations(Session, data_mapping)
+    data = batch_update_stations(data_mapping)
