@@ -79,7 +79,7 @@ with DAG(
             for x in new_stations:
                 x = Station(id=x)
                 station_inventory = StationInventory()
-                if x.data_inventory:
+                if hasattr(x, "data_inventory"):
                     update_station_inventory(db, station_inventory, x, data_mapping)
                     db.commit()
                     logging.info(f"Added station number: {x.id}")
