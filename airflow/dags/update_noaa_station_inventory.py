@@ -7,9 +7,7 @@ from app.models.models import StationInventory
 from geoalchemy2 import WKTElement
 from noaa_coops import Station, get_stations_from_bbox
 from sqlalchemy import create_engine, update
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql import select
 
 from airflow import DAG
 
