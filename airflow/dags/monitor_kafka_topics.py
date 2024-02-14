@@ -11,9 +11,6 @@ sasl_username = os.environ.get("KAFKA_DEFAULT_USERS")
 sasl_password = os.environ.get("KAFKA_DEFAULT_PASSWORDS")
 
 
-table_name = "wave_forecast"
-topic = "gefs_wave_urls"
-
 start_date = pendulum.datetime(2024, 1, 1)
 
 default_args = {
@@ -29,18 +26,17 @@ default_args = {
 
 
 with DAG(
-    "monitor_gefs_wave_url_kafka",
+    "monitor_kafka_topics",
     default_args=default_args,
-    description="Monitor Kafka GEFS wave url stream",
+    description="Monitor the content of Kafka topics",
     schedule=None,
     catchup=False,
 ) as dag:
 
     def taskflow():
+
         @task
-        def monitor_gefs_urls_kafka(
-            topic, sasl_username=sasl_username, sasl_password=sasl_password
-        ):
+        def monitor_kafka_topic(topic, sasl_username=sasl_username, sasl_password=sasl_password):
             conf = {
                 "bootstrap.servers": "kafka:9092",
                 "group.id": "airflow-consumers",
@@ -68,7 +64,14 @@ with DAG(
             # Skipping committing the offsets so that this can be run as many times as needed
             c.close()
 
-        monitor_task = monitor_gefs_urls_kafka(
-            topic=topic, sasl_username=sasl_username, sasl_password=sasl_password
+        monitor_wave_urls = monitor_kafka_topic(
+            topic="gefs_wave_urls", sasl_username=sasl_username, sasl_password=sasl_password
         )
-        dag = taskflow()
+
+        monitor_station_data = monitor_kafka_topic(
+            topic="noaa_station_latest_data",
+            sasl_username=sasl_username,
+            sasl_password=sasl_password,
+        )
+
+    dag = taskflow()
