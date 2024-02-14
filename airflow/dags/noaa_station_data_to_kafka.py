@@ -144,16 +144,16 @@ with DAG(
             except Exception as e:
                 logging.error(f"Failed to flush messages to Kafka: {e}")
 
-            # # Change default retention time for topic
-            # admin_client = AdminClient(conf)
-            # config_resource = ConfigResource(ConfigResource.Type.TOPIC, topic, config_changes)
-            # fs = admin_client.alter_configs([config_resource])
-            # for res, f in fs.items():
-            #     try:
-            #         f.result()  # The result itself is None
-            #         logging.info(f"Configuration for {res} changed successfully")
-            #     except Exception as e:
-            #         logging.info(f"Failed to change configuration for {res}: {e}")
+            # Change default retention time for the topic
+            admin_client = AdminClient(conf)
+            config_resource = ConfigResource(ConfigResource.Type.TOPIC, topic, config_changes)
+            fs = admin_client.alter_configs([config_resource])
+            for res, f in fs.items():
+                try:
+                    f.result()
+                    logging.info(f"Configuration for {res} changed successfully")
+                except Exception as e:
+                    logging.info(f"Failed to change configuration for {res}: {e}")
 
         urls = get_station_urls()
         data = synchronous_fetch_all(urls)
