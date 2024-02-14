@@ -8,7 +8,6 @@ import requests
 from airflow.decorators import task
 from bs4 import BeautifulSoup
 from confluent_kafka import Consumer, KafkaException, Producer
-from confluent_kafka.admin import AdminClient, ConfigResource
 
 from airflow import DAG
 

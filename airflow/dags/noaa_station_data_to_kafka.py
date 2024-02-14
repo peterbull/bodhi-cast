@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 
@@ -7,11 +8,20 @@ import pendulum
 import requests
 from airflow.decorators import task
 from app.models.models import StationInventory
+from confluent_kafka import KafkaException, Producer
+from confluent_kafka.admin import AdminClient, ConfigResource, NewTopic
 from noaa_coops import Station, get_stations_from_bbox
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from airflow import DAG
+
+sasl_username = os.environ.get("KAFKA_DEFAULT_USERS")
+sasl_password = os.environ.get("KAFKA_DEFAULT_PASSWORDS")
+
+topic = "noaa_station_latest_data"
+config_changes = {"retention.ms": "600000"}
+
 
 DATABASE_URL = os.environ.get("AIRFLOW__DATABASE__SQL_ALCHEMY_CONN")
 engine = create_engine(DATABASE_URL)
@@ -106,10 +116,48 @@ with DAG(
                 for entry in item.get("data", [])
             ]
             for message in kafka_messages:
-                logging.info(message)
+                logging.info(f"Processed: {message}")
+
+            return kafka_messages
+
+        @task
+        def write_to_kafka(data):
+            conf = {
+                "bootstrap.servers": "kafka:9092",
+                "security.protocol": "SASL_PLAINTEXT",
+                "sasl.mechanisms": "PLAIN",
+                "sasl.username": sasl_username,
+                "sasl.password": sasl_password,
+            }
+
+            producer = Producer(conf)
+
+            for item in data:
+                try:
+                    message = json.dumps(item).encode("utf-8")
+                    producer.produce(topic, message)
+                except Exception as e:
+                    logging.error(f"Failed to send message to Kafka: {e}")
+
+            try:
+                producer.flush()
+            except Exception as e:
+                logging.error(f"Failed to flush messages to Kafka: {e}")
+
+            # # Change default retention time for topic
+            # admin_client = AdminClient(conf)
+            # config_resource = ConfigResource(ConfigResource.Type.TOPIC, topic, config_changes)
+            # fs = admin_client.alter_configs([config_resource])
+            # for res, f in fs.items():
+            #     try:
+            #         f.result()  # The result itself is None
+            #         logging.info(f"Configuration for {res} changed successfully")
+            #     except Exception as e:
+            #         logging.info(f"Failed to change configuration for {res}: {e}")
 
         urls = get_station_urls()
         data = synchronous_fetch_all(urls)
         processed_data = process_data(data)
+        kafka_messages = write_to_kafka(processed_data)
 
     dag = taskflow()
