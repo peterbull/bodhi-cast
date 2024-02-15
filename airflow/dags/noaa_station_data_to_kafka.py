@@ -20,7 +20,7 @@ sasl_username = os.environ.get("KAFKA_DEFAULT_USERS")
 sasl_password = os.environ.get("KAFKA_DEFAULT_PASSWORDS")
 
 topic = "noaa_station_latest_data"
-config_changes = {"retention.ms": "600000"}
+config_changes = {"retention.ms": "900000"}
 
 
 DATABASE_URL = os.environ.get("AIRFLOW__DATABASE__SQL_ALCHEMY_CONN")
@@ -64,7 +64,7 @@ with DAG(
     "noaa_station_data_to_kafka",
     default_args=default_args,
     description="Get current tide data from noaa coops stations and write to kafka topic",
-    schedule=None,
+    schedule="*/6 * * * *",
     catchup=False,
 ) as dag:
 
