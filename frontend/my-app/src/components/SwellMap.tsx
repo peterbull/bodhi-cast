@@ -23,10 +23,34 @@ const SwellMap: React.FC<any> = ({
   currentComponent,
   setCurrentComponent,
 }) => {
+  const [stationData, setStationData] = useState([]);
   const spotCoords: [number, number] = [
     currentSpot.latitude,
     currentSpot.longitude,
   ];
+
+  const fetchStationData: any = async () => {
+    try {
+      const range = "300000";
+      const lat = spotCoords[0];
+      const lng = spotCoords[1];
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/current/spots/${range}/${lat}/${lng}`
+      );
+      const data = await res.json();
+
+      setStationData(data);
+      console.log(data);
+    } catch (error) {
+      console.error("Failed to fetch station data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStationData(); // fetch on mount
+    const interval = setInterval(fetchStationData, 360000); // fetch every 6 mins
+    return () => clearInterval(interval); // clean up on unmount to prevent mem leaks, etc.
+  }, []);
 
   const timeKeys = [
     "12 a.m.",
