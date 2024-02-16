@@ -228,6 +228,34 @@ class SpotCreate(BaseModel):
 
 @app.post("/addspot")
 def create_spot(spot: SpotCreate, db: Session = Depends(get_db)):
+    """
+    Create a new spot and store it in the database.
+
+    This endpoint accepts spot details, including its name, geographical coordinates, and street address, and creates a new record in the database.
+
+    Args:
+        spot (SpotCreate): A Pydantic model representing the new spot's data, including latitude (lat), longitude (lng), spot name, and street address.
+        db (Session, optional): The database session injected by FastAPI's dependency injection system. Defaults to the session provided by Depends(get_db).
+
+    Returns:
+        dict: A dictionary with a message indicating the successful creation of the spot. For example, {"message": "Spot successfully created"}.
+
+    Example:
+        Input:
+            {
+                "lat": 36.83055459542353,
+                "lng": -75.96764801341773,
+                "spot_name": "1st Street Jetty",
+                "street_address": "Virginia Beach, Va 23451"
+            }
+
+        Output:
+            {
+                "message": "Spot successfully created"
+            }
+    Raises:
+        HTTPException: An error message and status code if the spot cannot be created due to specific conditions (not shown here but consider implementing error handling for database operations).
+    """
     new_spot = Spots(
         latitude=spot.lat,
         longitude=spot.lng,
@@ -242,6 +270,19 @@ def create_spot(spot: SpotCreate, db: Session = Depends(get_db)):
 # Get nearby station data
 @app.get("/current/spots/{range}/{lat}/{lng}")
 def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depends(get_db)):
+    """
+    Retrieve nearby weather station data within a specified range. The station data is populated to redis in near realtime via consumption from a kafka topic
+
+
+    Parameters:
+    - range (str): The range in kilometers(km) within which to search for nearby stations.
+    - lat (str): The latitude of the location.
+    - lng (str): The longitude of the location.
+    - db (Session, optional): The database session. Defaults to Depends(get_db).
+
+    Returns:
+    - List[Dict[str, Any]]: A list of dictionaries containing the station data.
+    """
     range = float(range)
     lat = float(lat)
     lng = float(lng)
