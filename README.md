@@ -186,7 +186,6 @@ Bodhi-Cast is under the Apache License 2.0. See the [LICENSE](LICENSE) file for 
 - [ ] Get shore wind forecast
 - [x] Change data fetching utils to classes
 - [x] Add tests for all endpoints
-- [ ] Add API auth
 - [x] Add user spot creation endpoint
 
 ### Airflow:
@@ -208,3 +207,14 @@ Bodhi-Cast is under the Apache License 2.0. See the [LICENSE](LICENSE) file for 
 - [x] Configure DAGs for production
 - [x] Set up env for production
 - [x] Add auto tests for data verification as DAGs
+
+### Week Ending 240218
+
+- [ ] Remove any excessive logging in DAGs
+- [ ] Incoroporate realtime data from available weather stations
+  - [ ] add stations to new table in postgres
+  - [ ] create producer to push to kafka topic
+  - [ ] create consumer to write latest to redis
+  - [ ] add nearby realtime data to spot pages
+  - [ ] add endpoint to find stations within the radius of a given spot
+  - [ ] display nearby station data on frontend
