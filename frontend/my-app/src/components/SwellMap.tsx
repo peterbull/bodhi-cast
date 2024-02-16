@@ -146,6 +146,15 @@ const SwellMap: React.FC<any> = ({
             <h3 className="text-[#03e9f4] text-xl font-extralight text-center">
               {currentSpot.street_address}
             </h3>
+            <div className="flex justify-center items-center h-full pt-4">
+              <button className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-2">
+                SWELL FORECAST
+              </button>
+
+              <button className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-2">
+                CURRENT STATION DATA
+              </button>
+            </div>
           </>
         )}
 
