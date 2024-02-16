@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import redis
 from app.db.database import add_spots, create_tables, get_db
-from app.models.models import Spots
+from app.models.models import Spots, StationInventory
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -50,73 +50,73 @@ def read_root():
 # Get wave forecast data if points fall within a given bounding box
 
 
-@app.get("/forecasts/tiles/{date}/{lat}/{lng}/{zoom}")
-def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session = Depends(get_db)):
-    """
-    Retrieve wave forecasts for a specific tile based on date, latitude, longitude, and zoom level.
+# @app.get("/forecasts/tiles/{date}/{lat}/{lng}/{zoom}")
+# def get_forecasts_by_tile(date: str, lat: str, lng: str, zoom: str, db: Session = Depends(get_db)):
+#     """
+#     Retrieve wave forecasts for a specific tile based on date, latitude, longitude, and zoom level.
 
-    PostGIS is used to create a bounding box at calculated offets based on zoom from the orign
-    point(lat,lng) and return all data points that fall within the bounding box.
+#     PostGIS is used to create a bounding box at calculated offets based on zoom from the orign
+#     point(lat,lng) and return all data points that fall within the bounding box.
 
-    Args:
-        date (str): The date of the forecasts in the format 'YYYYMMDD'.
-        lat (str): The latitude of the tile.
-        lng (str): The longitude of the tile.
-        zoom (str): The zoom level of the tile.
-        db (Session, optional): The database session. Defaults to Depends(get_db).
+#     Args:
+#         date (str): The date of the forecasts in the format 'YYYYMMDD'.
+#         lat (str): The latitude of the tile.
+#         lng (str): The longitude of the tile.
+#         zoom (str): The zoom level of the tile.
+#         db (Session, optional): The database session. Defaults to Depends(get_db).
 
-    Returns:
-        list: A list of dictionaries representing the wave forecasts for the tile.
-    """
-    # Create unique key for this set of params and try to get results from redis
-    key = f"forecasts_by_tile:{date}:{lat}:{lng}:{zoom}"
-    result = redis_client.get(key)
+#     Returns:
+#         list: A list of dictionaries representing the wave forecasts for the tile.
+#     """
+#     # Create unique key for this set of params and try to get results from redis
+#     key = f"forecasts_by_tile:{date}:{lat}:{lng}:{zoom}"
+#     result = redis_client.get(key)
 
-    # If it is not cached in redis, run the query as normal
-    if result is not None:
-        return json.loads(result)
-    else:
-        date = datetime.strptime(date, "%Y%m%d").date()
-        next_day = date + timedelta(days=1)
-        # To do: Find an equation that returns proportionally at all zoom levels after deciding on
-        #        final map and corresponding projection and pixel size
-        # Current: A placeholder that will only work with values near the default `zoom`
-        zoom_factor = float(zoom) / 7.5
-        lat_min = float(lat) - (zoom_factor / 2)
-        lat_max = float(lat) + (zoom_factor / 2)
-        lng_min = float(lng) - zoom_factor
-        lng_max = float(lng) + zoom_factor
-        result = db.execute(
-            text(
-                """SELECT swh
-            FROM wave_forecast
-            WHERE
-                location::geometry && ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326)
-                AND ST_Intersects(
-                    location::geometry,
-                    ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326))
-                AND valid_time >= :date
-                AND time >= :date
-                AND valid_time < :next_day
-                AND time < :next_day
-                AND swh IS NOT NULL;
-                    """
-            ),
-            {
-                "lng_min": lng_min,
-                "lat_min": lat_min,
-                "lng_max": lng_max,
-                "lat_max": lat_max,
-                "date": date,
-                "next_day": next_day,
-            },
-        )
-        rows = result.all()
-        forecasts = [row._asdict() for row in rows]
+#     # If it is not cached in redis, run the query as normal
+#     if result is not None:
+#         return json.loads(result)
+#     else:
+#         date = datetime.strptime(date, "%Y%m%d").date()
+#         next_day = date + timedelta(days=1)
+#         # To do: Find an equation that returns proportionally at all zoom levels after deciding on
+#         #        final map and corresponding projection and pixel size
+#         # Current: A placeholder that will only work with values near the default `zoom`
+#         zoom_factor = float(zoom) / 7.5
+#         lat_min = float(lat) - (zoom_factor / 2)
+#         lat_max = float(lat) + (zoom_factor / 2)
+#         lng_min = float(lng) - zoom_factor
+#         lng_max = float(lng) + zoom_factor
+#         result = db.execute(
+#             text(
+#                 """SELECT swh
+#             FROM wave_forecast
+#             WHERE
+#                 location::geometry && ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326)
+#                 AND ST_Intersects(
+#                     location::geometry,
+#                     ST_MakeEnvelope(:lng_min, :lat_min, :lng_max, :lat_max, 4326))
+#                 AND valid_time >= :date
+#                 AND time >= :date
+#                 AND valid_time < :next_day
+#                 AND time < :next_day
+#                 AND swh IS NOT NULL;
+#                     """
+#             ),
+#             {
+#                 "lng_min": lng_min,
+#                 "lat_min": lat_min,
+#                 "lng_max": lng_max,
+#                 "lat_max": lat_max,
+#                 "date": date,
+#                 "next_day": next_day,
+#             },
+#         )
+#         rows = result.all()
+#         forecasts = [row._asdict() for row in rows]
 
-        redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=timedelta(hours=1))
+#         redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=timedelta(hours=1))
 
-        return forecasts
+#         return forecasts
 
 
 @app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}")
@@ -237,3 +237,36 @@ def create_spot(spot: SpotCreate, db: Session = Depends(get_db)):
     db.add(new_spot)
     db.commit()
     return {"message": "Spot successfully created"}
+
+
+# Get nearby station data
+@app.get("/current/spots/{range}/{lat}/{lng}")
+def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depends(get_db)):
+    range = float(range)
+    lat = float(lat)
+    lng = float(lng)
+
+    sql = text(
+        """
+    SELECT 
+        id, 
+        station_id, 
+        latitude, 
+        longitude, 
+        location
+    FROM 
+        station_inventory
+    WHERE 
+        ST_DWithin(
+            location::geography, 
+            ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
+            :range
+        );
+    """
+    )
+
+    result = db.execute(sql, {"lat": lat, "lng": lng, "range": range})
+    rows = result.all()
+
+    stations = [row._asdict() for row in rows]
+    return stations
