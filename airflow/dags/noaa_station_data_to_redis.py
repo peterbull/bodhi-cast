@@ -32,7 +32,7 @@ with DAG(
     "noaa_station_data_to_redis",
     default_args=default_args,
     description="Write latest noaa station data to redis",
-    schedule=None,
+    schedule="*/6 * * * *",
     catchup=False,
 ) as dag:
 
