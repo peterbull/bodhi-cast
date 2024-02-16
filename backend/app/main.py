@@ -275,7 +275,7 @@ def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depend
 
 
     Parameters:
-    - range (str): The range in kilometers(km) within which to search for nearby stations.
+    - range (str): The range in meters(m) within which to search for nearby stations.
     - lat (str): The latitude of the location.
     - lng (str): The longitude of the location.
     - db (Session, optional): The database session. Defaults to Depends(get_db).
@@ -310,7 +310,10 @@ def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depend
     rows = result.all()
 
     station_data = [row._asdict() for row in rows]
-    for data in station_data:
-        data.update(json.loads(redis_client.get(data["station_id"])))
+    current_conditions = [
+        json.loads(data)
+        for station in station_data
+        if (data := redis_client.get(station["station_id"]))
+    ]
 
-    return station_data
+    return current_conditions
