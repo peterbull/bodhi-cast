@@ -115,6 +115,7 @@ with DAG(
                 for item in data
                 for entry in item.get("data", [])
             ]
+            kafka_messages = sorted(kafka_messages, key=lambda x: x["time"])
             for message in kafka_messages:
                 logging.info(f"Processed: {message}")
 
