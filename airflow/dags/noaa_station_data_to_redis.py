@@ -33,6 +33,7 @@ with DAG(
     default_args=default_args,
     description="Write latest noaa station data to redis",
     schedule="*/6 * * * *",
+    # schedule=None, # debug setting
     catchup=False,
 ) as dag:
 
@@ -68,18 +69,13 @@ with DAG(
                         raise KafkaException(msg.error())
 
                     message_value = json.loads(msg.value().decode("utf-8"))
-                    location_id = message_value["id"]
-                    water_height = message_value["v"]
-                    measurement_time = message_value["time"]
+                    location_id = message_value["metadata"]["id"]
+                    redis_client.set(location_id, json.dumps(message_value))
 
-                    redis_value = json.dumps(
-                        {"water_height": water_height, "time": measurement_time}
-                    )
-                    redis_client.set(location_id, redis_value)
-                    redis_client.expire(location_id, 600)
+                    redis_client.expire(location_id, 600)  # set expiration of redis data
                     c.commit()
                     logging.info(
-                        f"Updated location {location_id} with water height {water_height} and time {measurement_time} in Redis."
+                        f"Updated location {location_id} to latest at {message_value['entry_created']}"
                     )
 
             finally:
