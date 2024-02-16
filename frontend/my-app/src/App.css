@@ -18,5 +18,5 @@ body {
 
 /* sizing of map container */
 .leaflet-container {
-  height: 75vh;
+  height: 50vh;
 }

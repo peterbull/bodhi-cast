@@ -79,6 +79,8 @@ const GlobeSpots: React.FC<any> = ({
     }, ms);
   };
 
+  // refocus to top on selection
+
   return spots.length > 0 ? (
     <>
       <div className="flex flex-col bg-gray-900">
@@ -175,7 +177,10 @@ const GlobeSpots: React.FC<any> = ({
                   <tr
                     className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
                     key={spot.id}
-                    onClick={() => globeZoom(spot, 0.2, 2500)}
+                    onClick={() => {
+                      globeZoom(spot, 0.2, 2500);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                   >
                     <td className="py-2 px-2 cursor-pointer">
                       {spot.spot_name}
