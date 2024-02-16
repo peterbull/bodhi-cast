@@ -268,5 +268,8 @@ def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depend
     result = db.execute(sql, {"lat": lat, "lng": lng, "range": range})
     rows = result.all()
 
-    stations = [row._asdict() for row in rows]
-    return stations
+    station_data = [row._asdict() for row in rows]
+    for data in station_data:
+        data.update(json.loads(redis_client.get(data["station_id"])))
+
+    return station_data
