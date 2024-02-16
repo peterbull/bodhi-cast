@@ -7,7 +7,7 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon } from "leaflet";
 import PrimaryWaveForecast from "./PrimaryWaveForecast";
@@ -15,6 +15,7 @@ import SwellWaveForecast from "./SwellWaveForecast";
 import WindWaveForecast from "./WindWaveForecast";
 import WindForecast from "./WindForecast";
 import SwellSim from "./SwellSim";
+import CurrentStationData from "./CurrentStationData";
 
 const SwellMap: React.FC<any> = ({
   currentSpot,
@@ -24,11 +25,12 @@ const SwellMap: React.FC<any> = ({
   setCurrentComponent,
 }) => {
   const [stationData, setStationData] = useState([]);
+  const [activeComponent, setActiveComponent] = useState("SwellSim");
   const spotCoords: [number, number] = [
     currentSpot.latitude,
     currentSpot.longitude,
   ];
-
+  const SwellSimMemo = memo(SwellSim);
   const fetchStationData: any = async () => {
     try {
       const range = "300000";
@@ -51,6 +53,11 @@ const SwellMap: React.FC<any> = ({
     const interval = setInterval(fetchStationData, 360000); // fetch every 6 mins
     return () => clearInterval(interval); // clean up on unmount to prevent mem leaks, etc.
   }, []);
+
+  const updateComponent = async (data: any) => {
+    setActiveComponent(data);
+    console.log(`active component: ${data}`);
+  };
 
   const timeKeys = [
     "12 a.m.",
@@ -97,143 +104,159 @@ const SwellMap: React.FC<any> = ({
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="w-full overflow-x-hidden">
-        <MapContainer
-          center={spotCoords}
-          zoom={zoom}
-          key={currentComponent}
-          scrollWheelZoom={false}
-        >
-          <MapEvents />
-          <TileLayer
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            attribution="Tiles &copy; Esri"
-          />
-          {/* <D3SwellVis currentSpot={currentSpot} /> */}
-          <Marker
-            position={spotCoords}
-            icon={
-              new Icon({
-                iconUrl: markerIconPng,
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-              })
-            }
+    <>
+      <div className="flex flex-col">
+        <div className="w-full overflow-x-hidden">
+          <MapContainer
+            center={spotCoords}
+            zoom={zoom}
+            key={currentComponent}
+            scrollWheelZoom={false}
           >
-            <Popup position={spotCoords} offset={[0, -41]}>
-              {currentSpot.spot_name}
-              <br />
-              {currentSpot.latitude}, {currentSpot.longitude}
-            </Popup>
-          </Marker>
-        </MapContainer>
-      </div>
-      <div className="w-full overflow-x-auto bg-gray-900">
-        {currentSpot && currentSpot.latitude && (
-          <>
-            <div className="flex justify-center items-center h-full pt-4">
-              <button
-                onClick={() => setCurrentComponent("GlobeSpots")}
-                className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2"
-              >
-                RETURN TO MAP
-              </button>
-            </div>
-            <h1 className="text-[#03e9f4] text-3xl font-thin text-center">
-              {currentSpot.spot_name}
-            </h1>
-            <h3 className="text-[#03e9f4] text-xl font-extralight text-center">
-              {currentSpot.street_address}
-            </h3>
-            <div className="flex justify-center items-center h-full pt-4">
-              <button className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-2">
-                SWELL FORECAST
-              </button>
+            <MapEvents />
+            <TileLayer
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              attribution="Tiles &copy; Esri"
+            />
+            {/* <D3SwellVis currentSpot={currentSpot} /> */}
+            <Marker
+              position={spotCoords}
+              icon={
+                new Icon({
+                  iconUrl: markerIconPng,
+                  iconSize: [25, 41],
+                  iconAnchor: [12, 41],
+                })
+              }
+            >
+              <Popup position={spotCoords} offset={[0, -41]}>
+                {currentSpot.spot_name}
+                <br />
+                {currentSpot.latitude}, {currentSpot.longitude}
+              </Popup>
+            </Marker>
+          </MapContainer>
+        </div>
+        <div className="w-full overflow-x-auto bg-gray-900">
+          {currentSpot && currentSpot.latitude && (
+            <>
+              <div className="flex justify-center items-center h-full pt-4">
+                <button
+                  onClick={() => setCurrentComponent("GlobeSpots")}
+                  className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2"
+                >
+                  RETURN TO MAP
+                </button>
+              </div>
+              <h1 className="text-[#03e9f4] text-3xl font-thin text-center">
+                {currentSpot.spot_name}
+              </h1>
+              <h3 className="text-[#03e9f4] text-xl font-extralight text-center">
+                {currentSpot.street_address}
+              </h3>
+              <div className="flex justify-center items-center h-full pt-4">
+                <button
+                  className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-2"
+                  onClick={() => updateComponent("SwellForecast")}
+                >
+                  SWELL FORECAST
+                </button>
 
-              <button className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-2">
-                CURRENT STATION DATA
-              </button>
-            </div>
-          </>
-        )}
-
+                <button
+                  className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-2"
+                  onClick={() => updateComponent("CurrentStationData")}
+                >
+                  CURRENT STATION DATA
+                </button>
+              </div>
+            </>
+          )}
+        </div>
         {spotForecast.length > 0 ? (
-          <>
-            <SwellSim spotForecast={spotForecast} />
-            <table className="mx-auto text-center divide-y divide-gray-500">
-              <thead>
-                <tr>
-                  <th
-                    colSpan={1}
-                    className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                  ></th>
-                  <th
-                    colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                  >
-                    Primary Waves
-                  </th>
-                  <th
-                    colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                  >
-                    Secondary Swell
-                  </th>
-                  <th
-                    colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                  >
-                    Wind Waves
-                  </th>
-                  <th
-                    colSpan={2}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium
-                    text-gray-400 uppercase tracking-wider"
-                  >
-                    Wind Report
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array(spotForecast.length)
-                  .fill(null)
-                  .map((_, index) => (
-                    <tr
-                      className="text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
-                      key={index}
-                    >
-                      <td className="py-6 font-normal">{timeKeys[index]}</td>
-                      <PrimaryWaveForecast
-                        hourlyIndex={index}
-                        spotForecast={spotForecast}
-                      />
-                      <SwellWaveForecast
-                        hourlyIndex={index}
-                        spotForecast={spotForecast}
-                      />
-                      <WindWaveForecast
-                        hourlyIndex={index}
-                        spotForecast={spotForecast}
-                      />
-                      <WindForecast
-                        hourlyIndex={index}
-                        spotForecast={spotForecast}
-                      />
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </>
+          <SwellSimMemo spotForecast={spotForecast} />
         ) : (
-          <div className="flex justify-center items-center h-half h-screen transform -translate-y-16 animate-pulse">
-            <p className="text-[#03e9f4] text-center text-s font-thin">
-              Loading...
-            </p>
-          </div>
+          <p>Loading...</p>
         )}
       </div>
-    </div>
+      {activeComponent === "SwellForecast" ? (
+        <>
+          <table className="mx-auto text-center divide-y divide-gray-500">
+            <thead>
+              <tr>
+                <th
+                  colSpan={1}
+                  className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                ></th>
+                <th
+                  colSpan={3}
+                  className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                >
+                  Primary Waves
+                </th>
+                <th
+                  colSpan={3}
+                  className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                >
+                  Secondary Swell
+                </th>
+                <th
+                  colSpan={3}
+                  className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                >
+                  Wind Waves
+                </th>
+                <th
+                  colSpan={2}
+                  className="w-1/5 px-6 py-3 text-center text-xs font-medium
+                    text-gray-400 uppercase tracking-wider"
+                >
+                  Wind Report
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array(spotForecast.length)
+                .fill(null)
+                .map((_, index) => (
+                  <tr
+                    className="text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
+                    key={index}
+                  >
+                    <td className="py-6 font-normal">{timeKeys[index]}</td>
+                    <PrimaryWaveForecast
+                      hourlyIndex={index}
+                      spotForecast={spotForecast}
+                    />
+                    <SwellWaveForecast
+                      hourlyIndex={index}
+                      spotForecast={spotForecast}
+                    />
+                    <WindWaveForecast
+                      hourlyIndex={index}
+                      spotForecast={spotForecast}
+                    />
+                    <WindForecast
+                      hourlyIndex={index}
+                      spotForecast={spotForecast}
+                    />
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <>
+          <CurrentStationData />
+        </>
+      )}
+      {/* //{" "}
+        <div className="flex justify-center items-center h-half h-screen transform -translate-y-16 animate-pulse">
+          //{" "}
+          <p className="text-[#03e9f4] text-center text-s font-thin">
+            // Loading... //{" "}
+          </p>
+          //{" "} */}
+    </>
   );
 };
 
