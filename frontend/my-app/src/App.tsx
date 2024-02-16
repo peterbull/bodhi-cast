@@ -6,7 +6,7 @@ import { ComponentMapProvider } from "./contexts/ComponentMapProvider";
 
 function App() {
   const [spots, setSpots] = useState([]);
-  const [zoom, setZoom] = useState(13);
+  const [zoom, setZoom] = useState(15);
   const [currentSpot, setCurrentSpot] = useState<any>(null);
   const [spotForecast, setSpotForecast] = useState<any>([]);
   const [tileForecast, setTileForecast] = useState<any>([]);

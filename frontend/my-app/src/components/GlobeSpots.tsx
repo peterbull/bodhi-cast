@@ -151,7 +151,6 @@ const GlobeSpots: React.FC<any> = ({
                 setTimeout(() => {
                   setCurrentComponent("AddSpot");
                 }, 2500);
-                window.scrollTo({ top: 0, behavior: "smooth" });
               }}
             >
               ADD A SPOT
