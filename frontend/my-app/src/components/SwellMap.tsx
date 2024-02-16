@@ -7,7 +7,7 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon } from "leaflet";
 import PrimaryWaveForecast from "./PrimaryWaveForecast";
@@ -15,7 +15,6 @@ import SwellWaveForecast from "./SwellWaveForecast";
 import WindWaveForecast from "./WindWaveForecast";
 import WindForecast from "./WindForecast";
 import SwellSim from "./SwellSim";
-import CurrentStationData from "./CurrentStationData";
 
 const SwellMap: React.FC<any> = ({
   currentSpot,
@@ -25,12 +24,11 @@ const SwellMap: React.FC<any> = ({
   setCurrentComponent,
 }) => {
   const [stationData, setStationData] = useState([]);
-  const [activeComponent, setActiveComponent] = useState("SwellSim");
   const spotCoords: [number, number] = [
     currentSpot.latitude,
     currentSpot.longitude,
   ];
-  const SwellSimMemo = memo(SwellSim);
+
   const fetchStationData: any = async () => {
     try {
       const range = "300000";
@@ -53,11 +51,6 @@ const SwellMap: React.FC<any> = ({
     const interval = setInterval(fetchStationData, 360000); // fetch every 6 mins
     return () => clearInterval(interval); // clean up on unmount to prevent mem leaks, etc.
   }, []);
-
-  const updateComponent = async (data: any) => {
-    setActiveComponent(data);
-    console.log(`active component: ${data}`);
-  };
 
   const timeKeys = [
     "12 a.m.",
@@ -157,90 +150,81 @@ const SwellMap: React.FC<any> = ({
         )}
 
         {spotForecast.length > 0 ? (
-          <SwellSimMemo spotForecast={spotForecast} />
+          <>
+            <SwellSim spotForecast={spotForecast} />
+            <table className="mx-auto text-center divide-y divide-gray-500">
+              <thead>
+                <tr>
+                  <th
+                    colSpan={1}
+                    className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                  ></th>
+                  <th
+                    colSpan={3}
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                  >
+                    Primary Waves
+                  </th>
+                  <th
+                    colSpan={3}
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                  >
+                    Secondary Swell
+                  </th>
+                  <th
+                    colSpan={3}
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
+                  >
+                    Wind Waves
+                  </th>
+                  <th
+                    colSpan={2}
+                    className="w-1/5 px-6 py-3 text-center text-xs font-medium
+                    text-gray-400 uppercase tracking-wider"
+                  >
+                    Wind Report
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array(spotForecast.length)
+                  .fill(null)
+                  .map((_, index) => (
+                    <tr
+                      className="text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
+                      key={index}
+                    >
+                      <td className="py-6 font-normal">{timeKeys[index]}</td>
+                      <PrimaryWaveForecast
+                        hourlyIndex={index}
+                        spotForecast={spotForecast}
+                      />
+                      <SwellWaveForecast
+                        hourlyIndex={index}
+                        spotForecast={spotForecast}
+                      />
+                      <WindWaveForecast
+                        hourlyIndex={index}
+                        spotForecast={spotForecast}
+                      />
+                      <WindForecast
+                        hourlyIndex={index}
+                        spotForecast={spotForecast}
+                      />
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </>
         ) : (
-          <p>Loading...</p>
+          <div className="flex justify-center items-center h-half h-screen transform -translate-y-16 animate-pulse">
+            <p className="text-[#03e9f4] text-center text-s font-thin">
+              Loading...
+            </p>
+          </div>
         )}
       </div>
-      {activeComponent === "SwellForecast" ? (
-        <>
-          <table className="mx-auto text-center divide-y divide-gray-500">
-            <thead>
-              <tr>
-                <th
-                  colSpan={1}
-                  className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                ></th>
-                <th
-                  colSpan={3}
-                  className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                >
-                  Primary Waves
-                </th>
-                <th
-                  colSpan={3}
-                  className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                >
-                  Secondary Swell
-                </th>
-                <th
-                  colSpan={3}
-                  className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                >
-                  Wind Waves
-                </th>
-                <th
-                  colSpan={2}
-                  className="w-1/5 px-6 py-3 text-center text-xs font-medium
-                    text-gray-400 uppercase tracking-wider"
-                >
-                  Wind Report
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array(spotForecast.length)
-                .fill(null)
-                .map((_, index) => (
-                  <tr
-                    className="text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
-                    key={index}
-                  >
-                    <td className="py-6 font-normal">{timeKeys[index]}</td>
-                    <PrimaryWaveForecast
-                      hourlyIndex={index}
-                      spotForecast={spotForecast}
-                    />
-                    <SwellWaveForecast
-                      hourlyIndex={index}
-                      spotForecast={spotForecast}
-                    />
-                    <WindWaveForecast
-                      hourlyIndex={index}
-                      spotForecast={spotForecast}
-                    />
-                    <WindForecast
-                      hourlyIndex={index}
-                      spotForecast={spotForecast}
-                    />
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </>
-      ) : (
-        <>
-          <CurrentStationData />
-        </>
-      )}
-      {/* //{" "}
-        <div className="flex justify-center items-center h-half h-screen transform -translate-y-16 animate-pulse">
-          //{" "}
-          <p className="text-[#03e9f4] text-center text-s font-thin">
-            // Loading... //{" "}
-          </p>
-          //{" "} */}
-    </>
+    </div>
   );
 };
 
