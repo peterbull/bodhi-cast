@@ -85,7 +85,7 @@ with DAG(
                 )
                 urls = [
                     f"https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station={station_id}&product={product}&datum={datum}&time_zone={time_zone}&units=metric&format=json"
-                    for station_id, in station_ids
+                    for station_id in station_ids
                 ]
             except Exception as e:
                 logging.error(f"Error generating urls: {e}")
