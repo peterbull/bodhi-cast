@@ -1,20 +1,11 @@
-import {
-  MapContainer,
-  TileLayer,
-  Popup,
-  Marker,
-  useMap,
-  useMapEvents,
-} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import React, { useEffect, useState } from "react";
-import markerIconPng from "leaflet/dist/images/marker-icon.png";
-import { Icon } from "leaflet";
 import SwellTable from "./SwellTable";
 import SwellSim from "./SwellSim";
 import CurrentStationData from "./CurrentStationData";
 import Loading from "./Loading";
 import LeafletMap from "./LeafletMap";
+import { StationDataProvider } from "../contexts/StationDataProvider";
 
 const SwellMap: React.FC<any> = ({
   currentSpot,
@@ -61,10 +52,19 @@ const SwellMap: React.FC<any> = ({
           <>
             <SwellSim spotForecast={spotForecast} />
             <SwellTable spotForecast={spotForecast} />
-            <CurrentStationData
-              currentSpot={currentSpot}
-              spotCoords={spotCoords}
-            />
+            <StationDataProvider>
+              <LeafletMap
+                zoom={10}
+                currentComponent={currentComponent}
+                currentSpot={currentSpot}
+                setCurrentComponent={setCurrentComponent}
+                spotCoords={spotCoords}
+              />
+              <CurrentStationData
+                currentSpot={currentSpot}
+                spotCoords={spotCoords}
+              />
+            </StationDataProvider>
           </>
         ) : (
           <Loading />

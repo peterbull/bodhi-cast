@@ -7,13 +7,10 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext } from "react";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon } from "leaflet";
-import SwellTable from "./SwellTable";
-import SwellSim from "./SwellSim";
-import CurrentStationData from "./CurrentStationData";
-import Loading from "./Loading";
+import { StationDataContext } from "../contexts/StationDataProvider";
 
 const LeafletMap: React.FC<any> = ({
   zoom,
@@ -22,6 +19,8 @@ const LeafletMap: React.FC<any> = ({
   setCurrentComponent,
   spotCoords,
 }) => {
+  const { stationData } = useContext(StationDataContext);
+  console.log(`station data in leaflet ${stationData}`);
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
 
@@ -36,11 +35,11 @@ const LeafletMap: React.FC<any> = ({
       const zoomend = () => {
         const currentZoom = map.getZoom();
         console.log(currentZoom);
-        if (currentZoom <= 7) {
-          map.flyTo(spotCoords, 2.1, { duration: 3.5 });
+        if (currentZoom <= 0) {
+          map.flyTo(spotCoords, 2.1, { duration: 0.5 });
           setTimeout(() => {
             setCurrentComponent("GlobeSpots");
-          }, 3500);
+          }, 500);
         }
       };
 
@@ -57,35 +56,72 @@ const LeafletMap: React.FC<any> = ({
 
   return (
     <div className="w-full overflow-x-hidden">
-      <MapContainer
-        center={spotCoords}
-        zoom={zoom}
-        key={currentComponent}
-        scrollWheelZoom={false}
-      >
-        <MapEvents />
-        <TileLayer
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-          attribution="Tiles &copy; Esri"
-        />
-        {/* <D3SwellVis currentSpot={currentSpot} /> */}
-        <Marker
-          position={spotCoords}
-          icon={
-            new Icon({
-              iconUrl: markerIconPng,
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-            })
-          }
+      {stationData.length > 0 ? (
+        <MapContainer
+          center={spotCoords}
+          zoom={zoom}
+          key={currentComponent}
+          scrollWheelZoom={false}
         >
-          <Popup position={spotCoords} offset={[0, -41]}>
-            {currentSpot.spot_name}
-            <br />
-            {currentSpot.latitude}, {currentSpot.longitude}
-          </Popup>
-        </Marker>
-      </MapContainer>
+          <MapEvents />
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            attribution="Tiles &copy; Esri"
+          />
+          {stationData.map((station: any) => (
+            <Marker
+              key={station.metadata.id}
+              position={[station.metadata.lat, station.metadata.lon]}
+              icon={
+                new Icon({
+                  iconUrl: markerIconPng,
+                  iconSize: [25, 41],
+                  iconAnchor: [12, 41],
+                })
+              }
+            >
+              <Popup
+                key={station.metadata.id}
+                position={[station.metadata.lat, station.metadata.lon]}
+                offset={[0, -41]}
+              >
+                {station.metadata.name}
+                <br />
+                <p>hi there</p>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      ) : (
+        <MapContainer
+          center={spotCoords}
+          zoom={zoom}
+          key={currentComponent}
+          scrollWheelZoom={false}
+        >
+          <MapEvents />
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            attribution="Tiles &copy; Esri"
+          />
+          <Marker
+            position={spotCoords}
+            icon={
+              new Icon({
+                iconUrl: markerIconPng,
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+              })
+            }
+          >
+            <Popup position={spotCoords} offset={[0, -41]}>
+              {currentSpot.spot_name}
+              <br />
+              {currentSpot.latitude}, {currentSpot.longitude}
+            </Popup>
+          </Marker>
+        </MapContainer>
+      )}
     </div>
   );
 };

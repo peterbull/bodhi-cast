@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Loading from "./Loading";
+import { StationDataContext } from "../contexts/StationDataProvider";
 
 const formatDate = (dateString: any) => {
   const date = new Date(dateString);
@@ -25,7 +26,7 @@ const metersToMiles = (data: any) => {
 };
 
 const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
-  const [stationData, setStationData] = useState([]);
+  const { stationData, setStationData } = useContext(StationDataContext);
   const fetchStationData: any = async () => {
     try {
       const range = "300000";
