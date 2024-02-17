@@ -11,6 +11,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon } from "leaflet";
+import { ZoomDependentExpression } from "maplibre-gl";
 
 const AddSpot: React.FC<any> = ({
   spotClick,
@@ -22,10 +23,23 @@ const AddSpot: React.FC<any> = ({
   const [spotName, setSpotName] = useState("");
   const [spotLocation, setSpotLocation] = useState("");
   const [validSubmission, setValidSubmission] = useState(true);
+  const [succcessfulSubmission, setSuccessfulSubmission] = useState(false);
 
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
 
+    const globeReturn = () => {
+      map.flyTo(spotCoords, 2.1, { duration: 2.0 });
+      setTimeout(() => {
+        setCurrentComponent("GlobeSpots");
+      }, 2000);
+    };
+
+    useEffect(() => {
+      if (succcessfulSubmission) {
+        globeReturn();
+      }
+    }, [succcessfulSubmission]);
     useMapEvents({
       click: (e) => {
         setScrollWheelZoom(true);
@@ -65,6 +79,7 @@ const AddSpot: React.FC<any> = ({
     if (response.ok) {
       console.log("Surfs up");
       setValidSubmission(true);
+      setSuccessfulSubmission(true);
     } else {
       console.log("Wipeout");
     }
@@ -155,6 +170,12 @@ const AddSpot: React.FC<any> = ({
         {!validSubmission && (
           <p className="text-[#d6d6d6] text-center font-thin">
             Name and location must not be empty
+          </p>
+        )}
+        {validSubmission && succcessfulSubmission && (
+          <p className="text-[#03e9f4] text-center mt-3">
+            Spot successfully created! <br />
+            Returning to map...
           </p>
         )}
       </div>
