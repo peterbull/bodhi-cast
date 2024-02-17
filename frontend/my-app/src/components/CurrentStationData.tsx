@@ -26,7 +26,24 @@ const metersToMiles = (data: any) => {
 };
 
 const metersToFeet = (data: any) => {
+  if (!data || isNaN(Number(data))) {
+    return false;
+  }
   return (data * 3.28084).toFixed(2);
+};
+
+const celciusToFarenheit = (data: any) => {
+  if (!data || isNaN(Number(data))) {
+    return false;
+  }
+  return (data * (9 / 5) + 32).toFixed(1);
+};
+
+const metersPerSecondToKnots = (data: any) => {
+  if (!data || isNaN(Number(data))) {
+    return false;
+  }
+  return (data * 1.943844).toFixed(1);
 };
 
 const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
@@ -70,47 +87,84 @@ const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
       </h1>
 
       {stationData.length > 0 ? (
-        <table className="mx-auto text-center divide-y divide-gray-500">
-          <thead>
-            <tr className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-              <th colSpan={1}>STATION NAME</th>
-              <th colSpan={1}>LAT</th>
-              <th colSpan={1}>LON</th>
-              <th colSpan={1}>LAST UPDATED</th>
-              <th colSpan={1}>MILES</th>
-              <th colSpan={1}>WATER LEVEL</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stationData.map((station: any) => (
-              <tr
-                className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
-                key={station.metadata.id}
-              >
-                <td className="py-2 px-2 cursor-pointer">
-                  {station.metadata.name}
+        <>
+          <h3 className="text-[#03e9f4] text-xl font-extralight text-center pt-1 pb-4">
+            Last Updated: {formatDate(stationData[0].entry_created)}
+          </h3>
+          <table className="mx-auto text-center divide-y divide-gray-500">
+            <thead>
+              <tr className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                <td className="px-2" colSpan={1}>
+                  STATION NAME
                 </td>
-                <td className="py-2 px-2 cursor-pointer">
-                  {station.metadata.lat.toFixed(2)}
+                <td className="px-2" colSpan={1}>
+                  LAT
                 </td>
-                <td className="py-2 px-2 cursor-pointer">
-                  {station.metadata.lon.toFixed(2)}
+                <td className="px-2" colSpan={1}>
+                  LON
                 </td>
-                <td className="py-2 px-2 cursor-pointer">
-                  {formatDate(station.entry_created)}
+                <td className="px-2" colSpan={1}>
+                  DISTANCE
                 </td>
-                <td className="py-2 px-2 cursor-pointer">
-                  {metersToMiles(station.distance).toFixed(2)}
+                <td className="px-2" colSpan={1}>
+                  WATER LEVEL
                 </td>
-                <td className="py-2 px-2 cursor-pointer">
-                  {metersToFeet(station.data.water_level[0].v) || "-"}
+                <td className="px-2" colSpan={1}>
+                  AIR TEMP
+                </td>
+                <td className="px-2" colSpan={1}>
+                  WIND
+                </td>
+                <td className="px-2" colSpan={1}>
+                  WATER TEMP
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {stationData.map((station: any) => (
+                <tr
+                  className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
+                  key={station.metadata.id}
+                >
+                  <td className="py-2 px-2 cursor-pointer">
+                    {station.metadata.name}
+                  </td>
+                  <td className="py-2 px-2 cursor-pointer">
+                    {station.metadata.lat.toFixed(2)}
+                  </td>
+                  <td className="py-2 px-2 cursor-pointer">
+                    {station.metadata.lon.toFixed(2)}
+                  </td>
+                  <td className="py-2 px-2 cursor-pointer">
+                    {metersToMiles(station.distance).toFixed(1)} mi
+                  </td>
+                  <td className="py-2 px-2 cursor-pointer">
+                    {metersToFeet(station.data.water_level?.[0]?.v) || "-"} ft
+                  </td>
+                  <td className="py-2 px-2 cursor-pointer">
+                    {celciusToFarenheit(station.data.air_temperature?.[0]?.v) ||
+                      "-"}{" "}
+                    f
+                  </td>
+                  <td className="py-2 px-2 cursor-pointer">
+                    {metersPerSecondToKnots(station.data.wind?.[0]?.s) || "-"}{" "}
+                    kts {station.data.wind?.[0]?.dr || "-"}
+                  </td>
+                  <td className="py-2 px-2 cursor-pointer">
+                    {celciusToFarenheit(
+                      station.data.water_temperature?.[0]?.v
+                    ) || "-"}{" "}
+                    f
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
       ) : (
-        <Loading />
+        <p className="text-[#03e9f4] font-thin text-center py-40">
+          No Nearby Stations Found
+        </p>
       )}
     </div>
   );

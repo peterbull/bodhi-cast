@@ -29,7 +29,7 @@ const SwellMap: React.FC<any> = ({
         spotCoords={spotCoords}
       />
       <div className="w-full overflow-x-auto bg-gray-900">
-        {currentSpot && currentSpot.latitude && (
+        {currentSpot && currentSpot.id && (
           <>
             <div className="flex justify-center items-center h-full pt-4">
               <button
