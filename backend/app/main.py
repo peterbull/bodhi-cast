@@ -286,32 +286,34 @@ def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depend
     range = float(range)
     lat = float(lat)
     lng = float(lng)
-
     sql = text(
         """
-    SELECT 
-        id, 
-        station_id, 
-        latitude, 
-        longitude, 
-        location
-    FROM 
-        station_inventory
-    WHERE 
-        ST_DWithin(
-            location::geography, 
-            ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
-            :range
-        );
-    """
+        SELECT 
+            id, 
+            station_id, 
+            latitude, 
+            longitude, 
+            location,
+            ST_Distance(
+                location::geography, 
+                ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography
+            ) as distance
+        FROM 
+            station_inventory
+        WHERE 
+            ST_DWithin(
+                location::geography, 
+                ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
+                :range
+            );
+        """
     )
-
     result = db.execute(sql, {"lat": lat, "lng": lng, "range": range})
     rows = result.all()
 
     station_data = [row._asdict() for row in rows]
     current_conditions = [
-        json.loads(data)
+        {**json.loads(data), "distance": station["distance"]}
         for station in station_data
         if (data := redis_client.get(station["station_id"]))
     ]
