@@ -54,7 +54,7 @@ const SwellMap: React.FC<any> = ({
             <SwellTable spotForecast={spotForecast} />
             <StationDataProvider>
               <LeafletMap
-                zoom={10}
+                zoom={9}
                 currentComponent={currentComponent}
                 currentSpot={currentSpot}
                 setCurrentComponent={setCurrentComponent}

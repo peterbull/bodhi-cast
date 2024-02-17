@@ -25,11 +25,15 @@ const metersToMiles = (data: any) => {
   return data * 0.000621;
 };
 
+const metersToFeet = (data: any) => {
+  return (data * 3.28084).toFixed(2);
+};
+
 const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
   const { stationData, setStationData } = useContext(StationDataContext);
   const fetchStationData: any = async () => {
     try {
-      const range = "300000";
+      const range = "100000";
       const lat = spotCoords[0];
       const lng = spotCoords[1];
       const res = await fetch(
@@ -74,28 +78,32 @@ const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
               <th colSpan={1}>LON</th>
               <th colSpan={1}>LAST UPDATED</th>
               <th colSpan={1}>MILES</th>
+              <th colSpan={1}>WATER LEVEL</th>
             </tr>
           </thead>
           <tbody>
-            {stationData.map((spot: any) => (
+            {stationData.map((station: any) => (
               <tr
                 className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
-                key={spot.metadata.id}
+                key={station.metadata.id}
               >
                 <td className="py-2 px-2 cursor-pointer">
-                  {spot.metadata.name}
+                  {station.metadata.name}
                 </td>
                 <td className="py-2 px-2 cursor-pointer">
-                  {spot.metadata.lat.toFixed(2)}
+                  {station.metadata.lat.toFixed(2)}
                 </td>
                 <td className="py-2 px-2 cursor-pointer">
-                  {spot.metadata.lon.toFixed(2)}
+                  {station.metadata.lon.toFixed(2)}
                 </td>
                 <td className="py-2 px-2 cursor-pointer">
-                  {formatDate(spot.entry_created)}
+                  {formatDate(station.entry_created)}
                 </td>
                 <td className="py-2 px-2 cursor-pointer">
-                  {metersToMiles(spot.distance).toFixed(2)}
+                  {metersToMiles(station.distance).toFixed(2)}
+                </td>
+                <td className="py-2 px-2 cursor-pointer">
+                  {metersToFeet(station.data.water_level[0].v) || "-"}
                 </td>
               </tr>
             ))}
