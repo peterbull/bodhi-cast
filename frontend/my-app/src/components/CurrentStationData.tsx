@@ -20,6 +20,10 @@ const formatDate = (dateString: any) => {
   return `${formattedDate} ${formattedTime}`;
 };
 
+const metersToMiles = (data: any) => {
+  return data * 0.000621;
+};
+
 const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
   const [stationData, setStationData] = useState([]);
   const fetchStationData: any = async () => {
@@ -68,6 +72,7 @@ const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
               <th colSpan={1}>LAT</th>
               <th colSpan={1}>LON</th>
               <th colSpan={1}>LAST UPDATED</th>
+              <th colSpan={1}>MILES</th>
             </tr>
           </thead>
           <tbody>
@@ -87,6 +92,9 @@ const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
                 </td>
                 <td className="py-2 px-2 cursor-pointer">
                   {formatDate(spot.entry_created)}
+                </td>
+                <td className="py-2 px-2 cursor-pointer">
+                  {metersToMiles(spot.distance).toFixed(2)}
                 </td>
               </tr>
             ))}
