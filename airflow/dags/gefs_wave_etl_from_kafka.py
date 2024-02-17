@@ -8,6 +8,7 @@ import pendulum
 import requests
 import xarray as xr
 from airflow.decorators import task
+from airflow.exceptions import AirflowFailException
 from airflow.operators.empty import EmptyOperator
 from airflow.sensors.external_task import ExternalTaskSensor
 from confluent_kafka import Consumer, KafkaException
@@ -37,8 +38,8 @@ default_args = {
     "email": ["your-email@example.com"],
     "email_on_failure": False,
     "email_on_retry": False,
-    "retries": 1,
-    "retry_delay": pendulum.duration(minutes=5),
+    "retries": 5,
+    "retry_delay": pendulum.duration(minutes=1),
 }
 
 
@@ -192,7 +193,8 @@ def df_to_db(df, engine, table_name):
                 dtype={"location": Geography(geometry_type="POINT", srid=4326)},
             )
             entry_id = df["valid_time"].unique()
-            entry_id = entry_id[0].strftime("%Y-%m-%d %H:%M:%S")
+            entry_id_datetime = pd.to_datetime(entry_id[0])
+            entry_id_str = entry_id_datetime.strftime("%Y-%m-%d %H:%M:%S")
             print(f"Successfully wrote grib2 file for {entry_id}")
         except SQLAlchemyError as e:
             print(f"An error occurred: {e}")
@@ -207,30 +209,65 @@ with DAG(
     is_paused_upon_creation=False,
 ) as dag:
 
-    # ExternalTaskSensor to wait for gefs_wave_urls_to_kafka DAG to complete
-    wait_for_gefs_wave_urls_to_kafka = ExternalTaskSensor(
-        task_id="wait_for_gefs_wave_urls_to_kafka",
-        external_dag_id="gefs_wave_urls_to_kafka",
-        external_task_id=None,  # `None` will wait for the entire task to complete
-        timeout=7200,  # Timeout before failing task
-        poke_interval=60,  # Seconds to wait between checks
-        mode="reschedule",  # Reschedule for long waits to free up worker slots
-    )
+    def taskflow():
+        conf = {
+            "bootstrap.servers": "kafka:9092",
+            "group.id": "airflow-consumers",
+            "enable.auto.commit": False,
+            "auto.offset.reset": "earliest",  # consume from the start of topic
+            "security.protocol": "SASL_PLAINTEXT",
+            "sasl.mechanisms": "PLAIN",
+            "sasl.username": sasl_username,
+            "sasl.password": sasl_password,
+            "max.poll.interval.ms": 900000,
+        }
 
-    @task
-    def consume_and_process_from_kafka():
-        consume_from_kafka(
-            topic=topic,
-            engine=engine,
-            table_name=table_name,
-            bs=8,
-            sasl_username=sasl_username,
-            sasl_password=sasl_password,
-        )
+        # # ExternalTaskSensor to wait for gefs_wave_urls_to_kafka DAG to complete
+        # wait_for_gefs_wave_urls_to_kafka = ExternalTaskSensor(
+        #     task_id="wait_for_gefs_wave_urls_to_kafka",
+        #     external_dag_id="gefs_wave_urls_to_kafka",
+        #     external_task_id=None,  # `None` will wait for the entire task to complete
+        #     timeout=7200,  # Timeout before failing task
+        #     poke_interval=60,  # Seconds to wait between checks
+        #     mode="reschedule",  # Reschedule for long waits to free up worker slots
+        # )
 
-    data = consume_and_process_from_kafka()
+        @task
+        def check_for_messages():
+            c = Consumer(conf)
+            c.subscribe([topic])
+            logging.info(f"{conf}")
+            # Poll for messages
+            msg = c.poll(30.0)
+            c.close()
 
-    wait_for_gefs_wave_urls_to_kafka >> data
+            if msg is None:
+                logging.info("No new messages found. Task will be retried.")
+                raise AirflowFailException(
+                    "No new messages found. Task will be explicitly failed to trigger retry."
+                )
+            else:
+                logging.info("New messages found. Proceeding to consume and process.")
+                return True
+
+        @task
+        def consume_and_process_from_kafka():
+            consume_from_kafka(
+                topic=topic,
+                engine=engine,
+                table_name=table_name,
+                bs=8,
+                sasl_username=sasl_username,
+                sasl_password=sasl_password,
+            )
+
+        check_result = check_for_messages()
+        consume_task = consume_and_process_from_kafka()
+        check_result >> consume_task
+
+        # wait_for_gefs_wave_urls_to_kafka >> data
+
+    dag = taskflow()
 
 if __name__ == "__main__":
     dag.test()

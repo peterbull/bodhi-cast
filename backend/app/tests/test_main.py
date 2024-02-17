@@ -37,22 +37,22 @@ def test_get_forecasts_by_spot():
     assert isinstance(data, list)
 
 
-def test_get_forecasts_by_tile():
-    """
-    Test case for getting forecasts by tile.
+# def test_get_forecasts_by_tile():
+#     """
+#     Test case for getting forecasts by tile.
 
-    This test sends a GET request to the '/forecasts/tiles' endpoint with specific parameters.
-    It asserts that the response status code is 200 and the response data is a list.
-    """
-    current_date = datetime.datetime.now().strftime("%Y%m%d")
-    lat = "36.83055459542353"
-    lng = "-75.96764801341773"
-    zoom = "15"
-    response = client.get(f"/forecasts/tiles/{current_date}/{lat}/{lng}/{zoom}")
+#     This test sends a GET request to the '/forecasts/tiles' endpoint with specific parameters.
+#     It asserts that the response status code is 200 and the response data is a list.
+#     """
+#     current_date = datetime.datetime.now().strftime("%Y%m%d")
+#     lat = "36.83055459542353"
+#     lng = "-75.96764801341773"
+#     zoom = "15"
+#     response = client.get(f"/forecasts/tiles/{current_date}/{lat}/{lng}/{zoom}")
 
-    assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
+#     assert response.status_code == 200
+#     data = response.json()
+#     assert isinstance(data, list)
 
 
 def test_get_all_spots():

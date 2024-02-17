@@ -8,7 +8,6 @@ import requests
 from airflow.decorators import task
 from bs4 import BeautifulSoup
 from confluent_kafka import Consumer, KafkaException, Producer
-from confluent_kafka.admin import AdminClient, ConfigResource
 
 from airflow import DAG
 
@@ -26,7 +25,7 @@ default_args = {
     "email": ["your-email@example.com"],
     "email_on_failure": False,
     "email_on_retry": False,
-    "retries": 1,
+    "retries": 5,
     "retry_delay": pendulum.duration(minutes=5),
 }
 
