@@ -10,10 +10,7 @@ import "leaflet/dist/leaflet.css";
 import React, { useEffect, useState } from "react";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { Icon } from "leaflet";
-import PrimaryWaveForecast from "./PrimaryWaveForecast";
-import SwellWaveForecast from "./SwellWaveForecast";
-import WindWaveForecast from "./WindWaveForecast";
-import WindForecast from "./WindForecast";
+import SwellTable from "./SwellTable";
 import SwellSim from "./SwellSim";
 
 const SwellMap: React.FC<any> = ({
@@ -51,17 +48,6 @@ const SwellMap: React.FC<any> = ({
     const interval = setInterval(fetchStationData, 360000); // fetch every 6 mins
     return () => clearInterval(interval); // clean up on unmount to prevent mem leaks, etc.
   }, []);
-
-  const timeKeys = [
-    "12 a.m.",
-    "3 a.m.",
-    "6 a.m.",
-    "9 a.m.",
-    "12 p.m.",
-    "3 p.m.",
-    "6 p.m.",
-    "9 p.m.",
-  ];
 
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
@@ -152,69 +138,7 @@ const SwellMap: React.FC<any> = ({
         {spotForecast.length > 0 ? (
           <>
             <SwellSim spotForecast={spotForecast} />
-            <table className="mx-auto text-center divide-y divide-gray-500">
-              <thead>
-                <tr>
-                  <th
-                    colSpan={1}
-                    className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                  ></th>
-                  <th
-                    colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                  >
-                    Primary Waves
-                  </th>
-                  <th
-                    colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                  >
-                    Secondary Swell
-                  </th>
-                  <th
-                    colSpan={3}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider"
-                  >
-                    Wind Waves
-                  </th>
-                  <th
-                    colSpan={2}
-                    className="w-1/5 px-6 py-3 text-center text-xs font-medium
-                    text-gray-400 uppercase tracking-wider"
-                  >
-                    Wind Report
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array(spotForecast.length)
-                  .fill(null)
-                  .map((_, index) => (
-                    <tr
-                      className="text-center text-s text-[#03e9f4] font-thin border-0 bg-gray-900 divide-gray-200"
-                      key={index}
-                    >
-                      <td className="py-6 font-normal">{timeKeys[index]}</td>
-                      <PrimaryWaveForecast
-                        hourlyIndex={index}
-                        spotForecast={spotForecast}
-                      />
-                      <SwellWaveForecast
-                        hourlyIndex={index}
-                        spotForecast={spotForecast}
-                      />
-                      <WindWaveForecast
-                        hourlyIndex={index}
-                        spotForecast={spotForecast}
-                      />
-                      <WindForecast
-                        hourlyIndex={index}
-                        spotForecast={spotForecast}
-                      />
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <SwellTable spotForecast={spotForecast} />
           </>
         ) : (
           <div className="flex justify-center items-center h-half h-screen transform -translate-y-16 animate-pulse">
