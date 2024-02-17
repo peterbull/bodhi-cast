@@ -305,7 +305,8 @@ def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depend
                 location::geography, 
                 ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
                 :range
-            );
+            )
+        ORDER BY distance ASC;
         """
     )
     result = db.execute(sql, {"lat": lat, "lng": lng, "range": range})
