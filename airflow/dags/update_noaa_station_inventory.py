@@ -54,6 +54,7 @@ with DAG(
     description="Cycle through NOAA COOPS station list and append any new stations and inventory data to postgis table",
     schedule="@daily",
     catchup=False,
+    is_paused_upon_creation=False,
 ) as dag:
 
     data_mapping = {

@@ -210,11 +210,11 @@ Bodhi-Cast is under the Apache License 2.0. See the [LICENSE](LICENSE) file for 
 
 ### Week Ending 240218
 
-- [ ] Remove any excessive logging in DAGs
-- [ ] Incoroporate realtime data from available weather stations
-  - [ ] add stations to new table in postgres
-  - [ ] create producer to push to kafka topic
-  - [ ] create consumer to write latest to redis
-  - [ ] add nearby realtime data to spot pages
-  - [ ] add endpoint to find stations within the radius of a given spot
-  - [ ] display nearby station data on frontend
+- [ ] Add an autoclean for DAG logs
+- [x] Incoroporate realtime data from available weather stations
+  - [x] add stations to new table in postgres
+  - [x] create producer to push to kafka topic
+  - [x] create consumer to write latest to redis
+  - [x] add nearby realtime data to spot pages
+  - [x] add endpoint to find stations within the radius of a given spot
+  - [x] display nearby station data on frontend

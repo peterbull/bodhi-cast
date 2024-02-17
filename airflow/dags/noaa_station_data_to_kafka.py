@@ -47,6 +47,7 @@ with DAG(
     schedule="*/6 * * * *",
     # schedule=None, # debug setting
     catchup=False,
+    is_paused_upon_creation=False,
 ) as dag:
 
     def taskflow():
