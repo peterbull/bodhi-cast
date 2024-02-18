@@ -180,3 +180,9 @@ scratch.txt
 
 # Production Environment
 .env.prod
+
+# Memory debugging files
+airflow/mem-debug/**/*.bin
+airflow/mem-debug/**/*.html
+
+airflow/mem-debug/vars.sh

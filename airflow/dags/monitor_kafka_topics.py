@@ -75,3 +75,6 @@ with DAG(
         )
 
     dag = taskflow()
+
+    if __name__ == "__main__":
+        dag.test()
