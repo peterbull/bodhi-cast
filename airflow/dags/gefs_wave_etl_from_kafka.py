@@ -1,8 +1,10 @@
+import gc
 import logging
 import os
 import re
 import tempfile
 
+import numpy as np
 import pandas as pd
 import pendulum
 import requests
@@ -14,6 +16,7 @@ from airflow.sensors.external_task import ExternalTaskSensor
 from confluent_kafka import Consumer, KafkaException
 from geoalchemy2 import WKTElement
 from geoalchemy2.types import Geography
+from geopandas import GeoSeries
 from shapely.geometry import Point
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
@@ -153,16 +156,25 @@ def url_to_df(url):
                     how="all",
                     inplace=True,
                 )
-                # Adjust longitude scaling to domain of -180 to 180
+                # # Adjust longitude scaling to domain of -180 to 180
+                # df["longitude"] = (
+                #     df["longitude"].apply(lambda x: x - 360 if x > 180 else x).round(2)
+                # )
                 df["longitude"] = (
-                    df["longitude"].apply(lambda x: x - 360 if x > 180 else x).round(2)
+                    np.where(df["longitude"] > 180, df["longitude"] - 360, df["longitude"])
+                    .astype(np.float32)
+                    .round(2)
                 )
+
                 # Create a point for postgis for indexing
                 df["location"] = df.apply(
                     lambda row: Point(row["longitude"], row["latitude"]), axis=1
                 )
+                # geo_series = GeoSeries(df["location"])
+                # wkt_series = geo_series.to_wkt()
                 # Give a mercator value for the point where `srid` defines the projection scheme
                 df["location"] = df["location"].apply(lambda loc: WKTElement(loc.wkt, srid=4326))
+                # df["location"] = wkt_series.apply(lambda x: WKTElement(x, srid=4326))
                 df["step"] = df["step"].dt.total_seconds() / 3600.0
                 df["step"] = df["step"].astype(str) + " hours"
                 return df
