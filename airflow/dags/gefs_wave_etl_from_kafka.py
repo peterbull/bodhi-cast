@@ -166,15 +166,16 @@ def url_to_df(url):
                     .round(2)
                 )
 
-                # Create a point for postgis for indexing
-                df["location"] = df.apply(
-                    lambda row: Point(row["longitude"], row["latitude"]), axis=1
-                )
-                # geo_series = GeoSeries(df["location"])
-                # wkt_series = geo_series.to_wkt()
-                # Give a mercator value for the point where `srid` defines the projection scheme
-                df["location"] = df["location"].apply(lambda loc: WKTElement(loc.wkt, srid=4326))
-                # df["location"] = wkt_series.apply(lambda x: WKTElement(x, srid=4326))
+                # # Create a point for postgis for indexing
+                # df["location"] = df.apply(
+                #     lambda row: Point(row["longitude"], row["latitude"]), axis=1
+                # )
+                # # Give a mercator value for the point where `srid` defines the projection scheme
+                # df["location"] = df["location"].apply(lambda loc: WKTElement(loc.wkt, srid=4326))
+
+                # New Transformation for points
+                points = points_from_xy(df["longitude"], df["latitude"])
+                df["location"] = [WKTElement(point.wkt, srid=4326) for point in points]
                 df["step"] = df["step"].dt.total_seconds() / 3600.0
                 df["step"] = df["step"].astype(str) + " hours"
                 return df
