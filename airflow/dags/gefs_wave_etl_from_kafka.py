@@ -16,7 +16,7 @@ from airflow.sensors.external_task import ExternalTaskSensor
 from confluent_kafka import Consumer, KafkaException
 from geoalchemy2 import WKTElement
 from geoalchemy2.types import Geography
-from geopandas import GeoSeries
+from geopandas import GeoSeries, points_from_xy
 from shapely.geometry import Point
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
