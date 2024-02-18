@@ -191,6 +191,7 @@ def df_to_db(df, engine, table_name):
                 if_exists="append",
                 index=False,
                 dtype={"location": Geography(geometry_type="POINT", srid=4326)},
+                chunksize=1000,
             )
             entry_id = df["valid_time"].unique()
             entry_id_datetime = pd.to_datetime(entry_id[0])
@@ -256,7 +257,7 @@ with DAG(
                 topic=topic,
                 engine=engine,
                 table_name=table_name,
-                bs=8,
+                bs=1,
                 sasl_username=sasl_username,
                 sasl_password=sasl_password,
             )
