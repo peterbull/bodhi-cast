@@ -1,4 +1,3 @@
-import gc
 import logging
 import os
 import re
@@ -11,13 +10,10 @@ import requests
 import xarray as xr
 from airflow.decorators import task
 from airflow.exceptions import AirflowFailException
-from airflow.operators.empty import EmptyOperator
-from airflow.sensors.external_task import ExternalTaskSensor
 from confluent_kafka import Consumer, KafkaException
 from geoalchemy2 import WKTElement
 from geoalchemy2.types import Geography
 from geopandas import GeoSeries, points_from_xy
-from shapely.geometry import Point
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -156,28 +152,16 @@ def url_to_df(url):
                     how="all",
                     inplace=True,
                 )
-                # # Adjust longitude scaling to domain of -180 to 180
-                # df["longitude"] = (
-                #     df["longitude"].apply(lambda x: x - 360 if x > 180 else x).round(2)
-                # )
                 df["longitude"] = (
                     np.where(df["longitude"] > 180, df["longitude"] - 360, df["longitude"])
                     .astype(np.float32)
                     .round(2)
                 )
 
-                # # Create a point for postgis for indexing
-                # df["location"] = df.apply(
-                #     lambda row: Point(row["longitude"], row["latitude"]), axis=1
-                # )
-                # # Give a mercator value for the point where `srid` defines the projection scheme
-                # df["location"] = df["location"].apply(lambda loc: WKTElement(loc.wkt, srid=4326))
-
                 # New Transformation for points
                 points = points_from_xy(df["longitude"], df["latitude"])
                 df["location"] = [WKTElement(point.wkt, srid=4326) for point in points]
-                df["step"] = df["step"].dt.total_seconds() / 3600.0
-                df["step"] = df["step"].astype(str) + " hours"
+                df["step"] = (df["step"].dt.total_seconds() / 3600).astype(str) + " hours"
                 return df
 
     else:
@@ -236,16 +220,6 @@ with DAG(
             "max.poll.interval.ms": 900000,
         }
 
-        # # ExternalTaskSensor to wait for gefs_wave_urls_to_kafka DAG to complete
-        # wait_for_gefs_wave_urls_to_kafka = ExternalTaskSensor(
-        #     task_id="wait_for_gefs_wave_urls_to_kafka",
-        #     external_dag_id="gefs_wave_urls_to_kafka",
-        #     external_task_id=None,  # `None` will wait for the entire task to complete
-        #     timeout=7200,  # Timeout before failing task
-        #     poke_interval=60,  # Seconds to wait between checks
-        #     mode="reschedule",  # Reschedule for long waits to free up worker slots
-        # )
-
         @task
         def check_for_messages():
             c = Consumer(conf)
@@ -270,7 +244,7 @@ with DAG(
                 topic=topic,
                 engine=engine,
                 table_name=table_name,
-                bs=1,
+                bs=8,
                 sasl_username=sasl_username,
                 sasl_password=sasl_password,
             )
