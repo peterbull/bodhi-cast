@@ -7,3 +7,4 @@ xarray==2023.1.0
 debugpy
 noaa-coops==0.3.2
 tqdm==4.66.2
+memray==1.11.0
