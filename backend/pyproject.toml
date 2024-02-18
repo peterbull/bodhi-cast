@@ -39,6 +39,7 @@ isort = "^5.13.2"
 noaa-coops = "^0.3.2"
 tqdm = "^4.66.2"
 memray = "^1.11.0"
+geopandas = "^0.14.3"
 
 
 

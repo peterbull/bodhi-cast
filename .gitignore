@@ -184,3 +184,5 @@ scratch.txt
 # Memory debugging files
 airflow/mem-debug/**/*.bin
 airflow/mem-debug/**/*.html
+
+airflow/mem-debug/vars.sh
