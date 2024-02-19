@@ -1,5 +1,5 @@
 import "leaflet/dist/leaflet.css";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import SwellTable from "./SwellTable";
 import SwellSim from "./SwellSim";
 import CurrentStationData from "./CurrentStationData";
@@ -15,6 +15,8 @@ const SwellMap: React.FC<any> = ({
   setCurrentComponent,
 }) => {
   const stationDataRef = useRef<any>(null);
+  const jumpButtonRef = useRef<any>(null);
+
   const spotCoords: [number, number] = [
     currentSpot.latitude,
     currentSpot.longitude,
@@ -25,6 +27,9 @@ const SwellMap: React.FC<any> = ({
       behavior: "smooth",
       block: "start",
     });
+    if (jumpButtonRef.current) {
+      jumpButtonRef.current.blur();
+    }
   };
 
   return (
@@ -42,13 +47,14 @@ const SwellMap: React.FC<any> = ({
             <div className="flex justify-center items-center h-full pt-4">
               <button
                 onClick={() => setCurrentComponent("GlobeSpots")}
-                className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-4"
+                className="text-[#03e9f4] focus:text-[#95f2f7] hover:text-[#bff7fa] hover:font-medium focus:bg-[#00f2ffbd] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-4"
               >
                 RETURN TO MAIN MAP
               </button>
               <button
+                ref={jumpButtonRef}
                 onClick={scrollToElement}
-                className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-4"
+                className="text-[#03e9f4] focus:text-[#95f2f7] hover:text-[#95f2f7] hover:font-normal focus:bg-[#00f2ffbd] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-4"
               >
                 JUMP TO STATION DATA
               </button>
