@@ -1,5 +1,5 @@
 import "leaflet/dist/leaflet.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SwellTable from "./SwellTable";
 import SwellSim from "./SwellSim";
 import CurrentStationData from "./CurrentStationData";
@@ -14,10 +14,18 @@ const SwellMap: React.FC<any> = ({
   currentComponent,
   setCurrentComponent,
 }) => {
+  const stationDataRef = useRef<any>(null);
   const spotCoords: [number, number] = [
     currentSpot.latitude,
     currentSpot.longitude,
   ];
+
+  const scrollToElement = () => {
+    stationDataRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   return (
     <div className="flex flex-col">
@@ -34,9 +42,15 @@ const SwellMap: React.FC<any> = ({
             <div className="flex justify-center items-center h-full pt-4">
               <button
                 onClick={() => setCurrentComponent("GlobeSpots")}
-                className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2"
+                className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-4"
               >
-                RETURN TO MAP
+                RETURN TO MAIN MAP
+              </button>
+              <button
+                onClick={scrollToElement}
+                className="text-[#03e9f4] uppercase-tracking-[4px] border-2 border-[#03e9f4] rounded px-6 py-2 mx-4"
+              >
+                JUMP TO STATION DATA
               </button>
             </div>
             <h1 className="text-[#03e9f4] text-3xl font-thin text-center">
@@ -60,6 +74,8 @@ const SwellMap: React.FC<any> = ({
                 setCurrentComponent={setCurrentComponent}
                 spotCoords={spotCoords}
               />
+
+              <div ref={stationDataRef}></div>
               <CurrentStationData
                 currentSpot={currentSpot}
                 spotCoords={spotCoords}
