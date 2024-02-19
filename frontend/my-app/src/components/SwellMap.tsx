@@ -72,25 +72,25 @@ const SwellMap: React.FC<any> = ({
           <>
             <SwellSim spotForecast={spotForecast} />
             <SwellTable spotForecast={spotForecast} />
-            <StationDataProvider>
-              <LeafletMap
-                zoom={9}
-                currentComponent={currentComponent}
-                currentSpot={currentSpot}
-                setCurrentComponent={setCurrentComponent}
-                spotCoords={spotCoords}
-              />
-
-              <div ref={stationDataRef}></div>
-              <CurrentStationData
-                currentSpot={currentSpot}
-                spotCoords={spotCoords}
-              />
-            </StationDataProvider>
           </>
         ) : (
           <Loading />
         )}
+        <StationDataProvider>
+          <LeafletMap
+            zoom={9}
+            currentComponent={currentComponent}
+            currentSpot={currentSpot}
+            setCurrentComponent={setCurrentComponent}
+            spotCoords={spotCoords}
+          />
+
+          <div ref={stationDataRef}></div>
+          <CurrentStationData
+            currentSpot={currentSpot}
+            spotCoords={spotCoords}
+          />
+        </StationDataProvider>
       </div>
     </div>
   );
