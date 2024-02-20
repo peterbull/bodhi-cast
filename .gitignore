@@ -177,6 +177,7 @@ celerybeat-*
 airflow/logs/*
 
 scratch.txt
+**/spot_list.csv
 
 # Production Environment
 .env.prod
