@@ -50,7 +50,7 @@ const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
   const { stationData, setStationData } = useContext(StationDataContext);
   const fetchStationData: any = async () => {
     try {
-      const range = "100000";
+      const range = "170000";
       const lat = spotCoords[0];
       const lng = spotCoords[1];
       const res = await fetch(
