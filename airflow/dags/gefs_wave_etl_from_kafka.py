@@ -9,7 +9,7 @@ import pendulum
 import requests
 import xarray as xr
 from airflow.decorators import task
-from airflow.exceptions import AirflowFailException
+from airflow.exceptions import AirflowException
 from confluent_kafka import Consumer, KafkaException
 from geoalchemy2 import WKTElement
 from geoalchemy2.types import Geography
@@ -38,7 +38,7 @@ default_args = {
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 5,
-    "retry_delay": pendulum.duration(minutes=1),
+    "retry_delay": pendulum.duration(minutes=5),
 }
 
 
@@ -230,10 +230,7 @@ with DAG(
             c.close()
 
             if msg is None:
-                logging.info("No new messages found. Task will be retried.")
-                raise AirflowFailException(
-                    "No new messages found. Task will be explicitly failed to trigger retry."
-                )
+                raise AirflowException("No new messages found. Task will be retried.")
             else:
                 logging.info("New messages found. Proceeding to consume and process.")
                 return True
