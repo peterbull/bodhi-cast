@@ -50,29 +50,29 @@ function App() {
     }
   }, [currentSpot]);
 
-  useEffect(() => {
-    if (currentSpot) {
-      setSpotForecast([]);
-      const fetchTileForecast = async () => {
-        try {
-          const now = new Date();
-          const date =
-            now.getFullYear().toString() +
-            (now.getMonth() + 1).toString().padStart(2, "0") +
-            now.getDate().toString().padStart(2, "0");
-          const res = await fetch(
-            `${process.env.REACT_APP_BACKEND_URL}/forecasts/tiles/${date}/${currentSpot.latitude}/${currentSpot.longitude}/${zoom}`
-          );
-          const data = await res.json();
-          setTileForecast(data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
+  // useEffect(() => {
+  //   if (currentSpot) {
+  //     setSpotForecast([]);
+  //     const fetchTileForecast = async () => {
+  //       try {
+  //         const now = new Date();
+  //         const date =
+  //           now.getFullYear().toString() +
+  //           (now.getMonth() + 1).toString().padStart(2, "0") +
+  //           now.getDate().toString().padStart(2, "0");
+  //         const res = await fetch(
+  //           `${process.env.REACT_APP_BACKEND_URL}/forecasts/tiles/${date}/${currentSpot.latitude}/${currentSpot.longitude}/${zoom}`
+  //         );
+  //         const data = await res.json();
+  //         setTileForecast(data);
+  //       } catch (error) {
+  //         console.error(error);
+  //       }
+  //     };
 
-      fetchTileForecast();
-    }
-  }, [currentSpot, zoom]);
+  //     fetchTileForecast();
+  //   }
+  // }, [currentSpot, zoom]);
 
   return (
     <ComponentMapProvider>

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
-import { table } from "console";
 
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,

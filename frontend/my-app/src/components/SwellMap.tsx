@@ -78,7 +78,7 @@ const SwellMap: React.FC<any> = ({
         )}
         <StationDataProvider>
           <LeafletMap
-            zoom={9}
+            zoom={7}
             currentComponent={currentComponent}
             currentSpot={currentSpot}
             setCurrentComponent={setCurrentComponent}
