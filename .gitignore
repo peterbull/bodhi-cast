@@ -177,7 +177,10 @@ celerybeat-*
 airflow/logs/*
 
 scratch.txt
-**/spot_list.csv
+
+# notebook data
+**/nbs/python/data/*
+
 
 # Production Environment
 .env.prod
