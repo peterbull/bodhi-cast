@@ -174,7 +174,7 @@ const GlobeSpots: React.FC<any> = ({
             <h1 className="text-2xl text-center pt-4">NEARBY SPOTS</h1>
 
             <SearchBar query={query} setQuery={setQuery} />
-            <table className="mx-auto text-center divide-y divide-gray-500">
+            <table className="mx-auto text-center divide-y divide-gray-500 min-h-96">
               <thead>
                 <tr className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
                   <th colSpan={1}>NAME</th>
