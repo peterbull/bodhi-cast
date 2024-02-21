@@ -18,8 +18,10 @@ const GlobeSpots: React.FC<any> = ({
   const [query, setQuery] = useState("");
 
   // Filter items based on the search query
-  const filteredSpots = nearbySpots.filter((spot: any) =>
-    spot.spot_name.toLowerCase().includes(query.toLowerCase())
+  const filteredSpots = nearbySpots.filter(
+    (spot: any) =>
+      spot.spot_name.toLowerCase().includes(query.toLowerCase()) ||
+      spot.street_address.toLowerCase().includes(query.toLowerCase())
   );
 
   useEffect(() => {
