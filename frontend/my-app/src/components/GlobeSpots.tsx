@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
+import { table } from "console";
+import SearchBar from "./SearchBar";
 
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,
@@ -13,6 +15,14 @@ const GlobeSpots: React.FC<any> = ({
   const globeEl = useRef<any>();
   const [nearbySpots, setNearbySpots] = useState<any>([]);
   const [globeSize, setGlobeSize] = useState({ width: 700, height: 600 });
+  const [query, setQuery] = useState("");
+
+  // Filter items based on the search query
+  const filteredSpots = nearbySpots.filter(
+    (spot: any) =>
+      spot.spot_name.toLowerCase().includes(query.toLowerCase()) ||
+      spot.street_address.toLowerCase().includes(query.toLowerCase())
+  );
 
   useEffect(() => {
     const updateGlobeSize = () => {
@@ -82,7 +92,7 @@ const GlobeSpots: React.FC<any> = ({
 
   return spots.length > 0 ? (
     <>
-      <div className="flex flex-col bg-gray-900">
+      <div className="flex flex-col bg-gray-900 pb-28">
         <h1 className="text-[#03e9f4] text-4xl text-center pt-10 pb-2 shadow-neon">
           BODHI CAST
         </h1>
@@ -96,18 +106,18 @@ const GlobeSpots: React.FC<any> = ({
               height={globeSize.height}
               globeImageUrl={globeImageUrl}
               backgroundColor="rgb(17 24 39)"
-              labelsData={spots}
-              labelLat="latitude"
-              labelLng="longitude"
-              labelText="spot_name"
-              labelSize={0.0}
-              labelDotRadius={0.4}
-              labelColor={() => "rgba(164, 255, 61, 0.5)"}
-              labelLabel={(spot: any) =>
-                `<div>
-          <b>${spot.spot_name}</b>
-        </div>`
-              }
+              //       labelsData={spots}
+              //       labelLat="latitude"
+              //       labelLng="longitude"
+              //       labelText="spot_name"
+              //       labelSize={0.0}
+              //       labelDotRadius={0.4}
+              //       labelColor={() => "rgba(164, 255, 61, 0.5)"}
+              //       labelLabel={(spot: any) =>
+              //         `<div>
+              //   <b>${spot.spot_name}</b>
+              // </div>`
+              // }
               onGlobeClick={({ lat, lng }: any) => {
                 console.log(`Clicked at latitude: ${lat}, longitude: ${lng}`);
                 setSpotClick([lat, lng]);
@@ -162,6 +172,8 @@ const GlobeSpots: React.FC<any> = ({
                 : `None`}
             </p>
             <h1 className="text-2xl text-center pt-4">NEARBY SPOTS</h1>
+
+            <SearchBar query={query} setQuery={setQuery} />
             <table className="mx-auto text-center divide-y divide-gray-500">
               <thead>
                 <tr className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
@@ -172,7 +184,7 @@ const GlobeSpots: React.FC<any> = ({
                 </tr>
               </thead>
               <tbody>
-                {nearbySpots.map((spot: any) => (
+                {filteredSpots.map((spot: any) => (
                   <tr
                     className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
                     key={spot.id}

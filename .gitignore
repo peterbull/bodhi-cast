@@ -178,6 +178,10 @@ airflow/logs/*
 
 scratch.txt
 
+# notebook data
+**/nbs/python/data/*
+
+
 # Production Environment
 .env.prod
 
