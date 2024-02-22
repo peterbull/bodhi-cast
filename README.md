@@ -1,6 +1,8 @@
 # Bodhi-Cast
 
-Welcome to Bodhi-Cast, an innovative open-source application designed for surf enthusiasts and professionals around the globe. Bodhi-Cast offers comprehensive swell and surf forecasting, enabling users to explore and analyze surf conditions anywhere in the world.
+![alt text](assets/imgs/landing-page.png)
+
+Welcome to Bodhi-Cast, an open-source application designed for surf enthusiasts around the globe. Bodhi-Cast offers comprehensive swell and surf forecasting along with real-time weather conditions, enabling users to explore and analyze surf conditions anywhere in the world.
 
 1. [Introduction](#introduction)
 2. [Features](#features)
@@ -22,14 +24,16 @@ Welcome to Bodhi-Cast, an innovative open-source application designed for surf e
 
 Bodhi-Cast is more than just a surf forecasting app; it's your go-to platform for discovering and assessing surf spots with ease and precision. With the ability to select any location from a map, users can add surf spots and receive detailed forecasts including primary swell, secondary swell, wind waves, and wind speed/direction.
 
-Bodhi-Cast brings surf data to life with animated visualizations. Utilizing Three.js, the app generates captivating animations that depict wave height and period based on the primary swell, offering a quick and visually engaging way to evaluate surf conditions at a glance.
+Bodhi-Cast also aims to bring surf data to life with animated visualizations. Utilizing Three.js, the app generates captivating animations that depict wave height and period based on the primary swell, offering a quick and visually engaging way to evaluate surf conditions at a glance.
 
 ## Features
 
 - **Global Surf Spot Discovery:** Choose any location on the map to explore surf conditions.
-  ![alt text](assets/imgs/landing-page.png)
-- **Comprehensive Data Forecasts:** Get detailed information on primary and secondary swells, wind waves, and wind speed/direction.
+  ![alt text](assets/imgs/add-spot.png)
+  ![alt text](assets/imgs/spots.png)
+- **Comprehensive Data Forecasts:** Get detailed information on primary and secondary swells, wind waves, and wind speed/direction. As well as real-time weather data from nearby available stations(_only US based stations currently available_)
   ![alt text](assets/imgs/swell-table.png)
+  ![alt text](assets/imgs/nearby-stations.png)
 - **Animated Wave Visualizations:** Visualize surf data with animated representations of wave height and period, powered by Three.js.
   ![alt text](assets/imgs/swell-vis.png)
 
@@ -85,9 +89,14 @@ _Enabling them will begin processing the latest swell data and writing to your l
 
 The architecture of Bodhi-Cast incorporates several advanced components, which might initially appear as an overextension for the application's current scope. However, these choices were strategically made to accommodate future expansion and scalability. The components detailed below are foundational to providing a robust, flexible platform capable of evolving alongside the app's growth and user demands.
 
+![alt text](assets/imgs/bodhi-cast-arch.jpg)
+
 ### Frontend(React)
 
-React was selected for the Bodhi-Cast frontend for its composability, rich libraries, and extensibility. These features make it ideal for building a dynamic and scalable user interface, ensuring the app remains responsive and adaptable as it grows.
+- **Chosen for**:
+  - Composability
+  - Scalability
+  - Existing ecosystem
 
 ### **Backend Framework:** FastAPI
 
@@ -103,7 +112,6 @@ React was selected for the Bodhi-Cast frontend for its composability, rich libra
 
 - **ORM for PostGIS:** Sqlalchemy 1.4
   - Initial use of Sqlalchemy 2.0; reverted to 1.4 for Airflow compatibility
-  - Ensures operational stability and integration with existing technologies
 
 ### PostGIS
 
@@ -123,37 +131,29 @@ React was selected for the Bodhi-Cast frontend for its composability, rich libra
 
 ### Redis
 
-- **Dual Purpose:** Enhances performance and reliability by serving as:
+- **Multi Purpose:** Enhances performance and reliability by serving as:
   - A messaging system for Airflow's Celery executor, ensuring efficient task management
   - A cache for the backend API, reducing database load by storing frequently accessed query results
+  - A cache for current weather data streaming from Kafka
 
 ### Airflow
 
-- **Data Pipeline Orchestration:** Airflow is key for:
+- **Data Pipeline Orchestration:**
 
   - Managing complex workflows with precision
-  - Offering exceptional control, fault tolerance, and transparency
-
-- **Learning Curve vs. Long-Term Benefits:**
-
-  - While challenging at first, its value in maintaining an efficient, reliable data pipeline is unmatched
+  - Offering control, fault tolerance, and transparency
 
 - **Adaptability:**
   - Ensures Bodhi-Cast's data handling evolves without losing robustness or adaptability
 
 ### Kafka
 
-- **Initial Perception vs. Strategic Value:**
-
-  - May appear oversized for current needs, like managing swell data URLs
-  - Its real potential lies in future expansion, particularly for streaming weather data
-
 - **Framework for Real-Time Data:**
 
-  - Kafka's architecture is crucial for handling and processing real-time data streams effectively
+  - Kafka's architecture is crucial for handling and processing real-time data streams
 
 - **Future-Proofing Bodhi-Cast:**
-  - Prepares the app for scalable growth and real-time data integration, meeting evolving surf forecasting needs
+  - Prepares the app for scalable growth and further real-time data integration
 
 ## Contributing
 
@@ -178,12 +178,12 @@ Bodhi-Cast is under the Apache License 2.0. See the [LICENSE](LICENSE) file for 
 - [ ] Add user auth
 - [x] Add user spot creation pin drop
 - [ ] Add brief instructions on pages where needed
-- [ ] Change marker system on globe component
+- [x] Change marker system on globe component(removed)
 
 ### Backend:
 
-- [ ] Get tide forecast
-- [ ] Get shore wind forecast
+- [x] Get tide forecast(realtime tide data)
+- [x] Get shore wind forecast(realtime wind data)
 - [x] Change data fetching utils to classes
 - [x] Add tests for all endpoints
 - [x] Add user spot creation endpoint
@@ -211,10 +211,10 @@ Bodhi-Cast is under the Apache License 2.0. See the [LICENSE](LICENSE) file for 
 ### Week Ending 240218
 
 - [ ] Remove any excessive logging in DAGs
-- [ ] Incoroporate realtime data from available weather stations
-  - [ ] add stations to new table in postgres
-  - [ ] create producer to push to kafka topic
-  - [ ] create consumer to write latest to redis
-  - [ ] add nearby realtime data to spot pages
-  - [ ] add endpoint to find stations within the radius of a given spot
-  - [ ] display nearby station data on frontend
+- [x] Incoroporate realtime data from available weather stations
+  - [x] add stations to new table in postgres
+  - [x] create producer to push to kafka topic
+  - [x] create consumer to write latest to redis
+  - [x] add nearby realtime data to spot pages
+  - [x] add endpoint to find stations within the radius of a given spot
+  - [x] display nearby station data on frontend
