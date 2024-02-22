@@ -35,6 +35,11 @@ const AddSpot: React.FC<any> = ({
     return null;
   };
 
+  /**
+   * Handles the form submission for adding a spot.
+   * @param {Event} e - The form submission event.
+   * @returns {Promise<void>} - A promise that resolves when the submission is complete.
+   */
   const handleSubmit: any = async (e: any) => {
     e.preventDefault();
 

@@ -2,14 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import circleImg from "../img/circle.png";
-import {
-  Suspense,
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect,
-  useState,
-} from "react";
+import { Suspense, useCallback, useMemo, useRef, useEffect } from "react";
 
 function CameraControls() {
   const {
@@ -19,6 +12,7 @@ function CameraControls() {
 
   const controlsRef = useRef<any>();
 
+  // Set intial camera view and controls
   useEffect(() => {
     if (controlsRef.current) {
       controlsRef.current.target.set(0, 0, 50);
@@ -65,14 +59,8 @@ function Points({ spotForecast }: any) {
           : spotForecast[0].perpw); // Adjust this for tighter or looser waves
       const waveAmplitude = spotForecast[0].swh * feetFactor; // Adjust this for higher or lower waves
 
-      // Ocean-like wave equation: A sine function for wave propagation along the z-axis
+      // Sine function for wave propagation along the z-axis
       let y = waveAmplitude * Math.sin(waveFrequency * z + (waveSpeed + t) / 2);
-      // console.log(`y: ${y}`);
-      // console.log(`waveAmplitude: ${waveAmplitude}`);
-      // console.log(`waveFrequency: ${waveFrequency}`);
-      // console.log(`z: ${z}`);
-      // console.log(`waveSpeed: ${waveSpeed}`);
-      // console.log(`t: ${t}`);
 
       return y > 0 ? y : 0;
     },
@@ -112,7 +100,7 @@ function Points({ spotForecast }: any) {
         i += 3;
       }
     }
-
+    // Alert that values have changed and buffer needs updating
     bufferRef.current.needsUpdate = true;
   });
 
