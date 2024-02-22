@@ -31,6 +31,7 @@ class WaveForecast(Base):
     entry_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
 
+# Model for surf spots -- Database is seeded from data/spots/spots.py on build
 class Spots(Base):
     __tablename__ = "spots"
     id = Column(Integer, primary_key=True)
@@ -43,6 +44,7 @@ class Spots(Base):
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
 
 
+# Model for checking COOPS station data inventories
 class StationInventory(Base):
     __tablename__ = "station_inventory"
     id = Column(Integer, primary_key=True)
