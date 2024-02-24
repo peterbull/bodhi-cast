@@ -9,10 +9,13 @@ function App() {
   const [zoom, setZoom] = useState(13);
   const [currentSpot, setCurrentSpot] = useState<any>(null);
   const [spotForecast, setSpotForecast] = useState<any>([]);
-  const [tileForecast, setTileForecast] = useState<any>([]);
   const [spotClick, setSpotClick] = useState<any>([0, 0]);
 
   useEffect(() => {
+    /**
+     * Fetches all spots from the backend API and updates the state with the retrieved data.
+     * @returns {Promise<void>} A promise that resolves when the spots are fetched and the state is updated.
+     */
     const fetchAllSpots = async () => {
       try {
         const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/spots`);
@@ -29,6 +32,11 @@ function App() {
   useEffect(() => {
     if (currentSpot) {
       setSpotForecast([]);
+      /**
+       * Fetches the spot forecast from the backend API based on the current spot's latitude and longitude.
+       * The forecast is fetched for the current date.
+       * @returns {Promise<void>} A promise that resolves when the spot forecast is fetched and set in the state.
+       */
       const fetchSpotForecast = async () => {
         try {
           const now = new Date();
@@ -50,30 +58,6 @@ function App() {
     }
   }, [currentSpot]);
 
-  // useEffect(() => {
-  //   if (currentSpot) {
-  //     setSpotForecast([]);
-  //     const fetchTileForecast = async () => {
-  //       try {
-  //         const now = new Date();
-  //         const date =
-  //           now.getFullYear().toString() +
-  //           (now.getMonth() + 1).toString().padStart(2, "0") +
-  //           now.getDate().toString().padStart(2, "0");
-  //         const res = await fetch(
-  //           `${process.env.REACT_APP_BACKEND_URL}/forecasts/tiles/${date}/${currentSpot.latitude}/${currentSpot.longitude}/${zoom}`
-  //         );
-  //         const data = await res.json();
-  //         setTileForecast(data);
-  //       } catch (error) {
-  //         console.error(error);
-  //       }
-  //     };
-
-  //     fetchTileForecast();
-  //   }
-  // }, [currentSpot, zoom]);
-
   return (
     <ComponentMapProvider>
       <ComponentWrapper
@@ -82,7 +66,6 @@ function App() {
         currentSpot={currentSpot}
         setCurrentSpot={setCurrentSpot}
         spotForecast={spotForecast}
-        tileForecast={tileForecast}
         spotClick={spotClick}
         setSpotClick={setSpotClick}
       />

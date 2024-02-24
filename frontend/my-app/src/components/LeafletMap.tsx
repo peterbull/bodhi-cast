@@ -20,7 +20,6 @@ const LeafletMap: React.FC<any> = ({
   spotCoords,
 }) => {
   const { stationData } = useContext(StationDataContext);
-  console.log(`station data in leaflet ${stationData}`);
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
 
@@ -86,8 +85,6 @@ const LeafletMap: React.FC<any> = ({
                 offset={[0, -41]}
               >
                 {station.metadata.name}
-                <br />
-                <p>hi there</p>
               </Popup>
             </Marker>
           ))}

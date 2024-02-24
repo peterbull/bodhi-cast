@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
-import { table } from "console";
 import SearchBar from "./SearchBar";
 
 const GlobeSpots: React.FC<any> = ({
@@ -24,6 +23,7 @@ const GlobeSpots: React.FC<any> = ({
       spot.street_address.toLowerCase().includes(query.toLowerCase())
   );
 
+  // Workaround to somewhat dynamically flex the globe canvas
   useEffect(() => {
     const updateGlobeSize = () => {
       if (globeEl.current && globeEl.current.parentElement) {
@@ -43,6 +43,7 @@ const GlobeSpots: React.FC<any> = ({
     };
   }, []);
 
+  // Defining initial perspective and controls for globe component
   useEffect(() => {
     if (globeEl.current) {
       globeEl.current.pointOfView({
@@ -56,6 +57,7 @@ const GlobeSpots: React.FC<any> = ({
     }
   }, [currentSpot, spots]);
 
+  // Fetches all spots -- a placeholder for querying nearby spots in the future
   useEffect(() => {
     const fetchNearbySpots = async () => {
       try {
@@ -73,6 +75,7 @@ const GlobeSpots: React.FC<any> = ({
     }
   }, [spotClick]);
 
+  // Zoom in animation and component swap on spot selection
   const globeZoom = (data: any, altitude: any, ms: any) => {
     globeEl.current.pointOfView(
       {
@@ -87,8 +90,6 @@ const GlobeSpots: React.FC<any> = ({
       setCurrentComponent("SwellMap");
     }, ms);
   };
-
-  // refocus to top on selection
 
   return spots.length > 0 ? (
     <>
@@ -190,6 +191,7 @@ const GlobeSpots: React.FC<any> = ({
                     key={spot.id}
                     onClick={() => {
                       globeZoom(spot, 0.2, 2500);
+                      // Scroll to back to globe component on selecting a spot
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                   >

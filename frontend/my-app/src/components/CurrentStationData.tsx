@@ -21,6 +21,7 @@ const formatDate = (dateString: any) => {
   return `${formattedDate} ${formattedTime}`;
 };
 
+// Unit conversion functions:
 const metersToMiles = (data: any) => {
   return data * 0.000621;
 };
@@ -48,9 +49,13 @@ const metersPerSecondToKnots = (data: any) => {
 
 const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
   const { stationData, setStationData } = useContext(StationDataContext);
+  /**
+   * Fetches station data from the backend API based on the provided spot coordinates.
+   * @returns {Promise<void>} A promise that resolves when the station data is fetched and processed.
+   */
   const fetchStationData: any = async () => {
     try {
-      const range = "200000";
+      const range = "170000"; // Radius to search for stations in meters
       const lat = spotCoords[0];
       const lng = spotCoords[1];
       const res = await fetch(
@@ -74,6 +79,7 @@ const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
     }
   };
 
+  // Fetches station data periodically to ensure latest available weather data rendered
   useEffect(() => {
     fetchStationData(); // fetch on mount
     const interval = setInterval(fetchStationData, 360000); // fetch every 6 mins
