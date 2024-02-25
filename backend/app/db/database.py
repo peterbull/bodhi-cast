@@ -6,7 +6,7 @@ from app.core.config import get_app_settings
 from app.data.spots.spots import spots as fallback_spots
 from app.models.models import Base, Spots
 from botocore.exceptions import ClientError, EndpointConnectionError, NoCredentialsError
-from sqlalchemy import create_engine, exists
+from sqlalchemy import create_engine, event, exists, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
@@ -78,3 +78,34 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def after_create(target, connection, **kw):
+    # Directly using the connection object provided by the event
+    function_sql = text(
+        """
+        CREATE OR REPLACE FUNCTION update_location()
+        RETURNS TRIGGER AS $$
+        BEGIN
+        NEW.location = ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326)::geography;
+        RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+        """
+    )
+
+    trigger_sql = text(
+        """
+        CREATE TRIGGER update_location_trigger
+        BEFORE INSERT ON public.spots
+        FOR EACH ROW EXECUTE PROCEDURE update_location();
+        """
+    )
+
+    # Execute SQL
+    connection.execute(function_sql)
+    connection.execute(trigger_sql)
+
+
+# Listening to the 'after_create' event for Spots.__table__
+event.listen(Spots.__table__, "after_create", after_create)
