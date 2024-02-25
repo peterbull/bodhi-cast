@@ -14,7 +14,7 @@ from confluent_kafka import Consumer, KafkaException
 from geoalchemy2 import WKTElement
 from geoalchemy2.types import Geography
 from geopandas import GeoSeries, points_from_xy
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from airflow import DAG
@@ -246,9 +246,52 @@ with DAG(
                 sasl_password=sasl_password,
             )
 
+        @task
+        def reindex_db():
+            """
+            Create a GiST index on the 'location' column of the table in the
+            database if it doesn't already exist, then reindex the 'location'
+            column.
+
+            Raises:
+                SQLAlchemyError: If an error occurs while creating or reindexing
+                the index.
+            """
+            with engine.begin() as connection:
+                try:
+                    connection.execute(
+                        # create indexes if they don't exist
+                        text(
+                            """
+                        CREATE INDEX IF NOT EXISTS spots_location_idx ON spots USING gist(location);
+                        CREATE INDEX IF NOT EXISTS wave_forecast_location_idx ON wave_forecast USING gist(location);
+                        CREATE INDEX IF NOT EXISTS station_inventory_location_idx ON station_inventory USING gist(location);
+                        """
+                        )
+                    )
+
+                    print("Successfully created the index if it did not exist")
+                except SQLAlchemyError as e:
+                    print(f"An error occurred while creating the index: {e}")
+                try:
+                    connection.execute(
+                        # reindex database on each new batch of data
+                        text(
+                            """
+                    REINDEX INDEX spots_location_idx;
+                    REINDEX INDEX wave_forecast_location_idx;
+                    REINDEX INDEX station_inventory_location_idx;
+                    """
+                        )
+                    )
+                    print("Successfully reindexed the table")
+                except SQLAlchemyError as e:
+                    print(f"An error occurred while reindexing the table: {e}")
+
         check_result = check_for_messages()
         consume_task = consume_and_process_from_kafka()
-        check_result >> consume_task
+        update_idxs = reindex_db()
+        check_result >> consume_task >> update_idxs
 
         # wait_for_gefs_wave_urls_to_kafka >> data
 
