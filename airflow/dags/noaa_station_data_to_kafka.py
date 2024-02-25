@@ -69,7 +69,7 @@ with DAG(
         units = "metric"
 
         topic = "noaa_station_latest_data"
-        config_changes = {"retention.ms": "900000"}
+        config_changes = {"retention.ms": "1600000"}
 
         @task
         def get_station_urls():

@@ -73,7 +73,7 @@ with DAG(
                     location_id = message_value["metadata"]["id"]
                     redis_client.set(location_id, json.dumps(message_value))
 
-                    redis_client.expire(location_id, 600)  # set expiration of redis data
+                    redis_client.expire(location_id, 1500)
                     c.commit()
                     logging.info(
                         f"Updated location {location_id} to latest at {message_value['entry_created']}"
