@@ -80,8 +80,8 @@ def get_db():
         db.close()
 
 
+# func to create trigger to add spot location(postgis Point) on creation
 def after_create(target, connection, **kw):
-    # Directly using the connection object provided by the event
     function_sql = text(
         """
         CREATE OR REPLACE FUNCTION update_location()
@@ -102,7 +102,6 @@ def after_create(target, connection, **kw):
         """
     )
 
-    # Execute SQL
     connection.execute(function_sql)
     connection.execute(trigger_sql)
 

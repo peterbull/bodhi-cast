@@ -73,7 +73,6 @@ const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
       }));
 
       setStationData(transformedData);
-      console.log(transformedData);
     } catch (error) {
       console.error("Failed to fetch station data:", error);
     }

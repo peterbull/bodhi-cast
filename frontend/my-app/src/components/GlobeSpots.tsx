@@ -64,7 +64,6 @@ const GlobeSpots: React.FC<any> = ({
         const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/spots`);
         const data = await res.json();
         setNearbySpots(data);
-        console.log(`Nearby Spots updated: ${data}`);
       } catch (error) {
         console.error("Error fetching nearby spot data:", error);
       }

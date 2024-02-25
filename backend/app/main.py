@@ -120,7 +120,7 @@ def read_root():
 
 
 @app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}")
-def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
+def get_forecast_by_lat_lng(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
     """
     Retrieve wave forecasts for a specific spot based on date and coordinates.
 
@@ -214,7 +214,7 @@ def get_all_spots(db: Session = Depends(get_db)):
     Returns:
     - A list of dictionaries representing each spot.
     """
-    spots = db.query(Spots).all()
+    spots = db.query(Spots).order_by(Spots.spot_name.asc()).all()
     return [spot.as_dict() for spot in spots]
 
 
@@ -312,7 +312,7 @@ def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depend
     result = db.execute(sql, {"lat": lat, "lng": lng, "range": range})
     rows = result.all()
 
-    station_data = [row._asdict() for row in rows]
+    station_data = [row._asdict() for row in rows if row != "location"]
     current_conditions = [
         {**json.loads(data), "distance": station["distance"]}
         for station in station_data
@@ -324,62 +324,67 @@ def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depend
 
 @app.get("/forecasts/nearest/{date}/{spot_lat}/{spot_lng}")
 def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
-    # Create unique key for this set of params and try to get results from redis
-    key = f"forecasts_by_spot:{date}:{spot_lat}:{spot_lng}"
-    result = redis_client.get(key)
+    date = datetime.strptime(date, "%Y%m%d").date()
+    next_day = date + timedelta(days=1)
+    spot_lat = float(spot_lat)
+    spot_lng = float(spot_lng)
+    search_radius = 500000
 
-    # If it is not cached in redis, run the query as normal
-    if result is not None:
-        return json.loads(result)
-    else:
-        date = datetime.strptime(date, "%Y%m%d").date()
-        next_day = date + timedelta(days=1)
-        spot_lat = float(spot_lat)
-        spot_lng = float(spot_lng)
-        search_radius = 50000
-
-        sql = text(
-            """
-            WITH spot_location AS (
-                SELECT
-                    location
-                FROM
-                    spots
-                WHERE
-                    latitude = :spot_lat AND longitude = :spot_lng
-                LIMIT 1
-            ), nearest_forecast AS (
-                SELECT
-                    wf.id,
-                    wf.location,
-                    wf.time,
-                    wf.valid_time,
-                    COALESCE(wf.swh, 0) AS swh,
-                    COALESCE(wf.perpw, 0) AS perpw,
-                    COALESCE(wf.dirpw, 0) as dirpw,
-                    COALESCE(wf.swell, 0) as swell, COALESCE(wf.swper, 0) as swper, COALESCE(wf.shww, 0) as shww,
-                    COALESCE(wf.mpww, 0) as mpww, COALESCE(wf.wvdir, 0) as wvdir, COALESCE(wf.ws, 0) as ws, COALESCE(wf.wdir, 0) as wdir,
-                    ST_Distance(wf.location, (SELECT location FROM spot_location)) AS distance
-                FROM
-                    wave_forecast wf
-                WHERE
-                    wf.valid_time >= :date
-                    AND wf.time >= :date
-                    AND wf.valid_time < :next_day
-                    AND wf.time < :next_day
-                    AND wf.swh IS NOT NULL
-                    AND ST_DWithin(wf.location, (SELECT location FROM spot_location), :search_radius)
-                ORDER BY
-                    distance ASC
-                LIMIT 1
-            )
+    sql = text(
+        """
+        WITH spot_location AS (
             SELECT
-                *
+                location
             FROM
-                nearest_forecast;
-                """
+                spots
+            WHERE
+                latitude = :spot_lat AND longitude = :spot_lng
+            LIMIT 1
+        ), nearest_forecast AS (
+            SELECT
+                wf.id,
+                wf.location,
+                wf.time,
+                wf.valid_time,
+                COALESCE(wf.swh, 0) AS swh,
+                COALESCE(wf.perpw, 0) AS perpw,
+                COALESCE(wf.dirpw, 0) as dirpw,
+                COALESCE(wf.swell, 0) as swell, COALESCE(wf.swper, 0) as swper, COALESCE(wf.shww, 0) as shww,
+                COALESCE(wf.mpww, 0) as mpww, COALESCE(wf.wvdir, 0) as wvdir, COALESCE(wf.ws, 0) as ws, COALESCE(wf.wdir, 0) as wdir,
+                ST_Distance(wf.location, (SELECT location FROM spot_location)) AS distance
+            FROM
+                wave_forecast wf
+            WHERE
+                wf.valid_time >= :date
+                AND wf.time >= :date
+                AND wf.valid_time < :next_day
+                AND wf.time < :next_day
+                AND wf.swh IS NOT NULL
+                AND ST_DWithin(wf.location, (SELECT location FROM spot_location), :search_radius)
+            ORDER BY
+                distance ASC,
+                valid_time ASC
+            LIMIT 8
         )
+        SELECT
+            *
+        FROM
+            nearest_forecast;
+        """
+    )
 
+    result = db.execute(
+        sql,
+        {
+            "date": date,
+            "next_day": next_day,
+            "spot_lat": spot_lat,
+            "spot_lng": spot_lng,
+            "search_radius": search_radius,
+        },
+    )
+    # Add fallback for great lakes region
+    if result.rowcount == 0:
         result = db.execute(
             sql,
             {
@@ -387,13 +392,11 @@ def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session =
                 "next_day": next_day,
                 "spot_lat": spot_lat,
                 "spot_lng": spot_lng,
-                "search_radius": search_radius,
+                "search_radius": 10000000,
             },
         )
 
-        rows = result.all()
-        forecasts = [row._asdict() for row in rows]
+    rows = result.all()
+    forecasts = [row._asdict() for row in rows]
 
-        # redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=timedelta(hours=1))
-
-        return forecasts
+    return forecasts
