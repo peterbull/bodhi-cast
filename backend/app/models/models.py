@@ -39,6 +39,7 @@ class Spots(Base):
     longitude = Column(Float)
     spot_name = Column(String(255))
     street_address = Column(String(255))
+    location = Column(Geography("POINT", srid=4326))
 
     def as_dict(self):
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
