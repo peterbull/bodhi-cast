@@ -42,7 +42,9 @@ class Spots(Base):
     location = Column(Geography("POINT", srid=4326))
 
     def as_dict(self):
-        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
+        return {
+            c.name: getattr(self, c.name) for c in self.__table__.columns if c.name != "location"
+        }
 
 
 # Model for checking COOPS station data inventories
