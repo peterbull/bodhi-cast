@@ -18,7 +18,6 @@ function App() {
      */
     const fetchAllSpots = async () => {
       try {
-        console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
         const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/spots`);
         const data = await res.json();
         setSpots(data);
