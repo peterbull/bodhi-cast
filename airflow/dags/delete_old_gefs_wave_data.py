@@ -26,7 +26,7 @@ default_args = {
 
 @task
 def delete_old_gefs_wave_data(engine, table_name, days=2):
-    cutoff_date = pendulum.now("UTC").subtract(days).format("YYYY-MM-DD")
+    cutoff_date = pendulum.now("UTC").subtract(days=2).to_date_string()
 
     with engine.begin() as connection:
         query = text(
