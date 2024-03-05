@@ -39,7 +39,7 @@ with DAG(
         def monitor_kafka_topic(topic, sasl_username=sasl_username, sasl_password=sasl_password):
             conf = {
                 "bootstrap.servers": "kafka:9092",
-                "group.id": "airflow-consumers",
+                "group.id": "airflow-monitors",
                 "enable.auto.commit": False,
                 "auto.offset.reset": "earliest",  # consume from the start of topic
                 "security.protocol": "SASL_PLAINTEXT",
