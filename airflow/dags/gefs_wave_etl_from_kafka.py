@@ -241,10 +241,24 @@ with DAG(
                 topic=topic,
                 engine=engine,
                 table_name=table_name,
-                bs=8,
+                bs=1,
                 sasl_username=sasl_username,
                 sasl_password=sasl_password,
             )
+
+        @task
+        def delete_old_gefs_wave_data(table_name, days=2):
+            cutoff_date = pendulum.now("UTC").subtract(days)
+            cutoff_date_str = cutoff_date.strftime("%Y-%m-%d %H:%M:%S")
+
+            with engine.begin() as connection:
+                query = text(
+                    f"""
+                            DELETE FROM {table_name} WHERE entry_updated < :cutoff_date_str
+                            """
+                )
+                result = connection.execute(query, {"cutoff_date_str": cutoff_date_str})
+                logging.info(f"Deleted {result.rowcount} rows from {table_name}")
 
         @task
         def reindex_db():
@@ -290,10 +304,10 @@ with DAG(
 
         check_result = check_for_messages()
         consume_task = consume_and_process_from_kafka()
+        delete_old_data = delete_old_gefs_wave_data("wave_forecast", days=2)
         update_idxs = reindex_db()
-        check_result >> consume_task >> update_idxs
 
-        # wait_for_gefs_wave_urls_to_kafka >> data
+        check_result >> consume_task >> delete_old_data >> update_idxs
 
     dag = taskflow()
 
