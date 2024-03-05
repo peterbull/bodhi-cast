@@ -1,3 +1,4 @@
+import logging
 import os
 
 import pendulum
@@ -26,14 +27,16 @@ default_args = {
 @task
 def delete_old_gefs_wave_data(engine, table_name, days=2):
     cutoff_date = pendulum.now("UTC").subtract(days)
+    cutoff_date_str = cutoff_date.strftime("%Y-%m-%d %H:%M:%S")
 
     with engine.begin() as connection:
         query = text(
             f"""
-                     DELETE FROM {table_name} WHERE entry_updated < :cutoff_date
+                     DELETE FROM {table_name} WHERE entry_updated < :cutoff_date_str
                      """
         )
-        connection.execute(query, {"cutoff_date": cutoff_date})
+        result = connection.execute(query, {"cutoff_date_str": cutoff_date_str})
+        logging.info(f"Deleted {result.rowcount} rows from {table_name}")
 
 
 with DAG(
