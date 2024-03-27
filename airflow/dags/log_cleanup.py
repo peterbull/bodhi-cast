@@ -83,6 +83,7 @@ dag = DAG(
     start_date=START_DATE,
     tags=["teamclairvoyant", "airflow-maintenance-dags"],
     template_undefined=jinja2.Undefined,
+    is_paused_upon_creation=False,
 )
 if hasattr(dag, "doc_md"):
     dag.doc_md = __doc__
