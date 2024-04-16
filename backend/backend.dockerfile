@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y libpq-dev gcc wget curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Miniconda
-ENV MINICONDA_VERSION=latest
+ENV MINICONDA_VERSION=py310_24.1.2-0
 ENV CONDA_DIR=/opt/conda
 ENV PATH=$CONDA_DIR/bin:$PATH
 
