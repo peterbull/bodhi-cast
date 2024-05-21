@@ -94,17 +94,20 @@ with DAG(
         @task
         def synchronous_fetch_all(urls):
             async def fetch(session, url):
-                async with session.get(url) as response:
-                    data = await response.json()
-                    # parsing to extract queries
-                    parsed_url = urllib.parse.urlparse(url)
-                    query_params = urllib.parse.parse_qs(parsed_url.query)
-                    product = query_params.get("product", [None])[0]
+                try:
+                    async with session.get(url) as response:
+                        data = await response.json()
+                        # parsing to extract queries
+                        parsed_url = urllib.parse.urlparse(url)
+                        query_params = urllib.parse.parse_qs(parsed_url.query)
+                        product = query_params.get("product", [None])[0]
 
-                    # Add product
-                    if "metadata" in data:  # this assumes all requests have metadata key
-                        data["metadata"]["product"] = product
-                    return data
+                        # Add product
+                        if "metadata" in data:  # this assumes all requests have metadata key
+                            data["metadata"]["product"] = product
+                        return data
+                except json.JSONDecodeError:
+                    return {"error": f"Failed to parse JSON from {url}"}
 
             async def fetch_all(urls):
                 async with aiohttp.ClientSession() as session:
@@ -162,6 +165,8 @@ with DAG(
                 try:
                     message = json.dumps(item).encode("utf-8")
                     producer.produce(topic, message)
+                except json.JSONDecodeError as e:
+                    logging.error(f"Failed to decode JSON: {e}")
                 except Exception as e:
                     logging.error(f"Failed to send message to Kafka: {e}")
 
