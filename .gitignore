@@ -190,3 +190,10 @@ airflow/mem-debug/**/*.bin
 airflow/mem-debug/**/*.html
 
 airflow/mem-debug/vars.sh
+
+
+# Firebase
+firebase.json
+firestore.indexes.json
+firestore.rules
+.firebaserc
