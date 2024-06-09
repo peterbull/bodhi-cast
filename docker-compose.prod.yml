@@ -161,7 +161,7 @@ services:
     restart: always
 
   redis:
-    image: redis:latest
+    image: redis:7.2.4
     command: redis-server --requirepass ${REDIS_PASSWORD}
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
@@ -365,7 +365,7 @@ services:
   #     - "2181:2181"
 
   kafka:
-    image: "bitnami/kafka:latest"
+    image: "bitnami/kafka:3.6"
     ports:
       - "9092:9092"
     environment:
