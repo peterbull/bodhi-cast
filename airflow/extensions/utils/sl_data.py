@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 from typing import Any, Dict, List, Optional
 
 import aiohttp
@@ -41,6 +42,10 @@ class SpotsGetter:
         self.spot_urls = []
         self.spots = []
         self.engine = create_engine(database_uri)
+        self.SessionLocal = sessionmaker(bind=self.engine)
+
+    def get_session(self):
+        return self.SessionLocal()
 
     def _update_states(self):
         response = requests.get(
@@ -58,7 +63,6 @@ class SpotsGetter:
                 + state_id
                 + "&maxDepth=0"
             )
-        logging.info(f"{len(self.state_urls)}")
 
     async def fetch_url(self, url, session):
         async with session.get(url) as response:
@@ -148,12 +152,19 @@ class SpotsGetter:
             }
         )
         df.drop_duplicates(subset=["spot_id"], inplace=True)
+        # Drop entries with no spot_id
+        df = df.loc[df["spot_id"] != ""]
         return df
 
     def run(self) -> None:
         df = self.process_spots()
-        results = self.fetch_db_spots()
-        non_dupe_df = df[~df["spot_id"].isin(results)]
+        self.fetch_db_spots()
+        if self.spots is not None:
+            non_dupe_df = df[~df["spot_id"].isin(self.spots)]
+            logging.info(f"{len(non_dupe_df)} new spots to be added.")
+        else:
+            non_dupe_df = df
+            logging.info(f"{len(non_dupe_df)} new spots to be added.")
         non_dupe_df.to_sql("sl_spots", con=self.engine, if_exists="append", index=False)
 
 
@@ -168,14 +179,17 @@ class SpotsForecast:
 
     def fetch_all_forecasts(self) -> List[Dict[Any, Any]]:
         data = []
-        for spot in self.spots[:2]:
-            result = self.fetch_forecast(
-                SlApiEndpoints.WAVE.value, SlApiParams.SPOT_ID.value, param=spot
-            )
-            if result.get("associated"):
-                result["associated"]["spotId"] = spot
-                result["data"]["spotId"] = spot
-            data.append(result)
+        for i in range(0, len(self.spots), 100):
+            chunk = self.spots[i : i + 100]
+            for spot in self.spots[:3]:
+                result = self.fetch_forecast(
+                    SlApiEndpoints.WAVE.value, SlApiParams.SPOT_ID.value, param=spot
+                )
+                if result.get("associated"):
+                    result["associated"]["spotId"] = spot
+                    result["data"]["spotId"] = spot
+                data.append(result)
+                time.sleep(30)
         return data
 
     def fetch_forecast(
