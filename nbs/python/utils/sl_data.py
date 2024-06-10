@@ -1,10 +1,13 @@
 import asyncio
 import logging
-from typing import Dict, List
+from typing import Any, Dict, List, Optional
 
 import aiohttp
 import pandas as pd
 import requests
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import sessionmaker
+from utils.models import SlRatings, SlSpots
 from utils.schemas import SlApiEndpoints, SlApiParams
 
 
@@ -138,3 +141,90 @@ class SurflineSpots:
         )
         df.drop_duplicates(subset=["spot_id"], inplace=True)
         return df
+
+
+class SpotForecast:
+    def __init__(self, database_uri):
+        self.spots = []
+        self.engine = create_engine(database_uri)
+        self.SessionLocal = sessionmaker(bind=self.engine)
+
+    def get_session(self):
+        return self.SessionLocal()
+
+    def fetch_all_forecasts(self) -> List[Dict[Any, Any]]:
+        data = []
+        for spot in self.spots[:2]:
+            result = self.fetch_forecast(
+                SlApiEndpoints.WAVE.value, SlApiParams.SPOT_ID.value, param=spot
+            )
+            if result.get("associated"):
+                result["associated"]["spotId"] = spot
+                result["data"]["spotId"] = spot
+            data.append(result)
+        return data
+
+    def fetch_forecast(
+        self, endpoint: SlApiEndpoints, param_type: SlApiParams, param: str
+    ) -> Dict[Any, Any]:
+        base_url = "https://services.surfline.com/kbyg/spots/forecasts"
+        res = requests.get(f"{base_url}/{endpoint}", params={param_type: param})
+        data = res.json()
+        return data
+
+    def fetch_spots_from_db(self) -> None:
+        with self.get_session() as db:
+            stmt = select(SlSpots.spot_id)
+            self.spots = db.execute(stmt).scalars().all()
+
+    def transform_wave_data(self, data: Dict) -> List[Dict[Any, Any]]:
+        if not data:
+            raise ValueError("Data is empty")
+
+        meta_df = pd.json_normalize(data, sep="_")
+        meta_df.drop(
+            ["permissions_violations", "permissions_data", "data_wave", "data_spotId"],
+            inplace=True,
+            axis=1,
+        )
+
+        wave_df = pd.json_normalize(
+            data, record_path=["data", "wave"], meta=[["data", "spotId"]], sep="_"
+        )
+        wave_df.drop("swells", inplace=True, axis=1)
+        wave_df.rename(columns={"power": "wave_power"}, inplace=True)
+
+        swell_df = pd.json_normalize(
+            data,
+            record_path=["data", "wave", "swells"],
+            meta=[["data", "wave", "timestamp"], ["data", "spotId"]],
+            sep="_",
+        )
+
+        swell_df.rename(columns={"power": "swell_power"}, inplace=True)
+        swell_df["swells_idx"] = swell_df.groupby("data_wave_timestamp").cumcount()
+
+        combined_waves_df = pd.merge(
+            wave_df,
+            swell_df,
+            how="inner",
+            left_on=["timestamp", "data_spotId"],
+            right_on=["data_wave_timestamp", "data_spotId"],
+        )
+
+        combined_df = pd.merge(meta_df, combined_waves_df, how="cross")
+        dict_record = combined_df.to_dict("records")
+
+        return dict_record
+
+    def load_to_pg(self, dict_record: List[Dict[Any, Any]]) -> None:
+        with self.get_session() as db:
+            db.bulk_insert_mappings(SlRatings, dict_record)
+            db.commit()
+
+    def process_all_spot_ratings(self):
+        self.fetch_spots_from_db()
+        data = self.fetch_all_forecasts()
+        for spot in data:
+            record = self.transform_wave_data(spot)
+            self.load_to_pg(record)
