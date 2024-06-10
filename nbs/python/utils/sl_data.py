@@ -5,6 +5,19 @@ from typing import Dict, List
 import aiohttp
 import pandas as pd
 import requests
+from utils.schemas import SlApiEndpoints, SlApiParams
+
+
+def fetch_from_sl_api(endpoint: SlApiEndpoints, param_type: SlApiParams, param: str):
+    base_url = "https://services.surfline.com/kbyg/spots/forecasts"
+    res = requests.get(f"{base_url}/{endpoint}", params={param_type: param})
+    data = res.json()
+    return data
+
+
+def cull_extra_days(full_json):
+    if "data" in full_json and "rating" in full_json["data"]:
+        full_json["data"]["rating"] = full_json["data"]["rating"][:24]
 
 
 class SurflineSpots:
