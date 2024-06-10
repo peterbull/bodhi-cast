@@ -6,9 +6,9 @@ import aiohttp
 import pandas as pd
 import pendulum
 import requests
-from plugins.models.models import SlRatings, SlSpots
-from plugins.schemas.schemas import SlApiEndpoints, SlApiParams
-from plugins.utils.db_config import LOCAL_PG_URI
+from extensions.models.models import SlRatings, SlSpots
+from extensions.schemas.schemas import SlApiEndpoints, SlApiParams
+from extensions.utils.db_config import LOCAL_PG_URI
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 
@@ -25,7 +25,7 @@ def cull_extra_days(full_json):
         full_json["data"]["rating"] = full_json["data"]["rating"][:24]
 
 
-class SurflineSpots:
+class SpotsGetter:
     def __init__(self, database_uri):
         self.states = []
         self.state_ids = []
@@ -157,7 +157,7 @@ class SurflineSpots:
         non_dupe_df.to_sql("sl_spots", con=self.engine, if_exists="append", index=False)
 
 
-class SpotForecast:
+class SpotsForecast:
     def __init__(self, database_uri):
         self.spots = []
         self.engine = create_engine(database_uri)
@@ -247,7 +247,7 @@ class SpotForecast:
             db.bulk_insert_mappings(SlRatings, dict_record)
             db.commit()
 
-    def process_all_spot_ratings(self):
+    def run(self):
         self.fetch_spots_from_db()
         data = self.fetch_all_forecasts()
         for spot in data:

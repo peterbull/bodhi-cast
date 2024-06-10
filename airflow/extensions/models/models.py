@@ -1,4 +1,4 @@
-from plugins.utils.db_config import LOCAL_PG_URI
+from extensions.utils.db_config import LOCAL_PG_URI
 from sqlalchemy import (
     BigInteger,
     Boolean,
