@@ -78,7 +78,7 @@ x-airflow-common: &airflow-common
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
-    PYTHONPATH: "/opt/airflow/backend:${PYTHONPATH:-}"
+    PYTHONPATH: "/opt/airflow/backend:/opt/airflow:${PYTHONPATH:-}"
     REDIS_PASSWORD: ${REDIS_PASSWORD}
   volumes:
     - ./backend:/opt/airflow/backend
