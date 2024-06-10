@@ -1,7 +1,23 @@
-from sqlalchemy import BigInteger, Boolean, Column, Float, Integer, String, Text
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    Integer,
+    String,
+    Text,
+    create_engine,
+)
 from sqlalchemy.orm import declarative_base
+from utils.utils import LOCAL_PG_URI
 
 Base = declarative_base()
+engine = create_engine(LOCAL_PG_URI)
+
+
+def create_tables():
+    Base.metadata.create_all(bind=engine)
 
 
 class SlSpots(Base):
@@ -53,3 +69,4 @@ class SlRatings(Base):
     optimalScore = Column(Integer)
     data_wave_timestamp = Column(String)
     swells_idx = Column(Integer)
+    timestamp_utc = Column(DateTime)

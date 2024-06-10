@@ -6,10 +6,11 @@ import aiohttp
 import pandas as pd
 import pendulum
 import requests
+from plugins.models.models import SlRatings, SlSpots
+from plugins.schemas.schemas import SlApiEndpoints, SlApiParams
+from plugins.utils.db_config import LOCAL_PG_URI
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
-from utils.models import SlRatings, SlSpots
-from utils.schemas import SlApiEndpoints, SlApiParams
 
 
 def fetch_from_sl_api(endpoint: SlApiEndpoints, param_type: SlApiParams, param: str):
@@ -25,7 +26,7 @@ def cull_extra_days(full_json):
 
 
 class SurflineSpots:
-    def __init__(self):
+    def __init__(self, database_uri):
         self.states = []
         self.state_ids = []
         self.state_urls = []
@@ -38,6 +39,8 @@ class SurflineSpots:
         self.spot_lon = []
         self.spot_lat = []
         self.spot_urls = []
+        self.spots = []
+        self.engine = create_engine(database_uri)
 
     def _update_states(self):
         response = requests.get(
@@ -74,12 +77,16 @@ class SurflineSpots:
         data = asyncio.run(self.fetch_all_urls(data_target))
         setattr(self, attr_target, data)
 
+    def fetch_db_spots(self):
+        with self.get_session() as db:
+            stmt = select(SlSpots.spot_id)
+            self.spots = db.execute(stmt).scalars().all()
+
     def process_spots(self):
         if len(self.states) == 0:
             self._update_states()
 
         self.update_data(self.state_urls, "state_data")
-        logging.info("spots")
 
         county_ids = []
         for state in self.state_data:
@@ -142,6 +149,12 @@ class SurflineSpots:
         )
         df.drop_duplicates(subset=["spot_id"], inplace=True)
         return df
+
+    def run(self) -> None:
+        df = self.process_spots()
+        results = self.fetch_db_spots()
+        non_dupe_df = df[~df["spot_id"].isin(results)]
+        non_dupe_df.to_sql("sl_spots", con=self.engine, if_exists="append", index=False)
 
 
 class SpotForecast:
