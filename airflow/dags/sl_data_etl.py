@@ -27,7 +27,12 @@ default_args = {
 }
 
 
-@dag(dag_id="sl_data_etl", start_date=start_date, schedule="@daily")
+@dag(
+    dag_id="sl_data_etl",
+    start_date=start_date,
+    schedule="@daily",
+    is_paused_upon_creation=False,
+)
 def taskflow():
     @task()
     def handle_create_tables():
