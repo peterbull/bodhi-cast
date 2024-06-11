@@ -78,7 +78,7 @@ x-airflow-common: &airflow-common
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
-    PYTHONPATH: "/opt/airflow/backend:${PYTHONPATH:-}"
+    PYTHONPATH: "/opt/airflow/backend:/opt/airflow:${PYTHONPATH:-}"
     REDIS_PASSWORD: ${REDIS_PASSWORD}
   volumes:
     - ./backend:/opt/airflow/backend
@@ -87,6 +87,7 @@ x-airflow-common: &airflow-common
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/mem-debug:/opt/airflow/mem-debug
+    - ${AIRFLOW_PROJ_DIR:-.}/extensions:/opt/airflow/extensions
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on: &airflow-common-depends-on
     redis:
@@ -204,6 +205,9 @@ services:
       retries: 5
       start_period: 30s
     restart: always
+    environment:
+      <<: *airflow-common-env
+      SUPABASE_PG_URI: ${SUPABASE_PG_URI:-}
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -229,6 +233,7 @@ services:
       DUMB_INIT_SETSID: "0"
       KAFKA_DEFAULT_USERS: ${KAFKA_DEFAULT_USERS:-user}
       KAFKA_DEFAULT_PASSWORDS: ${KAFKA_DEFAULT_PASSWORDS:-password}
+      SUPABASE_PG_URI: ${SUPABASE_PG_URI:-}
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
@@ -313,6 +318,7 @@ services:
       _AIRFLOW_WWW_USER_CREATE: "true"
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      SUPABASE_PG_URI: ${SUPABASE_PG_URI:-}
     user: "0:0"
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
