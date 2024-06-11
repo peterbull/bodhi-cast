@@ -52,7 +52,7 @@ with DAG(
     "update_noaa_station_inventory",
     default_args=default_args,
     description="Cycle through NOAA COOPS station list and append any new stations and inventory data to postgis table",
-    schedule="@daily",
+    schedule="0 6 * * *",
     catchup=False,
     is_paused_upon_creation=False,
 ) as dag:

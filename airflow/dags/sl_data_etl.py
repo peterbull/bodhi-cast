@@ -30,7 +30,7 @@ default_args = {
 @dag(
     dag_id="sl_data_etl",
     start_date=start_date,
-    schedule="@daily",
+    schedule="30 9 * * *",
     catchup=False,
     is_paused_upon_creation=False,
 )
