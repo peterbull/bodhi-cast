@@ -51,6 +51,7 @@ class SpotsGetter:
         response = requests.get(
             "https://services.surfline.com/taxonomy?type=taxonomy&id=58f7ed51dadb30820bb3879c&maxDepth=0"
         )
+        logging.info(f"Response: {response.text}")
         json_data = response.json()
         json_contains = json_data["contains"]
         for x in json_contains:
