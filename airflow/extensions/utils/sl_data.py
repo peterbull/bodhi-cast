@@ -14,18 +14,6 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 
 
-def fetch_from_sl_api(endpoint: SlApiEndpoints, param_type: SlApiParams, param: str):
-    base_url = "https://services.surfline.com/kbyg/spots/forecasts"
-    res = requests.get(f"{base_url}/{endpoint}", params={param_type: param})
-    data = res.json()
-    return data
-
-
-def cull_extra_days(full_json):
-    if "data" in full_json and "rating" in full_json["data"]:
-        full_json["data"]["rating"] = full_json["data"]["rating"][:24]
-
-
 class SpotsGetter:
     def __init__(self, database_uri):
         self.states = []
@@ -43,13 +31,18 @@ class SpotsGetter:
         self.spots = []
         self.engine = create_engine(database_uri)
         self.SessionLocal = sessionmaker(bind=self.engine)
+        self.headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        }
 
     def get_session(self):
         return self.SessionLocal()
 
     def _update_states(self):
+
         response = requests.get(
-            "https://services.surfline.com/taxonomy?type=taxonomy&id=58f7ed51dadb30820bb3879c&maxDepth=0"
+            "https://services.surfline.com/taxonomy?type=taxonomy&id=58f7ed51dadb30820bb3879c&maxDepth=0",
+            headers=self.headers,
         )
         logging.info(f"Response: {response.text}")
         json_data = response.json()
@@ -175,6 +168,9 @@ class SpotsForecast:
         self.engine = create_engine(database_uri)
         self.SessionLocal = sessionmaker(bind=self.engine)
         self.sleep_delay = sleep_delay
+        self.headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        }
 
     def get_session(self):
         return self.SessionLocal()
@@ -203,7 +199,11 @@ class SpotsForecast:
         self, endpoint: SlApiEndpoints, param_type: SlApiParams, param: str
     ) -> Dict[Any, Any]:
         base_url = "https://services.surfline.com/kbyg/spots/forecasts"
-        res = requests.get(f"{base_url}/{endpoint}", params={param_type: param})
+        res = requests.get(
+            f"{base_url}/{endpoint}",
+            params={param_type: param},
+            headers=self.headers,
+        )
         data = res.json()
         return data
 
