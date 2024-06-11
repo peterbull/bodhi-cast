@@ -169,7 +169,7 @@ class SpotsGetter:
 
 
 class SpotsForecast:
-    def __init__(self, database_uri, sleep_delay=20):
+    def __init__(self, database_uri, sleep_delay=60):
         self.spots = []
         self.engine = create_engine(database_uri)
         self.SessionLocal = sessionmaker(bind=self.engine)
@@ -178,8 +178,7 @@ class SpotsForecast:
     def get_session(self):
         return self.SessionLocal()
 
-    def fetch_all_forecasts(self) -> List[Dict[Any, Any]]:
-        data = []
+    def fetch_forecasts_to_db(self) -> List[Dict[Any, Any]]:
         chunk_total = 0
         for i in range(0, len(self.spots), 100):
             chunk = self.spots[i : i + 100]
@@ -190,11 +189,13 @@ class SpotsForecast:
                 if result.get("associated"):
                     result["associated"]["spotId"] = spot
                     result["data"]["spotId"] = spot
-                data.append(result)
+                data = self.transform_wave_data(result)
+                self.load_to_pg(data)
             chunk_total += len(chunk)
             logging.info(f"Processed forecasts for {chunk_total} spots out of {len(self.spots)}.")
             logging.info(f"Sleeping {self.sleep_delay} seconds to give the API a break.")
             time.sleep(self.sleep_delay)
+
         return data
 
     def fetch_forecast(
@@ -266,12 +267,6 @@ class SpotsForecast:
             db.bulk_insert_mappings(SlRatings, dict_record)
             db.commit()
 
-    ########################################################################
-    # TODO: Batch for each 100 requests rather that the full dump here.
-    ########################################################################
     def run(self):
         self.fetch_spots_from_db()
-        data = self.fetch_all_forecasts()
-        for spot in data:
-            record = self.transform_wave_data(spot)
-            self.load_to_pg(record)
+        self.fetch_forecasts_to_db()

@@ -194,6 +194,9 @@ services:
       retries: 5
       start_period: 30s
     restart: always
+    environment:
+      <<: *airflow-common-env
+      SUPABASE_PG_URI: ${SUPABASE_PG_URI:-}
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -218,6 +221,7 @@ services:
       DUMB_INIT_SETSID: "0"
       KAFKA_DEFAULT_USERS: ${KAFKA_DEFAULT_USERS:-user}
       KAFKA_DEFAULT_PASSWORDS: ${KAFKA_DEFAULT_PASSWORDS:-password}
+      SUPABASE_PG_URI: ${SUPABASE_PG_URI:-}
     restart: always
     depends_on:
       <<: *airflow-common-depends-on

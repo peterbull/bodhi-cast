@@ -1,4 +1,6 @@
-from extensions.utils.db_config import LOCAL_PG_URI
+import os
+
+from extensions.utils.db_config import LOCAL_PG_URI, SUPABASE_PG_URI
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -13,7 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
-engine = create_engine(LOCAL_PG_URI)
+engine = create_engine(os.environ.get("SUPABASE_PG_URI"))
 
 
 def create_tables():

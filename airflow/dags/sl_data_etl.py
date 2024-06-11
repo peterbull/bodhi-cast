@@ -4,11 +4,14 @@ import os
 import pendulum
 from airflow.decorators import dag, task
 from extensions.models.models import create_tables
-from extensions.utils.db_config import LOCAL_PG_URI
+from extensions.utils.db_config import LOCAL_PG_URI, SUPABASE_PG_URI
 from extensions.utils.sl_data import SpotsForecast, SpotsGetter
 
-create_tables()
-db_uri = LOCAL_PG_URI
+# db_uri = LOCAL_PG_URI
+# Have to declare it this way for now
+# the parser is giving an error on initial load
+# using environ directly seems to fix it
+db_uri = os.environ.get("SUPABASE_PG_URI")
 
 start_date = pendulum.datetime(2024, 2, 6)
 
@@ -26,6 +29,9 @@ default_args = {
 
 @dag(dag_id="sl_data_etl", start_date=start_date, schedule="@daily")
 def taskflow():
+    @task()
+    def handle_create_tables():
+        create_tables()
 
     @task()
     def get_new_spots():
@@ -37,7 +43,7 @@ def taskflow():
         sl_ratings = SpotsForecast(db_uri)
         sl_ratings.run()
 
-    get_new_spots() >> get_wave_ratings()
+    handle_create_tables() >> get_new_spots() >> get_wave_ratings()
 
 
 dag_run = taskflow()
