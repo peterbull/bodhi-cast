@@ -13,7 +13,7 @@ from extensions.utils.sl_data import SpotsForecast, SpotsGetter
 # using environ directly seems to fix it
 db_uri = os.environ.get("SUPABASE_PG_URI")
 
-start_date = pendulum.datetime(2024, 2, 6)
+start_date = pendulum.datetime(2024, 6, 9)
 
 default_args = {
     "owner": "airflow",
@@ -31,6 +31,7 @@ default_args = {
     dag_id="sl_data_etl",
     start_date=start_date,
     schedule="@daily",
+    catchup=False,
     is_paused_upon_creation=False,
 )
 def taskflow():
