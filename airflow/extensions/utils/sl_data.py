@@ -59,7 +59,7 @@ class SpotsGetter:
             )
 
     async def fetch_url(self, url, session):
-        async with session.get(url) as response:
+        async with session.get(url, headers=self.headers) as response:
             return await response.json()
 
     async def fetch_all_urls(self, target):
