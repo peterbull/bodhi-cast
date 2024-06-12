@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, List, Optional
 
 from geoalchemy2 import Geography
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -24,7 +24,7 @@ Base = declarative_base()
 engine = create_engine(LOCAL_AIRFLOW_PG_URI)
 
 
-def create_tables():
+def create_tables(engine: Engine):
     Base.metadata.create_all(bind=engine)
 
 
@@ -33,19 +33,19 @@ def get_session(engine: Engine) -> Session:
     return SessionLocal()
 
 
-class Spots(Base):
-    __tablename__ = "spots"
-    id = Column(Integer, primary_key=True)
-    latitude = Column(Float)
-    longitude = Column(Float)
-    spot_name = Column(String(255))
-    street_address = Column(String(255))
-    location = Column(Geography("POINT", srid=4326))
+# class Spots(Base):
+#     __tablename__ = "spots"
+#     id = Column(Integer, primary_key=True)
+#     latitude = Column(Float)
+#     longitude = Column(Float)
+#     spot_name = Column(String(255))
+#     street_address = Column(String(255))
+#     location = Column(Geography("POINT", srid=4326))
 
 
-class WaveForecast(Base):
-    __tablename__ = "wave_forecast"
-    id = Column(Integer, primary_key=True)
+class BodhiWaves(Base):
+    __tablename__ = "bodhi_waves"
+    id = Column(BigInteger, primary_key=True)
     location = Column(Geography("POINT", srid=4326))
     latitude = Column(Float)
     longitude = Column(Float)
@@ -65,16 +65,18 @@ class WaveForecast(Base):
     entry_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
 
-class SpotsModel(BaseModel):
-    id: int
-    latitude: float
-    longitude: float
-    spot_name: str
-    street_address: str
-    location: str
+# class SpotsModel(BaseModel):
+#     id: int
+#     latitude: float
+#     longitude: float
+#     spot_name: str
+#     street_address: str
+#     location: str
+
+# model_config = ConfigDict(from_attributes=True)
 
 
-class WaveForecastModel(BaseModel):
+class BohdiWavesModel(BaseModel):
     id: int
     location: str
     latitude: float
@@ -82,14 +84,16 @@ class WaveForecastModel(BaseModel):
     time: datetime
     step: timedelta
     valid_time: datetime
-    swh: float
-    perpw: float
-    dirpw: float
-    shww: float
-    mpww: float
-    wvdir: float
-    ws: float
-    wdir: float
-    swell: float
-    swper: float
+    swh: Optional[float]
+    perpw: Optional[float]
+    dirpw: Optional[float]
+    shww: Optional[float]
+    mpww: Optional[float]
+    wvdir: Optional[float]
+    ws: Optional[float]
+    wdir: Optional[float]
+    swell: Optional[float]
+    swper: Optional[float]
     entry_updated: datetime
+
+    model_config = ConfigDict(from_attributes=True)
