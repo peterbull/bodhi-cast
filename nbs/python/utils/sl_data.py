@@ -8,8 +8,9 @@ import pendulum
 import requests
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
-from utils.models import SlRatings, SlSpots
 from utils.schemas import SlApiEndpoints, SlApiParams
+
+from nbs.python.utils.sl_models import SlRatings, SlSpots
 
 
 def fetch_from_sl_api(endpoint: SlApiEndpoints, param_type: SlApiParams, param: str):
