@@ -8,18 +8,28 @@ from sqlalchemy import (
     DateTime,
     Float,
     Integer,
+    Interval,
     String,
     Text,
     create_engine,
+    func,
 )
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm.session import Session
 
 Base = declarative_base()
 engine = create_engine(os.environ.get("SUPABASE_PG_URI"))
+bodhi_engine = create_engine(os.environ.get("AIRFLOW__DATABASE__SQL_ALCHEMY_CONN"))
 
 
 def create_tables():
     Base.metadata.create_all(bind=engine)
+
+
+def get_session(engine: Engine) -> Session:
+    SessionLocal = sessionmaker(bind=engine)
+    return SessionLocal()
 
 
 class SlSpots(Base):
@@ -72,3 +82,24 @@ class SlRatings(Base):
     data_wave_timestamp = Column(String)
     swells_idx = Column(Integer)
     timestamp_utc = Column(DateTime)
+
+
+class BodhiWaves(Base):
+    __tablename__ = "bodhi_waves"
+    id = Column(BigInteger, primary_key=True)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    time = Column(DateTime(timezone=True))
+    step = Column(Interval)  # using an Interval to represent a timedelta
+    valid_time = Column(DateTime(timezone=True))
+    swh = Column(Float)  # Significant height of combined wind waves and swell
+    perpw = Column(Float)  # Primary wave mean period
+    dirpw = Column(Float)  # Primary wave direction
+    shww = Column(Float)  # Significant height of wind waves
+    mpww = Column(Float)  # Mean period of wind waves
+    wvdir = Column(Float)  # Direction of wind waves
+    ws = Column(Float)  # Wind speed
+    wdir = Column(Float)  # Wind direction
+    swell = Column(Float)  # Significant height of swell waves
+    swper = Column(Float)  # Mean period of swell waves
+    entry_updated = Column(DateTime(timezone=True), onupdate=func.now())
