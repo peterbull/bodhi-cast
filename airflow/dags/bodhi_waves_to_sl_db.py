@@ -10,6 +10,7 @@ from extensions.utils.sl_data import SpotsForecast, SpotsGetter
 from sqlalchemy import insert, select, text
 
 # db_uri = LOCAL_PG_URI
+
 # Have to declare it this way for now
 # the parser is giving an error on initial load
 # using environ directly seems to fix it
