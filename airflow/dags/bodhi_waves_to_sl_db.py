@@ -52,7 +52,7 @@ def taskflow():
             return data_dict
         except Exception as e:
             logging.error(f"Error fetching wave data: {str(e)}")
-            return []
+            raise
 
     def wave_data_to_db(data):
         try:
@@ -137,7 +137,7 @@ def taskflow():
                 return lat_lon_list
         except Exception as e:
             logging.error(f"Error getting spot offshore locations: {str(e)}")
-            return []
+            raise
 
     @task()
     def bodhi_waves_to_db(lat_lon_list):
