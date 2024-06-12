@@ -81,6 +81,10 @@ def taskflow():
             logging.error(f"Error processing batches: {str(e)}")
 
     @task()
+    def handle_create_tables():
+        create_tables()
+
+    @task()
     def handle_enable_extension():
         with get_session(engine) as db:
             stmt = text("""CREATE EXTENSION IF NOT EXISTS postgis""")
@@ -141,7 +145,7 @@ def taskflow():
         lat_lon_list = [tuple(pair) for pair in lat_lon_list]
         get_all_batches(lat_lon_list=lat_lon_list, bs=50)
 
-    handle_enable_extension() >> handle_db_idxs()
+    handle_create_tables() >> handle_enable_extension() >> handle_db_idxs()
     lat_lon_list = get_spot_offshore_locations()
     bodhi_waves_to_db(lat_lon_list)
 
