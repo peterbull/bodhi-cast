@@ -32,7 +32,7 @@ default_args = {
 @dag(
     dag_id="bodhi_waves_to_sl_db",
     start_date=start_date,
-    schedule="30 10 * * *",
+    schedule="0 10 * * *",
     catchup=False,
     is_paused_upon_creation=False,
 )
