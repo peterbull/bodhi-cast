@@ -46,7 +46,6 @@ def get_session(engine: Engine) -> Session:
 class BodhiWaves(Base):
     __tablename__ = "bodhi_waves"
     id = Column(BigInteger, primary_key=True)
-    location = Column(Geography("POINT", srid=4326))
     latitude = Column(Float)
     longitude = Column(Float)
     time = Column(DateTime(timezone=True))
@@ -76,7 +75,7 @@ class BodhiWaves(Base):
 # model_config = ConfigDict(from_attributes=True)
 
 
-class BohdiWavesModel(BaseModel):
+class BodhiWavesModel(BaseModel):
     id: int
     location: str
     latitude: float
