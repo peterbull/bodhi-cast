@@ -105,9 +105,9 @@ services:
     ports:
       - "80:80"
     command: bin/sh -c "sleep 110; nginx -g 'daemon off;'"
-    depends_on:
-      backend:
-        condition: service_healthy
+    # depends_on:
+    #   backend:
+    #     condition: service_healthy
 
   backend:
     build:

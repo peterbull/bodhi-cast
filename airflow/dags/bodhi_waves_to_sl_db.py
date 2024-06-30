@@ -35,7 +35,7 @@ default_args = {
     start_date=start_date,
     schedule="0 10 * * *",
     catchup=False,
-    is_paused_upon_creation=False,
+    is_paused_upon_creation=True,
 )
 def taskflow():
     def fetch_wave_data(lat_lon_str):

@@ -32,7 +32,7 @@ default_args = {
     start_date=start_date,
     schedule="30 9 * * *",
     catchup=False,
-    is_paused_upon_creation=False,
+    is_paused_upon_creation=True,
 )
 def taskflow():
     @task()

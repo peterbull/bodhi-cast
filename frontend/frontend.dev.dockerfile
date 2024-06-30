@@ -1,4 +1,4 @@
-FROM node:20-slim as build
+FROM node:20-slim AS build
 
 # Build the react app
 WORKDIR /usr/src/app
