@@ -1,7 +1,9 @@
 cfgrib==0.9.10.4
 confluent-kafka==2.3.0
 eccodes==1.6.1
-ecmwflibs==0.5.3
+# ecmwflibs==0.5.3
+# ecmwflibs
+# climetlab[ecmwflibs]
 GeoAlchemy2==0.14.3
 xarray==2023.1.0
 debugpy

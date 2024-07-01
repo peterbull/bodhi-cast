@@ -4,6 +4,7 @@ FROM apache/airflow:2.8.1
 USER root
 RUN apt-get update --fix-missing && apt-get install -y libpq-dev gcc g++ wget \
     libnetcdff-dev libopenjp2-7-dev gfortran make unzip git cmake \
+    libgdal-dev gdal-bin \  
     && mkdir /root/source_builds \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
