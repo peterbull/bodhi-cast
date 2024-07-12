@@ -169,52 +169,6 @@ Contributions are what make the open-source community such an amazing place to l
 
 Bodhi-Cast is under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details. This license allows for a permissive usage of the software, provided that the proper credit is given by retaining this license notice. For more details on the terms, please review the license directly.
 
-## To Do:
 
-## Long-Term:
 
-### Frontend:
 
-- [ ] Add user auth
-- [x] Add user spot creation pin drop
-- [ ] Add brief instructions on pages where needed
-- [x] Change marker system on globe component(removed)
-
-### Backend:
-
-- [x] Get tide forecast(realtime tide data)
-- [x] Get shore wind forecast(realtime wind data)
-- [x] Change data fetching utils to classes
-- [x] Add tests for all endpoints
-- [x] Add user spot creation endpoint
-
-### Airflow:
-
-### Week Ending 240121
-
-- [x] Add basic wave visualization component in three.js using `swh` data
-
-### Week Ending 240128
-
-- [x] Migrate data pipeline to airflow
-- [x] Downgrade to SQLAlchemy 1.4
-- [x] Merge Docker compose services with airflow
-- [x] Extend airflow image to correctly install ECCodes for use of cfgrib engine in data processing
-
-### Week Ending 240204
-
-- [x] Set up kafka for streams
-- [x] Configure DAGs for production
-- [x] Set up env for production
-- [x] Add auto tests for data verification as DAGs
-
-### Week Ending 240218
-
-- [ ] Add an autoclean for DAG logs
-- [x] Incoroporate realtime data from available weather stations
-  - [x] add stations to new table in postgres
-  - [x] create producer to push to kafka topic
-  - [x] create consumer to write latest to redis
-  - [x] add nearby realtime data to spot pages
-  - [x] add endpoint to find stations within the radius of a given spot
-  - [x] display nearby station data on frontend
