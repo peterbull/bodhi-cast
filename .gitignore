@@ -197,3 +197,5 @@ firebase.json
 firestore.indexes.json
 firestore.rules
 .firebaserc
+
+.DS_Store
