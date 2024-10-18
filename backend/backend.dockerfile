@@ -4,10 +4,11 @@ FROM python:3.10.12-slim
 
 # Install system dependencies required for psycopg2 and wget
 RUN apt-get update && apt-get install -y libpq-dev gcc wget curl coreutils gdal-bin libgdal-dev g++ && \
-    rm -rf /var/lib/apt/lists/*
+  rm -rf /var/lib/apt/lists/*
 
 # Install Miniconda
 ENV MINICONDA_VERSION=py310_24.1.2-0
+ARG MINICONDA_ARCH
 
 # Uncomment this for building on ARM
 ENV MINICONDA_ARCH=Linux-aarch64
@@ -18,9 +19,9 @@ ENV CONDA_DIR=/opt/conda
 ENV PATH=$CONDA_DIR/bin:$PATH
 
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-$MINICONDA_ARCH.sh \
-    && mkdir -p $CONDA_DIR \
-    && sh Miniconda3-$MINICONDA_VERSION-$MINICONDA_ARCH.sh -b -u -p $CONDA_DIR \
-    && rm -f Miniconda3-$MINICONDA_VERSION-$MINICONDA_ARCH.
+  && mkdir -p $CONDA_DIR \
+  && sh Miniconda3-$MINICONDA_VERSION-$MINICONDA_ARCH.sh -b -u -p $CONDA_DIR \
+  && rm -f Miniconda3-$MINICONDA_VERSION-$MINICONDA_ARCH.
 
 # Install cfgrib and eccodes using Conda, this is somewhat redudant,
 # but the only way the cfgrib library installs correctly for xarray that I've found
@@ -37,7 +38,7 @@ ENV PYTHONPATH /usr/src/app
 COPY pyproject.toml poetry.lock ./
 
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+  && poetry install --no-interaction --no-ansi
 
 COPY . .
 
