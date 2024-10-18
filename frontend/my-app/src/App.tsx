@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import ComponentWrapper from "./components/ComponentWrapper";
 import { ComponentMapProvider } from "./contexts/ComponentMapProvider";
 
-//
-//
 function App() {
   const [spots, setSpots] = useState([]);
   const [zoom, setZoom] = useState(13);
@@ -47,7 +45,7 @@ function App() {
             (now.getMonth() + 1).toString().padStart(2, "0") +
             now.getDate().toString().padStart(2, "0");
           const res = await fetch(
-            `${process.env.REACT_APP_BACKEND_URL}/forecasts/nearest/${date}/${currentSpot.latitude}/${currentSpot.longitude}`,
+            `${process.env.REACT_APP_BACKEND_URL}/forecasts/nearest/${date}/${currentSpot.latitude}/${currentSpot.longitude}`
           );
           const data = await res.json();
           setSpotForecast(data);
