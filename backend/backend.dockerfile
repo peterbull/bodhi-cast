@@ -3,24 +3,18 @@ FROM python:3.10.12-slim
 
 
 # Install system dependencies required for psycopg2 and wget
-RUN apt-get update && apt-get install -y libpq-dev gcc wget curl coreutils gdal-bin libgdal-dev g++ && \
+RUN apt-get update && apt-get install -y libpq-dev gcc wget curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Miniconda
 ENV MINICONDA_VERSION=py310_24.1.2-0
-
-# Uncomment this for building on ARM
-ENV MINICONDA_ARCH=Linux-aarch64
-
-# Typical x86 build env
-# ENV MINICONDA_ARCH=Linux-x86_64
 ENV CONDA_DIR=/opt/conda
 ENV PATH=$CONDA_DIR/bin:$PATH
 
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-$MINICONDA_ARCH.sh \
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh \
     && mkdir -p $CONDA_DIR \
-    && sh Miniconda3-$MINICONDA_VERSION-$MINICONDA_ARCH.sh -b -u -p $CONDA_DIR \
-    && rm -f Miniconda3-$MINICONDA_VERSION-$MINICONDA_ARCH.
+    && sh Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -b -u -p $CONDA_DIR \
+    && rm -f Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh
 
 # Install cfgrib and eccodes using Conda, this is somewhat redudant,
 # but the only way the cfgrib library installs correctly for xarray that I've found
