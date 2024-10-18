@@ -121,7 +121,7 @@ services:
       context: ./backend
       dockerfile: backend.dockerfile
       args:
-        MINICONDA_ARCH: x86_64
+        MINICONDA_ARCH: Linux-x86_64
     env_file:
       - .env.prod
 

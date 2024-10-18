@@ -10,9 +10,6 @@ RUN apt-get update && apt-get install -y libpq-dev gcc wget curl coreutils gdal-
 ENV MINICONDA_VERSION=py310_24.1.2-0
 ARG MINICONDA_ARCH
 
-# Uncomment this for building on ARM
-ENV MINICONDA_ARCH=Linux-aarch64
-
 # Typical x86 build env
 # ENV MINICONDA_ARCH=Linux-x86_64
 ENV CONDA_DIR=/opt/conda
