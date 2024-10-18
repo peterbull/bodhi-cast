@@ -113,6 +113,9 @@ services:
     build:
       context: ./backend
       dockerfile: backend.dockerfile
+      args:
+        MINICONDA_ARCH: Linux-aarch64
+        # MINICONDA_ARCH: Linux-x86_64 # Enable for local dev on non-ARM
     env_file:
       - .env
     command: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000"

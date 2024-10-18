@@ -120,8 +120,11 @@ services:
     build:
       context: ./backend
       dockerfile: backend.dockerfile
+      args:
+        MINICONDA_ARCH: Linux-x86_64
     env_file:
       - .env.prod
+
     command: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000"
     volumes:
       - ./backend:/usr/src/app
