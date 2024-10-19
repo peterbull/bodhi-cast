@@ -2,6 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
 import SearchBar from "./SearchBar";
+import { Spot } from "../App";
+
+export interface GlobeSpotsProps {
+  setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
+  currentSpot: Spot;
+  setCurrentSpot: React.Dispatch<React.SetStateAction<Spot | undefined>>;
+  spots: Spot[];
+  spotClick: [number, number];
+  setSpotClick: React.Dispatch<React.SetStateAction<[number, number]>>;
+}
 
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,
@@ -10,7 +20,7 @@ const GlobeSpots: React.FC<any> = ({
   spots,
   spotClick,
   setSpotClick,
-}) => {
+}: GlobeSpotsProps) => {
   const globeEl = useRef<any>();
   const [nearbySpots, setNearbySpots] = useState<any>([]);
   const [globeSize, setGlobeSize] = useState({ width: 700, height: 600 });
@@ -18,7 +28,7 @@ const GlobeSpots: React.FC<any> = ({
 
   // Filter items based on the search query
   const filteredSpots = nearbySpots.filter(
-    (spot: any) =>
+    (spot: Spot) =>
       spot.spot_name.toLowerCase().includes(query.toLowerCase()) ||
       spot.street_address.toLowerCase().includes(query.toLowerCase()),
   );
@@ -64,7 +74,7 @@ const GlobeSpots: React.FC<any> = ({
         const res = await fetch(
           `${process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000"}/spots`,
         );
-        const data = await res.json();
+        const data: Spot[] = await res.json();
         setNearbySpots(data);
       } catch (error) {
         console.error("Error fetching nearby spot data:", error);
@@ -92,6 +102,11 @@ const GlobeSpots: React.FC<any> = ({
     }, ms);
   };
 
+  const handleGlobeClick = ({ lat, lng }: { lat: number; lng: number }) => {
+    setSpotClick([lat, lng]);
+    console.log(`Clicked [${lat + "," + lng}]`);
+  };
+
   return spots.length > 0 ? (
     <>
       <div className="flex flex-col bg-gray-900 pb-28">
@@ -108,22 +123,7 @@ const GlobeSpots: React.FC<any> = ({
               height={globeSize.height}
               globeImageUrl={globeImageUrl}
               backgroundColor="rgb(17 24 39)"
-              //       labelsData={spots}
-              //       labelLat="latitude"
-              //       labelLng="longitude"
-              //       labelText="spot_name"
-              //       labelSize={0.0}
-              //       labelDotRadius={0.4}
-              //       labelColor={() => "rgba(164, 255, 61, 0.5)"}
-              //       labelLabel={(spot: any) =>
-              //         `<div>
-              //   <b>${spot.spot_name}</b>
-              // </div>`
-              // }
-              onGlobeClick={({ lat, lng }: any) => {
-                console.log(`Clicked at latitude: ${lat}, longitude: ${lng}`);
-                setSpotClick([lat, lng]);
-              }}
+              onGlobeClick={handleGlobeClick}
               onLabelClick={(label: any) => {
                 globeEl.current.pointOfView(
                   {

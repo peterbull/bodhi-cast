@@ -31,6 +31,9 @@ export type SpotForecast = {
   ws: number | null;
   wvdir: number | null;
 };
+
+export type Coordinates = {};
+
 function getFormattedDate(): FormattedDate {
   /**
    * Returns the date as a string formatted YYYYMMDD
@@ -44,9 +47,9 @@ function getFormattedDate(): FormattedDate {
 function App() {
   const [spots, setSpots] = useState<Spot[]>([]);
   const [zoom, setZoom] = useState<number>(13);
-  const [currentSpot, setCurrentSpot] = useState<Spot | null>(null);
+  const [currentSpot, setCurrentSpot] = useState<Spot | undefined>(undefined);
   const [spotForecast, setSpotForecast] = useState<SpotForecast[]>([]);
-  const [spotClick, setSpotClick] = useState<any>([0, 0]);
+  const [spotClick, setSpotClick] = useState<[number, number]>([0, 0]);
 
   useEffect(() => {
     /**
