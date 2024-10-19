@@ -71,14 +71,14 @@ const AddSpot: React.FC<any> = ({
     };
 
     const response = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/addspot`,
+      `${process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000"}/addspot`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      }
+      },
     );
 
     if (response.ok) {

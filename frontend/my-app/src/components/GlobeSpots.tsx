@@ -20,7 +20,7 @@ const GlobeSpots: React.FC<any> = ({
   const filteredSpots = nearbySpots.filter(
     (spot: any) =>
       spot.spot_name.toLowerCase().includes(query.toLowerCase()) ||
-      spot.street_address.toLowerCase().includes(query.toLowerCase())
+      spot.street_address.toLowerCase().includes(query.toLowerCase()),
   );
 
   // Workaround to somewhat dynamically flex the globe canvas
@@ -61,7 +61,9 @@ const GlobeSpots: React.FC<any> = ({
   useEffect(() => {
     const fetchNearbySpots = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/spots`);
+        const res = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000"}/spots`,
+        );
         const data = await res.json();
         setNearbySpots(data);
       } catch (error) {
@@ -82,7 +84,7 @@ const GlobeSpots: React.FC<any> = ({
         lng: data.longitude,
         altitude: altitude,
       },
-      ms
+      ms,
     );
     setCurrentSpot(data);
     setTimeout(() => {
@@ -129,7 +131,7 @@ const GlobeSpots: React.FC<any> = ({
                     lng: label.longitude,
                     altitude: 0.1,
                   },
-                  2500
+                  2500,
                 );
                 setCurrentSpot(spots.find((spot: any) => spot.id === label.id));
                 setTimeout(() => {
@@ -155,7 +157,7 @@ const GlobeSpots: React.FC<any> = ({
                     lng: spotClick[1],
                     altitude: 0.2,
                   },
-                  2500
+                  2500,
                 );
                 setTimeout(() => {
                   setCurrentComponent("AddSpot");

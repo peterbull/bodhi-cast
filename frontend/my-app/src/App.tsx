@@ -4,22 +4,60 @@ import { useEffect, useState } from "react";
 import ComponentWrapper from "./components/ComponentWrapper";
 import { ComponentMapProvider } from "./contexts/ComponentMapProvider";
 
+export type FormattedDate = string & { readonly brand: unique symbol };
+
+export type Spot = {
+  id: number;
+  latitude: number;
+  longitude: number;
+  spot_name: string;
+  street_address: string;
+};
+
+export type SpotForecast = {
+  dirpw: number | null;
+  distance: number;
+  id: number;
+  location: string;
+  mpww: number | null;
+  perpw: number | null;
+  shww: number | null;
+  swell: number | null;
+  swh: number | null;
+  swper: number | null;
+  time: string;
+  valid_time: string;
+  wdir: number | null;
+  ws: number | null;
+  wvdir: number | null;
+};
+function getFormattedDate(): FormattedDate {
+  /**
+   * Returns the date as a string formatted YYYYMMDD
+   */
+  const now: Date = new Date();
+
+  return (now.getFullYear().toString() +
+    (now.getMonth() + 1).toString().padStart(2, "0") +
+    now.getDate().toString().padStart(2, "0")) as FormattedDate;
+}
 function App() {
-  const [spots, setSpots] = useState([]);
-  const [zoom, setZoom] = useState(13);
-  const [currentSpot, setCurrentSpot] = useState<any>(null);
-  const [spotForecast, setSpotForecast] = useState<any>([]);
+  const [spots, setSpots] = useState<Spot[]>([]);
+  const [zoom, setZoom] = useState<number>(13);
+  const [currentSpot, setCurrentSpot] = useState<Spot | null>(null);
+  const [spotForecast, setSpotForecast] = useState<SpotForecast[]>([]);
   const [spotClick, setSpotClick] = useState<any>([0, 0]);
 
   useEffect(() => {
     /**
      * Fetches all spots from the backend API and updates the state with the retrieved data.
-     * @returns {Promise<void>} A promise that resolves when the spots are fetched and the state is updated.
      */
-    const fetchAllSpots = async () => {
+    const fetchAllSpots = async (): Promise<void> => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/spots`);
-        const data = await res.json();
+        const res = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000"}/spots`,
+        );
+        const data: Spot[] = await res.json();
         setSpots(data);
       } catch (error) {
         console.error("Error fetching spot data:", error);
@@ -35,19 +73,14 @@ function App() {
       /**
        * Fetches the spot forecast from the backend API based on the current spot's latitude and longitude.
        * The forecast is fetched for the current date.
-       * @returns {Promise<void>} A promise that resolves when the spot forecast is fetched and set in the state.
        */
-      const fetchSpotForecast = async () => {
+      const fetchSpotForecast = async (): Promise<void> => {
         try {
-          const now = new Date();
-          const date =
-            now.getFullYear().toString() +
-            (now.getMonth() + 1).toString().padStart(2, "0") +
-            now.getDate().toString().padStart(2, "0");
+          const date = getFormattedDate();
           const res = await fetch(
-            `${process.env.REACT_APP_BACKEND_URL}/forecasts/nearest/${date}/${currentSpot.latitude}/${currentSpot.longitude}`
+            `${process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000"}/forecasts/nearest/${date}/${currentSpot.latitude}/${currentSpot.longitude}`,
           );
-          const data = await res.json();
+          const data: SpotForecast[] = await res.json();
           setSpotForecast(data);
         } catch (error) {
           console.error(error);

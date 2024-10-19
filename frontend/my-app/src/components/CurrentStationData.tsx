@@ -59,7 +59,7 @@ const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
       const lat = spotCoords[0];
       const lng = spotCoords[1];
       const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/current/spots/${range}/${lat}/${lng}`
+        `${process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000"}/current/spots/${range}/${lat}/${lng}`,
       );
       const data = await res.json();
 
@@ -157,7 +157,7 @@ const CurrentStationData: React.FC<any> = ({ currentSpot, spotCoords }) => {
                   </td>
                   <td className="py-2 px-2 cursor-pointer">
                     {celciusToFarenheit(
-                      station.data.water_temperature?.[0]?.v
+                      station.data.water_temperature?.[0]?.v,
                     ) || "-"}{" "}
                     f
                   </td>
