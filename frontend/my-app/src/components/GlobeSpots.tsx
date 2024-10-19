@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Globe from "react-globe.gl";
+import Globe, { GlobeMethods } from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
 import SearchBar from "./SearchBar";
 import { Spot } from "../App";
@@ -13,6 +13,11 @@ export interface GlobeSpotsProps {
   setSpotClick: React.Dispatch<React.SetStateAction<[number, number]>>;
 }
 
+export type GlobeSize = {
+  width: number;
+  height: number;
+};
+
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,
   currentSpot,
@@ -21,37 +26,40 @@ const GlobeSpots: React.FC<any> = ({
   spotClick,
   setSpotClick,
 }: GlobeSpotsProps) => {
-  const globeEl = useRef<any>();
-  const [nearbySpots, setNearbySpots] = useState<any>([]);
-  const [globeSize, setGlobeSize] = useState({ width: 700, height: 600 });
-  const [query, setQuery] = useState("");
+  const globeEl = useRef<GlobeMethods>();
+  const [nearbySpots, setNearbySpots] = useState<Spot[]>([]);
+  const [globeSize, setGlobeSize] = useState<GlobeSize>({
+    width: 700,
+    height: 600,
+  });
+  const [query, setQuery] = useState<string>("");
 
   // Filter items based on the search query
   const filteredSpots = nearbySpots.filter(
-    (spot: Spot) =>
+    (spot) =>
       spot.spot_name.toLowerCase().includes(query.toLowerCase()) ||
       spot.street_address.toLowerCase().includes(query.toLowerCase()),
   );
-
-  // Workaround to somewhat dynamically flex the globe canvas
-  useEffect(() => {
-    const updateGlobeSize = () => {
-      if (globeEl.current && globeEl.current.parentElement) {
-        const { width, height } =
-          globeEl.current.parentElement.getBoundingClientRect();
-        setGlobeSize({ width, height });
-      }
-    };
-
-    // Call updateGlobeSize on mount and add a resize listener
-    updateGlobeSize();
-    window.addEventListener("resize", updateGlobeSize);
-
-    // Clean up the resize listener on component unmount
-    return () => {
-      window.removeEventListener("resize", updateGlobeSize);
-    };
-  }, []);
+  //
+  // // Workaround to somewhat dynamically flex the globe canvas
+  // useEffect(() => {
+  //   const updateGlobeSize = () => {
+  //     if (globeEl.current && globeEl.current.parentElement) {
+  //       const { width, height } =
+  //         globeEl.current.parentElement.getBoundingClientRect();
+  //       setGlobeSize({ width, height });
+  //     }
+  //   };
+  //
+  //   // Call updateGlobeSize on mount and add a resize listener
+  //   updateGlobeSize();
+  //   window.addEventListener("resize", updateGlobeSize);
+  //
+  //   // Clean up the resize listener on component unmount
+  //   return () => {
+  //     window.removeEventListener("resize", updateGlobeSize);
+  //   };
+  // }, []);
 
   // Defining initial perspective and controls for globe component
   useEffect(() => {
@@ -88,23 +96,46 @@ const GlobeSpots: React.FC<any> = ({
 
   // Zoom in animation and component swap on spot selection
   const globeZoom = (data: any, altitude: any, ms: any) => {
-    globeEl.current.pointOfView(
-      {
-        lat: data.latitude,
-        lng: data.longitude,
-        altitude: altitude,
-      },
-      ms,
-    );
-    setCurrentSpot(data);
-    setTimeout(() => {
-      setCurrentComponent("SwellMap");
-    }, ms);
+    if (globeEl.current) {
+      globeEl.current.pointOfView(
+        {
+          lat: data.latitude,
+          lng: data.longitude,
+          altitude: altitude,
+        },
+        ms,
+      );
+      setCurrentSpot(data);
+      setTimeout(() => {
+        setCurrentComponent("SwellMap");
+      }, ms);
+    }
   };
 
   const handleGlobeClick = ({ lat, lng }: { lat: number; lng: number }) => {
     setSpotClick([lat, lng]);
     console.log(`Clicked [${lat + "," + lng}]`);
+  };
+
+  const handleGlobeZoom = (spot: Spot) => {
+    globeZoom(spot, 0.2, 2500);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleClickAddSpot = () => {
+    if (globeEl.current) {
+      globeEl.current.pointOfView(
+        {
+          lat: spotClick[0],
+          lng: spotClick[1],
+          altitude: 0.2,
+        },
+        2500,
+      );
+      setTimeout(() => {
+        setCurrentComponent("AddSpot");
+      }, 2500);
+    }
   };
 
   return spots.length > 0 ? (
@@ -124,20 +155,6 @@ const GlobeSpots: React.FC<any> = ({
               globeImageUrl={globeImageUrl}
               backgroundColor="rgb(17 24 39)"
               onGlobeClick={handleGlobeClick}
-              onLabelClick={(label: any) => {
-                globeEl.current.pointOfView(
-                  {
-                    lat: label.latitude,
-                    lng: label.longitude,
-                    altitude: 0.1,
-                  },
-                  2500,
-                );
-                setCurrentSpot(spots.find((spot: any) => spot.id === label.id));
-                setTimeout(() => {
-                  setCurrentComponent("SwellMap");
-                }, 2500);
-              }}
             />
           </div>
         </div>
@@ -150,19 +167,7 @@ const GlobeSpots: React.FC<any> = ({
           <div className="text-[#03e9f4] font-thin flex-auto text-center">
             <button
               className="border-2 border-[#03e9f4] rounded px-6 py-2"
-              onClick={() => {
-                globeEl.current.pointOfView(
-                  {
-                    lat: spotClick[0],
-                    lng: spotClick[1],
-                    altitude: 0.2,
-                  },
-                  2500,
-                );
-                setTimeout(() => {
-                  setCurrentComponent("AddSpot");
-                }, 2500);
-              }}
+              onClick={handleClickAddSpot}
             >
               ADD A SPOT
             </button>
@@ -186,15 +191,11 @@ const GlobeSpots: React.FC<any> = ({
                 </tr>
               </thead>
               <tbody>
-                {filteredSpots.map((spot: any) => (
+                {filteredSpots.map((spot) => (
                   <tr
                     className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
                     key={spot.id}
-                    onClick={() => {
-                      globeZoom(spot, 0.2, 2500);
-                      // Scroll to back to globe component on selecting a spot
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
+                    onClick={() => handleGlobeZoom(spot)}
                   >
                     <td className="py-2 px-2 cursor-pointer">
                       {spot.spot_name}
