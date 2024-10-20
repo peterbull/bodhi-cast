@@ -13,12 +13,12 @@ import { Icon } from "leaflet";
 import { StationDataContext } from "../contexts/StationDataProvider";
 
 const LeafletMap: React.FC<any> = ({
-  zoom,
   currentComponent,
   currentSpot,
   setCurrentComponent,
   spotCoords,
 }) => {
+  const zoom = 13;
   const { stationData } = useContext(StationDataContext);
   const MapEvents: React.FC<any> = (): any => {
     const map = useMap();
