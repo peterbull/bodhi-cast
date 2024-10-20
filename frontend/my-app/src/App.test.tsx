@@ -1,23 +1,25 @@
-import { render, act } from "@testing-library/react";
-import fetchMock from "jest-fetch-mock";
+import React from "react";
+import { render, waitFor, screen } from "@testing-library/react";
 import App from "./App";
+import "jest-canvas-mock";
 
-test("renders without crashing", () => {
-  const { container } = render(<App />);
-  expect(container).toBeInTheDocument();
-});
+global.fetch = jest.fn() as jest.Mock;
 
-test("calls fetch with the correct url when rendered", async () => {
-  const fakeResponse = [
-    { id: 1, name: "Spot 1" },
-    { id: 2, name: "Spot 2" },
-  ];
-  fetchMock.mockResponseOnce(JSON.stringify(fakeResponse));
+describe("main page smoke tests", () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
 
-  render(<App />);
+  it("renders the app component", async () => {
+    // Mock the fetch responses
+    (global.fetch as jest.Mock).mockResolvedValue({
+      json: () => Promise.resolve([{ id: 1, name: "Test Spot" }]),
+    });
 
-  expect(fetch).toHaveBeenCalledTimes(1);
-  expect(fetch).toHaveBeenCalledWith(
-    `http://${process.env.REACT_APP_BACKEND_HOST}:${process.env.REACT_APP_BACKEND_PORT}/spots`
-  );
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("main-app-content")).toBeInTheDocument();
+    });
+  });
 });

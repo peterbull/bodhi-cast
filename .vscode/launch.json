@@ -1,102 +1,99 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FastAPI",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--reload"],
+      "cwd": "${workspaceFolder}/backend",
+      "jinja": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Launch Chrome against localhost client",
+      "request": "launch",
+      "type": "pwa-chrome",
+      "url": "http://localhost:3000/",
+      "webRoot": "${workspaceFolder}/frontend/my-app",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
+        "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
+        "${workspaceFolder}/frontend/my-app/node_modules/**/*.mjs",
+        "**/build/*"
+      ]
+    },
+    {
+      "name": "Backend Current .py File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/backend",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/backend:${env:PYTHONPATH}"
+      }
+    },
+    {
+      "name": "Docker: Attach to FastAPI",
+      "type": "python",
+      "request": "attach",
+      "port": 5678,
+      "host": "localhost",
+      "pathMappings": [
         {
-            "name": "FastAPI",
-            "type": "python",
-            "request": "launch",
-            "module": "uvicorn",
-            "args": [
-                "app.main:app", // Replace 'main:app' with '<your_file>:<your_app_instance>' if different
-                "--reload"
-            ],
-            "cwd": "${workspaceFolder}/backend",
-            "jinja": false,
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Launch Chrome against localhost client",
-            "request": "launch",
-            // "preLaunchTask": "npm: start",
-            "type": "pwa-chrome",
-            "url": "http://localhost:3000/",
-            "webRoot": "${workspaceFolder}/frontend/my-app",
-            "sourceMaps": true,
-            "skipFiles": [
-                "<node_internals>/**/*.js",
-                "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
-                "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
-                "${workspaceFolder}/frontend/my-app/node_modules/**/*.mjs",
-                "**/build/*"
-            ]
-        },
-        {
-            "name": "Backend Current .py File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/backend",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/backend:${env:PYTHONPATH}"
-            }
-        },
-        {
-            "name": "Docker: Attach to FastAPI",
-            "type": "python",
-            "request": "attach",
-            "port": 5678,
-            "host": "localhost",
-            "pathMappings": [
-                {
-                    "localRoot": "${workspaceFolder}/backend/app",
-                    "remoteRoot": "/usr/src/app/app"
-                }
-            ]
-        },
-        {
-            "name": "Docker: Attach to Celery",
-            "type": "python",
-            "request": "attach",
-            "port": 5679,
-            "host": "localhost",
-            "pathMappings": [
-                {
-                    "localRoot": "${workspaceFolder}/backend/app",
-                    "remoteRoot": "/usr/src/app/app"
-                }
-            ]
-        },
-        {
-            "name": "Docker: Launch Chrome against Localhost",
-            "type": "pwa-chrome",
-            "request": "attach",
-            "address": "localhost",
-            "port": 9229,
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}/frontend/my-app",
-            "sourceMaps": true,
-            "skipFiles": [
-                "<node_internals>/**/*.js",
-                "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
-                "${workspaceFolder}/frontend/my-app/node_modules/**/*.mjs",
-                "**/build/*"
-            ]
-        },
-        {
-            "name": "Docker: Airflow Worker",
-            "type": "debugpy",
-            "request": "attach",
-            "connect": {
-                "port": 5679,
-                "host": "localhost",
-            },
-            "pathMappings": [
-                {
-                    "localRoot": "${workspaceFolder}/airflow",
-                    "remoteRoot": "/opt/airflow"
-                }
-            ]
+          "localRoot": "${workspaceFolder}/backend/app",
+          "remoteRoot": "/usr/src/app/app"
         }
-    ]
+      ]
+    },
+    {
+      "name": "Docker: Attach to Celery",
+      "type": "python",
+      "request": "attach",
+      "port": 5679,
+      "host": "localhost",
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/backend/app",
+          "remoteRoot": "/usr/src/app/app"
+        }
+      ]
+    },
+    {
+      "name": "Docker: Launch Chrome against Localhost",
+      "type": "pwa-chrome",
+      "request": "attach",
+      "address": "localhost",
+      "port": 9229,
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/frontend/my-app",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
+        "${workspaceFolder}/frontend/my-app/node_modules/**/*.mjs",
+        "**/build/*"
+      ]
+    },
+    {
+      "name": "Docker: Airflow Worker",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "port": 5679,
+        "host": "localhost"
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/airflow",
+          "remoteRoot": "/opt/airflow"
+        }
+      ]
+    }
+  ]
 }
+

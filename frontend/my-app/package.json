@@ -19,13 +19,14 @@
     "date-fns": "^3.0.6",
     "dotenv": "^16.3.2",
     "firebase": "^10.7.1",
-    "jest-fetch-mock": "^3.0.3",
+    "jest-canvas-mock": "^2.5.2",
     "leaflet": "^1.9.4",
     "mapbox-gl": "^3.0.1",
     "maplibre-gl": "^3.6.2",
     "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-globe.gl": "^2.27.1",
     "react-leaflet": "^4.2.1",
     "react-map-gl": "^7.1.7",
     "react-scripts": "5.0.1",
@@ -61,15 +62,22 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.25.8",
+    "@babel/preset-react": "^7.25.7",
     "@types/d3": "^7.4.3",
     "@types/dat.gui": "^0.7.12",
     "@types/node": "^20.10.5",
     "@types/three": "^0.159.0",
-    "react-globe.gl": "^2.27.1",
+    "babel-jest": "^29.7.0",
+    "canvas": "^2.11.2",
+    "jest": "^27.5.1",
+    "jest-fetch-mock": "^3.0.3",
+    "react-test-renderer": "^18.3.1",
     "tailwindcss": "^3.4.0"
   },
   "jest": {
     "transformIgnorePatterns": [
+      "node_modules/(?!(three)/)",
       "!node_modules/"
     ]
   }
