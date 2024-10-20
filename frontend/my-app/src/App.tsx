@@ -1,38 +1,9 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-
+import { useSpotsContext } from "./hooks/useSpot";
 import ComponentWrapper from "./components/ComponentWrapper";
 import { ComponentMapProvider } from "./contexts/ComponentMapProvider";
-
-export type FormattedDate = string & { readonly brand: unique symbol };
-
-export type Spot = {
-  id: number;
-  latitude: number;
-  longitude: number;
-  spot_name: string;
-  street_address: string;
-};
-
-export type SpotForecast = {
-  dirpw: number | null;
-  distance: number;
-  id: number;
-  location: string;
-  mpww: number | null;
-  perpw: number | null;
-  shww: number | null;
-  swell: number | null;
-  swh: number | null;
-  swper: number | null;
-  time: string;
-  valid_time: string;
-  wdir: number | null;
-  ws: number | null;
-  wvdir: number | null;
-};
-
-export type Coordinates = {};
+import { FormattedDate, Spot, SpotForecast } from "./types/types";
 
 function getFormattedDate(): FormattedDate {
   /**
@@ -45,30 +16,11 @@ function getFormattedDate(): FormattedDate {
     now.getDate().toString().padStart(2, "0")) as FormattedDate;
 }
 function App() {
-  const [spots, setSpots] = useState<Spot[]>([]);
   const [zoom, setZoom] = useState<number>(13);
   const [currentSpot, setCurrentSpot] = useState<Spot | undefined>(undefined);
   const [spotForecast, setSpotForecast] = useState<SpotForecast[]>([]);
   const [spotClick, setSpotClick] = useState<[number, number]>([0, 0]);
-
-  useEffect(() => {
-    /**
-     * Fetches all spots from the backend API and updates the state with the retrieved data.
-     */
-    const fetchAllSpots = async (): Promise<void> => {
-      try {
-        const res = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000"}/spots`,
-        );
-        const data: Spot[] = await res.json();
-        setSpots(data);
-      } catch (error) {
-        console.error("Error fetching spot data:", error);
-      }
-    };
-
-    fetchAllSpots();
-  }, []);
+  const { spots } = useSpotsContext();
 
   useEffect(() => {
     if (currentSpot) {

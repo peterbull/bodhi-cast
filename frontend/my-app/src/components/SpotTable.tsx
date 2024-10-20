@@ -1,9 +1,10 @@
-import { Spot } from "../App";
+import { Spot } from "../types/types";
 
 interface SpotTableProps {
   filteredSpots: Spot[];
   handleGlobeZoom: (spot: Spot) => void;
 }
+
 export function SpotTable({ filteredSpots, handleGlobeZoom }: SpotTableProps) {
   return (
     <table className="mx-auto text-center divide-y divide-gray-500 min-h-96">

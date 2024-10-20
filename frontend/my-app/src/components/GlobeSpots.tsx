@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import Globe, { GlobeMethods } from "react-globe.gl";
 import globeImageUrl from "../img/earth-blue-marble.jpg";
 import SearchBar from "./SearchBar";
-import { Spot } from "../App";
+import { SpotTable } from "./SpotTable";
+import { Spot } from "../types/types";
+import { GlobeSize } from "../types/types";
 
 export interface GlobeSpotsProps {
   setCurrentComponent: React.Dispatch<React.SetStateAction<string>>;
@@ -12,11 +14,6 @@ export interface GlobeSpotsProps {
   spotClick: [number, number];
   setSpotClick: React.Dispatch<React.SetStateAction<[number, number]>>;
 }
-
-export type GlobeSize = {
-  width: number;
-  height: number;
-};
 
 const GlobeSpots: React.FC<any> = ({
   setCurrentComponent,
@@ -40,26 +37,6 @@ const GlobeSpots: React.FC<any> = ({
       spot.spot_name.toLowerCase().includes(query.toLowerCase()) ||
       spot.street_address.toLowerCase().includes(query.toLowerCase()),
   );
-  //
-  // // Workaround to somewhat dynamically flex the globe canvas
-  // useEffect(() => {
-  //   const updateGlobeSize = () => {
-  //     if (globeEl.current && globeEl.current.parentElement) {
-  //       const { width, height } =
-  //         globeEl.current.parentElement.getBoundingClientRect();
-  //       setGlobeSize({ width, height });
-  //     }
-  //   };
-  //
-  //   // Call updateGlobeSize on mount and add a resize listener
-  //   updateGlobeSize();
-  //   window.addEventListener("resize", updateGlobeSize);
-  //
-  //   // Clean up the resize listener on component unmount
-  //   return () => {
-  //     window.removeEventListener("resize", updateGlobeSize);
-  //   };
-  // }, []);
 
   // Defining initial perspective and controls for globe component
   useEffect(() => {
@@ -148,21 +125,17 @@ const GlobeSpots: React.FC<any> = ({
           Riding the Data Wave to Your Next Break
         </h3>
         <div className="bg-gray-900 overflow-x-hidden">
-          <div>
-            <Globe
-              ref={globeEl}
-              height={globeSize.height}
-              globeImageUrl={globeImageUrl}
-              backgroundColor="rgb(17 24 39)"
-              onGlobeClick={handleGlobeClick}
-            />
-          </div>
+          <Globe
+            ref={globeEl}
+            height={globeSize.height}
+            globeImageUrl={globeImageUrl}
+            backgroundColor="rgb(17 24 39)"
+            onGlobeClick={handleGlobeClick}
+          />
         </div>
-        <div>
-          <p className="text-[#03e9f4] font-thin text-center">
-            CLICK A LOCATION TO SEE NEARBY SPOTS
-          </p>
-        </div>
+        <p className="text-[#03e9f4] font-thin text-center">
+          CLICK A LOCATION TO SEE NEARBY SPOTS
+        </p>
         <div className="flex pt-8">
           <div className="text-[#03e9f4] font-thin flex-auto text-center">
             <button
@@ -173,46 +146,16 @@ const GlobeSpots: React.FC<any> = ({
             </button>
             <p className="pt-4">
               Current Selection:{" "}
-              {spotClick.length > 0
-                ? `${spotClick[0].toFixed(2)},${" "}
-              ${spotClick[1].toFixed(2)}`
-                : `None`}
+              {`${spotClick[0].toFixed(2)},${" "}
+              ${spotClick[1].toFixed(2)}`}
             </p>
             <h1 className="text-2xl text-center pt-4">NEARBY SPOTS</h1>
 
             <SearchBar query={query} setQuery={setQuery} />
-            <table className="mx-auto text-center divide-y divide-gray-500 min-h-96">
-              <thead>
-                <tr className="w-1/12 px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  <th colSpan={1}>NAME</th>
-                  <th colSpan={1}>LOCATION</th>
-                  <th colSpan={1}>LAT</th>
-                  <th colSpan={1}>LON</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredSpots.map((spot) => (
-                  <tr
-                    className="hover:text-[#95f2f7] text-[#03e9f4] hover:font-normal justify-left text-center text-s font-thin border-0 bg-gray-900 divide-gray-200"
-                    key={spot.id}
-                    onClick={() => handleGlobeZoom(spot)}
-                  >
-                    <td className="py-2 px-2 cursor-pointer">
-                      {spot.spot_name}
-                    </td>
-                    <td className="py-2 px-2 cursor-pointer">
-                      {spot.street_address}
-                    </td>
-                    <td className="py-2 px-2 cursor-pointer">
-                      {spot.latitude.toFixed(2)}
-                    </td>
-                    <td className="py-2 px-2 cursor-pointer">
-                      {spot.longitude.toFixed(2)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <SpotTable
+              filteredSpots={filteredSpots}
+              handleGlobeZoom={handleGlobeZoom}
+            />
           </div>
         </div>
       </div>
