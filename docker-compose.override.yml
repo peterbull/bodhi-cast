@@ -19,10 +19,11 @@ services:
     ports:
       - "5678:5678"
 
+  x-airflow-common: &airflow-common
+    build:
+      context: .
+      dockerfile: ${AIRFLOW_PROJ_DIR:-.}/airflow.arm.extension.dockerfile
   airflow-worker:
-    # command: >
-    #   bash -c "python -m debugpy --listen 0.0.0.0:5679 --wait-for-client -m celery
-    #   -A airflow.executors.celery_executor:app worker"
     command: >
       bash -c "python -m debugpy --listen 0.0.0.0:5679 -m celery
       -A airflow.executors.celery_executor:app worker"

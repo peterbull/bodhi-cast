@@ -2,6 +2,12 @@ FROM apache/airflow:2.8.1
 
 # Install additional dependencies for ECCODES
 USER root
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg
+RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/keyrings/postgresql.gpg
+RUN curl -fsSL https://mariadb.org/mariadb_release_signing_key.asc | gpg --dearmor -o /etc/apt/keyrings/mariadb.gpg
+
+
 RUN apt-get update --fix-missing && apt-get install -y libpq-dev gcc g++ wget \
   libnetcdff-dev libopenjp2-7-dev gfortran make unzip git cmake \
   libgdal-dev gdal-bin \
