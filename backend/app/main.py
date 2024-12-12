@@ -15,10 +15,11 @@ create_tables()
 db = get_db()
 app = FastAPI()
 
-allowed_origins = os.getenv("ALLOWED_ORIGINS").split(",")
+# allowed_origins = os.getenv("ALLOWED_ORIGINS").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    # allow_origins=allowed_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],  # Allows all headers
@@ -120,7 +121,9 @@ def read_root():
 
 
 @app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}")
-def get_forecast_by_lat_lng(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
+def get_forecast_by_lat_lng(
+    date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)
+):
     """
     Retrieve wave forecasts for a specific spot based on date and coordinates.
 
@@ -189,13 +192,21 @@ def get_forecast_by_lat_lng(date: str, spot_lat: str, spot_lng: str, db: Session
         )
 
         result = db.execute(
-            sql, {"date": date, "next_day": next_day, "spot_lat": spot_lat, "spot_lng": spot_lng}
+            sql,
+            {
+                "date": date,
+                "next_day": next_day,
+                "spot_lat": spot_lat,
+                "spot_lng": spot_lng,
+            },
         )
 
         rows = result.all()
         forecasts = [row._asdict() for row in rows]
 
-        redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=timedelta(hours=1))
+        redis_client.set(
+            key, json.dumps(forecasts, cls=DateTimeEncoder), ex=timedelta(hours=1)
+        )
 
         return forecasts
 
@@ -269,7 +280,9 @@ def create_spot(spot: SpotCreate, db: Session = Depends(get_db)):
 
 # Get nearby station data
 @app.get("/current/spots/{range}/{lat}/{lng}")
-def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depends(get_db)):
+def get_nearby_station_data(
+    range: str, lat: str, lng: str, db: Session = Depends(get_db)
+):
     """
     Retrieve nearby weather station data within a specified range. The station data is populated to redis in near realtime via consumption from a kafka topic
 
@@ -323,7 +336,9 @@ def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depend
 
 
 @app.get("/forecasts/nearest/{date}/{spot_lat}/{spot_lng}")
-def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
+def get_forecasts_by_spot(
+    date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)
+):
     date = datetime.strptime(date, "%Y%m%d").date()
     next_day = date + timedelta(days=1)
     spot_lat = float(spot_lat)

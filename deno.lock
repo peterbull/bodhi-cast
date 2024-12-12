@@ -1,0 +1,39 @@
+{
+  "version": "4",
+  "specifiers": {
+    "npm:noaa-gfs-js@^1.1.0": "1.1.0",
+    "npm:vgrib2@~0.1.13": "0.1.13"
+  },
+  "npm": {
+    "base64-js@1.5.1": {
+      "integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+    },
+    "buffer@6.0.3": {
+      "integrity": "sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==",
+      "dependencies": [
+        "base64-js",
+        "ieee754"
+      ]
+    },
+    "ieee754@1.2.1": {
+      "integrity": "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+    },
+    "noaa-gfs-js@1.1.0": {
+      "integrity": "sha512-WEsSprEos9mRjp4eX4yu1U94JFi/8NVsvhBF/JvCJMBJ76B6covjKoaQ0VltBlqKLjhShx7EjsLowGt3E6G0cQ=="
+    },
+    "vgrib2@0.1.13": {
+      "integrity": "sha512-XlZOkpACNxRV/lInTNpv/0fE4owRmqj8WfIvYMhDTD4ES2NkBjHkqBT/CENAX5iA9+QGkGsQhZKdgpLW29Ob0w==",
+      "dependencies": [
+        "base64-js",
+        "buffer",
+        "ieee754"
+      ]
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:noaa-gfs-js@^1.1.0",
+      "npm:vgrib2@~0.1.13"
+    ]
+  }
+}

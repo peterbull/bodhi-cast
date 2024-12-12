@@ -51,7 +51,7 @@ x-airflow-common: &airflow-common
   # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.8.1}
   build:
     context: .
-    dockerfile: ${AIRFLOW_PROJ_DIR:-.}/airflow.extension.dockerfile
+    dockerfile: ${AIRFLOW_PROJ_DIR:-.}/airflow.arm.extension.dockerfile
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+${POSTGRES_DB_DRIVER}://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_SERVER}/${POSTGRES_DB}
@@ -137,7 +137,9 @@ services:
         condition: service_healthy
 
   postgres:
-    image: postgis/postgis:16-master
+    build:
+      context: ./db
+      dockerfile: Dockerfile
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -147,7 +149,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
       retries: 5
       start_period: 5s
