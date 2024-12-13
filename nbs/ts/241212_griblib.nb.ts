@@ -21,7 +21,7 @@ await Deno.mkdir("./data", { recursive: true });
 
 //#nbts@code
 const response = await fetch(
-  `https://nomads.ncep.noaa.gov/pub/data/nccf/com/gens/prod/gefs.20241212/00/wave/gridded/gefs.wave.t00z.mean.global.0p25.f045.grib2`
+  `https://nomads.ncep.noaa.gov/pub/data/nccf/com/gens/prod/gefs.${formattedDate}/00/wave/gridded/gefs.wave.t00z.mean.global.0p25.f045.grib2`
 );
 
 //#nbts@code
