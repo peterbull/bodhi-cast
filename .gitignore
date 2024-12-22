@@ -201,3 +201,5 @@ firestore.rules
 
 # ds
 .DS_Store
+
+**/data/*
