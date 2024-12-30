@@ -297,6 +297,18 @@ async function getStationData(stationId: string): Promise<SensorData> {
 const stationRes = await getStationData("8639348");
 
 //#nbts@code
+function isProductSuccess(
+  response: ProductResponse
+): response is ProductResponseSuccess {
+  return "metadata" in response && "data" in response;
+}
+
+//#nbts@code
+if (isProductSuccess(stationRes.waterLevel)) {
+  stationRes.waterLevel;
+}
 
 //#nbts@code
 await writeJsonToFile(stationRes, "./data/stationResponse.json");
+
+//#nbts@code

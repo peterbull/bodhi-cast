@@ -1,6 +1,7 @@
 {
   "imports": {
     "eccodes-ts": "npm:eccodes-ts@^0.0.17",
+    "jsdom": "npm:jsdom@^25.0.1",
     "noaa-gfs-js": "npm:noaa-gfs-js@^1.1.0",
     "vgrib2": "npm:vgrib2@^0.1.13"
   }
