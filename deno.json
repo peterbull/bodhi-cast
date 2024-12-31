@@ -4,5 +4,6 @@
     "jsdom": "npm:jsdom@^25.0.1",
     "noaa-gfs-js": "npm:noaa-gfs-js@^1.1.0",
     "vgrib2": "npm:vgrib2@^0.1.13"
-  }
+  },
+  "exclude": ["typeflow/", "typeflow/**/*"]
 }
