@@ -6,8 +6,8 @@
     "npm:drizzle-kit@~0.30.1": "0.30.1_esbuild@0.19.12",
     "npm:drizzle-orm@*": "0.38.3_pg@8.13.1",
     "npm:drizzle-orm@~0.38.3": "0.38.3_pg@8.13.1",
-    "npm:eccodes-ts@*": "0.0.18",
-    "npm:eccodes-ts@^0.0.18": "0.0.18",
+    "npm:eccodes-ts@*": "0.0.19",
+    "npm:eccodes-ts@^0.0.19": "0.0.19",
     "npm:jsdom@*": "25.0.1",
     "npm:jsdom@^25.0.1": "25.0.1",
     "npm:pg@^8.13.1": "8.13.1",
@@ -250,8 +250,8 @@
         "pg"
       ]
     },
-    "eccodes-ts@0.0.18": {
-      "integrity": "sha512-TT94GBKkQm7GFKpYFSidcD+kDB2bof2eY761kRghKJfwzsOgXChAMTVXuT7Pdp2rd9JDvTeglLhxV3/hUj8SyQ==",
+    "eccodes-ts@0.0.19": {
+      "integrity": "sha512-tm6czm1u5kdtvMOZmdl5b2QcCD32oD8K4sphpEuNbLq4Qup50GrcHoGQMD17qfkT+N5Thsw+FC8oQpY+wXCgrw==",
       "dependencies": [
         "bindings",
         "node-addon-api"
@@ -654,7 +654,7 @@
       "npm:dotenv@^16.4.7",
       "npm:drizzle-kit@~0.30.1",
       "npm:drizzle-orm@~0.38.3",
-      "npm:eccodes-ts@^0.0.18",
+      "npm:eccodes-ts@^0.0.19",
       "npm:jsdom@^25.0.1",
       "npm:pg@^8.13.1",
       "npm:postgres@^3.4.5"
