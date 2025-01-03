@@ -3,9 +3,10 @@
 import { EccodesWrapper } from "npm:eccodes-ts";
 import { getMeanGlobalForecastUrls } from "../../typeflow/src/utils.ts";
 import { drizzle } from "npm:drizzle-orm/node-postgres";
-import { waveForecast } from "../../typeflow/src/db/schema.ts";
+import { sql, SQL } from "npm:drizzle-orm";
 import { DATABASE_URL } from "../../typeflow/src/db/index.ts";
 import { LocationForecast } from "npm:eccodes-ts";
+import { waveForecast } from "../../typeflow/src/db/schema.ts";
 
 //#nbts@code
 const links = await getMeanGlobalForecastUrls();
@@ -66,5 +67,36 @@ intToDate(swh[0].dataDate);
 swh[0].values;
 
 //#nbts@code
-for (const point of swh[0].values as LocationForecast[]) {
+async function addPointLocations(batch: PointLocation[]) {
+  await db.insert(waveForecast).values(batch);
 }
+
+//#nbts@code
+export interface PointLocation {
+  latitude: number;
+  longitude: number;
+  location: SQL;
+}
+
+let batch: PointLocation[] = [];
+let processed = 0;
+
+for (const point of swh[0].values as LocationForecast[]) {
+  batch.push({
+    latitude: point.lat,
+    longitude: point.lon,
+    location: sql`ST_SetSRID(ST_MakePoint(${point.lon}, ${point.lat}), 4326)`,
+  });
+  processed++;
+  if (processed === 5000) {
+    await addPointLocations(batch);
+    batch = [];
+    processed = 0;
+  }
+}
+
+if (batch.length > 0) {
+  await addPointLocations(batch);
+}
+
+//#nbts@code

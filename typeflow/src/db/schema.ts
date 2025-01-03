@@ -65,7 +65,6 @@ export const spots = pgTable(
   (table) => [index("idx_spots_location").using("gist", table.location)]
 );
 
-// Station Inventory table
 export const stationInventory = pgTable(
   "station_inventory",
   {
