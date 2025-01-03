@@ -2,7 +2,7 @@ import logging
 import os
 import re
 from urllib.parse import urljoin
-
+import time
 import pendulum
 import requests
 from airflow.decorators import task
@@ -14,7 +14,8 @@ from airflow import DAG
 sasl_username = os.environ.get("KAFKA_DEFAULT_USERS")
 sasl_password = os.environ.get("KAFKA_DEFAULT_PASSWORDS")
 
-start_date = pendulum.datetime(2024, 2, 6)
+start_date = pendulum.datetime(2025, 1, 1)
+
 
 topic = "gefs_wave_urls"
 
@@ -102,6 +103,7 @@ def send_urls_to_kafka(urls, topic, sasl_username=sasl_username, sasl_password=s
 
 @task
 def verify_messages(topic, sasl_username=sasl_username, sasl_password=sasl_password):
+    time.sleep(10)
     c = Consumer(
         {
             "bootstrap.servers": "kafka:9092",
