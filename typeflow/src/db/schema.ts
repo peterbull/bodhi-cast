@@ -1,11 +1,11 @@
 import {
   pgTable,
   boolean,
-  bigint,
   doublePrecision,
   timestamp,
   interval,
   geometry,
+  bigserial,
   integer,
   text,
 } from "drizzle-orm/pg-core";
@@ -15,10 +15,7 @@ import { index } from "drizzle-orm/pg-core";
 export const waveForecast = pgTable(
   "wave_forecast",
   {
-    id: bigint("id", { mode: "number" })
-      .primaryKey()
-      .notNull()
-      .default(sql`nextval('wave_forecast_id_seq')`),
+    id: bigserial("id", { mode: "number" }).primaryKey().notNull(),
 
     location: geometry("location", {
       type: "point",
@@ -30,7 +27,9 @@ export const waveForecast = pgTable(
     longitude: doublePrecision("longitude"),
     time: timestamp("time", { withTimezone: true }),
     step: interval("step"),
-    validTime: timestamp("valid_time", { withTimezone: true }),
+    dataTime: integer("data_time"),
+    forecastTime: integer("forecast_time"),
+    dataDate: timestamp("data_date", { withTimezone: true }),
     swh: doublePrecision("swh"),
     perpw: doublePrecision("perpw"),
     dirpw: doublePrecision("dirpw"),
