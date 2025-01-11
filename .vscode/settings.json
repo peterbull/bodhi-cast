@@ -1,5 +1,20 @@
 {
     "deno.enablePaths": [
         "./nbs/ts"
-    ]
+    ],
+    "eslint.workingDirectories": [
+        "./frontend/my-app"
+    ],
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "typescript.tsdk": "frontend/my-app/node_modules/typescript/lib",
+    "eslint.enable": true,
+    "eslint.debug": true
 }
