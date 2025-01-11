@@ -1,3 +1,7 @@
+import { useSpots } from "../hooks/useSpots";
+
 export function SpotSelector() {
-  return <h1>testing</h1>;
+  const { spotsArray } = useSpots();
+
+  return <p>{JSON.stringify(spotsArray)}</p>;
 }
