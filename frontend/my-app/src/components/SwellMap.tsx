@@ -14,8 +14,8 @@ const SwellMap: React.FC<any> = ({
   currentComponent,
   setCurrentComponent,
 }) => {
-  const stationDataRef = useRef<any>(null);
-  const jumpButtonRef = useRef<any>(null);
+  const stationDataRef = useRef<HTMLDivElement>(null);
+  const jumpButtonRef = useRef<HTMLButtonElement>(null);
 
   const spotCoords: [number, number] = [
     currentSpot.latitude,
