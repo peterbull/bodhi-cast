@@ -15,6 +15,20 @@
       "when": 1735915965460,
       "tag": "0001_fast_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1736200663592,
+      "tag": "0002_sad_phil_sheldon",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1736201675287,
+      "tag": "0003_sturdy_mentallo",
+      "breakpoints": true
     }
   ]
 }

@@ -8,43 +8,62 @@ import {
   bigserial,
   integer,
   text,
+  serial,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { index } from "drizzle-orm/pg-core";
+import { index, uniqueIndex } from "drizzle-orm/pg-core";
 
-export const waveForecast = pgTable(
-  "wave_forecast",
+export const forecastPoints = pgTable(
+  "forecast_points",
   {
     id: bigserial("id", { mode: "number" }).primaryKey().notNull(),
-
     location: geometry("location", {
       type: "point",
       mode: "xy",
       srid: 4326,
-    }),
+    }).notNull(),
+    latitude: doublePrecision("latitude").notNull(),
+    longitude: doublePrecision("longitude").notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_forecast_points_location").using("gist", table.location),
+  ]
+);
 
-    latitude: doublePrecision("latitude"),
-    longitude: doublePrecision("longitude"),
+export const waveMeasurements = pgTable(
+  "wave_measurements",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey().notNull(),
+    pointId: integer("point_id")
+      .references(() => forecastPoints.id)
+      .notNull(),
+
     time: timestamp("time", { withTimezone: true }),
     step: interval("step"),
     dataTime: integer("data_time"),
     forecastTime: integer("forecast_time"),
     dataDate: timestamp("data_date", { withTimezone: true }),
+
+    // Wave measurements
     swh: doublePrecision("swh"),
     perpw: doublePrecision("perpw"),
     dirpw: doublePrecision("dirpw"),
     shww: doublePrecision("shww"),
     mpww: doublePrecision("mpww"),
     wvdir: doublePrecision("wvdir"),
+
+    // Wind measurements
     ws: doublePrecision("ws"),
     wdir: doublePrecision("wdir"),
+
+    // Swell measurements
     swell: doublePrecision("swell"),
     swper: doublePrecision("swper"),
+
     entryUpdated: timestamp("entry_updated", { withTimezone: true }),
   },
   (table) => [
-    index("idx_wave_forecast_location").using("gist", table.location),
-    index("wave_forecast_location_idx").using("gist", table.location),
+    index("idx_wave_measurements_point_time").on(table.pointId, table.time),
   ]
 );
 
