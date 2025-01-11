@@ -203,3 +203,4 @@ firestore.rules
 .DS_Store
 
 **/data/*
+routeTree.gen.ts
