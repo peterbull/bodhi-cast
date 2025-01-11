@@ -23,6 +23,8 @@ export function useSpots() {
   const spotsQuery = useQuery({ queryKey: ["spots"], queryFn: fetchSpots });
 
   return {
-    spotsArray: spotsQuery.data ?? [],
+    spots: spotsQuery.data ?? [],
+    spotsLoading: spotsQuery.isLoading,
+    spotsError: spotsQuery.isError,
   };
 }

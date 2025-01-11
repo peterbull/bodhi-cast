@@ -1,7 +1,16 @@
 import { useSpots } from "../hooks/useSpots";
 
 export function SpotSelector() {
-  const { spotsArray } = useSpots();
+  const { spots, spotsLoading } = useSpots();
 
-  return <p>{JSON.stringify(spotsArray)}</p>;
+  if (spotsLoading) {
+    return <div className="text-center ">Loading...</div>;
+  }
+
+  return (
+    <>
+      <p>test</p>
+      <p>{JSON.stringify(spots)}</p>
+    </>
+  );
 }
