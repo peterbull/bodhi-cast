@@ -4,7 +4,7 @@ import { ReactQueryDevtools } from "react-query-devtools"
 
 const queryClient = new QueryClient()
 
-export const Route = createRootRoute({
+export const RootComponent = createRootRoute({
   component: () => {
     return (
       <QueryClientProvider client={queryClient}>

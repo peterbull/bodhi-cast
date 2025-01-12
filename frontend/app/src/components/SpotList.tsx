@@ -1,11 +1,20 @@
+import { Spot } from "@/hooks/useSpots";
+import { useGlobe } from "@/hooks/useGlobe";
 import { useSearch } from "@/hooks/useSearch";
 import { useSpots } from "@/hooks/useSpots";
 
 export function SpotList() {
+  const { globeZoom } = useGlobe();
   const { spots, spotsLoading } = useSpots();
   const { searchQuery } = useSearch();
+
   if (spotsLoading) {
     return <div className="text-center ">Loading...</div>;
+  }
+
+  const handleSpotClick = (spot: Spot, ms: number) => {
+    globeZoom(spot, 0.2, ms);
+    window.scrollTo({ top: 0, behavior: "smooth"});
   }
 
   return (
@@ -30,7 +39,7 @@ export function SpotList() {
             <tr
               className="hover:text-lightneon text-neon hover:font-normal justify-left text-center text-s font-thin border-0  divide-gray-200"
               key={spot.id}
-              onClick={() => null}
+              onClick={() => handleSpotClick(spot, 2000)}
             >
             <td className="py-2 px-2 cursor-pointer">{spot.spot_name}</td>
             <td className="py-2 px-2 cursor-pointer">{spot.street_address}</td>

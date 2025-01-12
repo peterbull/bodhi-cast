@@ -1,11 +1,11 @@
-
+import { Spot } from './useSpots';
 import { GlobeMethods } from 'react-globe.gl';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const GLOBE_KEY = 'globeRef';
 const GLOBE_HEIGHT_KEY = 'globeHeight';
 
-let globeRefValue: GlobeMethods | undefined;
+let globeRef: GlobeMethods | undefined;
 
 export function useGlobe() {
   const queryClient = useQueryClient();
@@ -17,17 +17,32 @@ export function useGlobe() {
   });
 
   const setGlobeRef = (ref: GlobeMethods | undefined) => {
-    globeRefValue = ref;
+    globeRef = ref;
   };
 
   const setHeight = (newHeight: number) => {
     queryClient.setQueryData([GLOBE_HEIGHT_KEY], newHeight);
   };
 
+
+ const globeZoom = (spot: Spot, altitude: number, ms: number) => {
+    if (globeRef && spot) {
+      globeRef.pointOfView(
+        {
+          lat: spot.latitude,
+          lng: spot.longitude,
+          altitude: altitude,
+        },
+        ms
+      );
+    }
+  };
+
   return { 
-    globeRef: globeRefValue, 
+    globeRef, 
     setGlobeRef,
     height,
-    setHeight
+    setHeight,
+    globeZoom
   };
 }
