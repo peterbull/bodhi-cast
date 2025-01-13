@@ -2,19 +2,30 @@ import { Spot } from "@/hooks/useSpots";
 import { useGlobe } from "@/hooks/useGlobe";
 import { useSearch } from "@/hooks/useSearch";
 import { useSpots } from "@/hooks/useSpots";
+import { useNavigate } from "@tanstack/react-router";
 
 export function SpotList() {
   const { globeZoom } = useGlobe();
+  const navigate = useNavigate();
   const { spots, spotsLoading } = useSpots();
   const { searchQuery } = useSearch();
 
   if (spotsLoading) {
     return <div className="text-center ">Loading...</div>;
   }
+  const handleNavigate = (spot: Spot) => {
+    navigate({
+      to: '/spots/$spotId',
+      params: { 
+        spotId: spot.id.toString() 
+      }
+    })
+  } 
 
   const handleSpotClick = (spot: Spot, ms: number) => {
     globeZoom(spot, 0.2, ms);
     window.scrollTo({ top: 0, behavior: "smooth"});
+    setTimeout(() => handleNavigate(spot), ms)
   }
 
   return (
