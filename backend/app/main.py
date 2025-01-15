@@ -5,11 +5,14 @@ from datetime import datetime, timedelta
 import redis
 from app.db.database import add_spots, create_tables, get_db
 from app.models.models import Spots, StationInventory
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
 from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
 
 create_tables()
 db = get_db()
@@ -227,6 +230,24 @@ def get_all_spots(db: Session = Depends(get_db)):
     """
     spots = db.query(Spots).order_by(Spots.spot_name.asc()).all()
     return [spot.as_dict() for spot in spots]
+
+@app.get("/spots/{spot_id}")
+def get_spot(spot_id: int, db: Session = Depends(get_db)):
+    """
+    Retrieve a single spot from the db by id 
+
+    Parameters:
+    - id: Spot Id
+
+    Returns: 
+    - A single spot  
+    """
+    spot = db.query(Spots).filter(Spots.id == spot_id).first()
+    
+    if spot is None:
+        raise HTTPException(status_code=404, detail="Spot not found")
+        
+    return JSONResponse(content=spot.as_dict())
 
 
 # Write new spots
