@@ -20,7 +20,9 @@ export type SpotForecast = {
   wvdir: number | null;
 };
 
-async function fetchSpotForecasts(spot: Spot): Promise<SpotForecast[]> {
+async function fetchSpotForecasts(spot: Spot | undefined | null): Promise<SpotForecast[]> {
+  if (!spot) return [];
+  
   try {
     const date = getFormattedDate();
     const res = await fetch(
@@ -39,9 +41,9 @@ async function fetchSpotForecasts(spot: Spot): Promise<SpotForecast[]> {
   }
 }
 
-export function useSpotForecasts(spot: Spot) {
+export function useSpotForecasts(spot: Spot | undefined | null) {
   const spotForecasts = useQuery({
-    queryKey: ["spotForecasts", spot.id],
+    queryKey: ["spotForecasts", spot?.id],
     queryFn: () => fetchSpotForecasts(spot),
     enabled: Boolean(spot),
   });
