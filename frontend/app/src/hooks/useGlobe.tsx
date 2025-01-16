@@ -25,6 +25,7 @@ export function useGlobe() {
   };
 
 
+
  const globeZoom = (spot: Spot, altitude: number, ms: number) => {
     if (globeRef && spot) {
       globeRef.pointOfView(

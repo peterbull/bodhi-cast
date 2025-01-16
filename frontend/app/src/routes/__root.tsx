@@ -8,7 +8,7 @@ export const Route = createRootRoute({
   component: () => {
     return (
       <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen text-neon">
+        <div className="min-h-screen text-neon font-thin shadow-neon">
           <main className="container mx-auto px-4 py-8">
             <Outlet />
           </main>
