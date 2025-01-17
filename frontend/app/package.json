@@ -11,12 +11,17 @@
     "generate-routes": "@tanstack/router-cli generate-routes"
   },
   "dependencies": {
+    "@react-three/drei": "^9.121.2",
+    "@react-three/fiber": "^8.17.12",
     "@tanstack/react-query": "^5.63.0",
     "@tanstack/react-router": "^1.95.3",
+    "@types/three": "^0.172.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-globe.gl": "^2.29.4",
     "react-query-devtools": "^2.6.3",
+    "three": "^0.172.0",
+    "three-stdlib": "^2.35.7",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

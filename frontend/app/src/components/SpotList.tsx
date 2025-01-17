@@ -7,7 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 export function SpotList() {
   const { globeZoom } = useGlobe();
   const navigate = useNavigate();
-  const { spots, spotsLoading } = useSpots();
+  const { spots, spotsLoading, setCurrentSpot } = useSpots();
   const { searchQuery } = useSearch();
 
   if (spotsLoading) {

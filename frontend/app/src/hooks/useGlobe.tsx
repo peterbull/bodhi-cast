@@ -1,4 +1,4 @@
-import { Spot } from './useSpots';
+import { Spot } from '@/hooks/useSpots';
 import { GlobeMethods } from 'react-globe.gl';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 

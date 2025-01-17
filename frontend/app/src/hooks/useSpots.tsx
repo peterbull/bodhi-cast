@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { create } from "zustand";
 
 export type Spot = {
   id: number;
@@ -8,11 +9,21 @@ export type Spot = {
   street_address: string;
 };
 
+interface SpotStore {
+  currentSpot: Spot | null;
+  setCurrentSpot: (spot: Spot | null) => void;
+}
+
+const useSpotStore = create<SpotStore>((set) => ({
+  currentSpot: null,
+  setCurrentSpot: (spot) => set({ currentSpot: spot }),
+}));
+
 async function fetchSpot(spotId: number): Promise<Spot> {
   const res = await fetch(
     `${import.meta.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000"}/spots/${spotId}`
   );
- if (!res.ok) {
+  if (!res.ok) {
     throw new Error(`HTTP error! status: ${res.status}`);
   }
   const data = await res.json();
@@ -30,27 +41,35 @@ async function fetchSpots(): Promise<Spot[]> {
   return data;
 }
 
-export function useSpot(spotId: number) {
-  const spotQuery = useQuery({
-    queryKey: ["spot", spotId],
-    queryFn: () => fetchSpot(spotId),
-    enabled: !!spotId, 
+export function useSpots(spotId?: number) {
+  const spotsQuery = useQuery({ 
+    queryKey: ["spots"], 
+    queryFn: fetchSpots 
   });
 
-  return {
-    spot: spotQuery.data,
-    isLoading: spotQuery.isLoading,
-    isError: spotQuery.isError,
-    error: spotQuery.error,
-  };
-}
+  const spotQuery = useQuery({
+    queryKey: ["spot", spotId],
+    queryFn: () => fetchSpot(spotId!),
+    enabled: !!spotId,
+  });
 
-export function useSpots() {
-  const spotsQuery = useQuery({ queryKey: ["spots"], queryFn: fetchSpots });
-  
+  const currentSpot = useSpotStore((state) => state.currentSpot);
+  const setCurrentSpot = useSpotStore((state) => state.setCurrentSpot);
+
   return {
+    // List of spots
     spots: spotsQuery.data ?? [],
     spotsLoading: spotsQuery.isLoading,
     spotsError: spotsQuery.isError,
+
+    // Single spot
+    spot: spotQuery.data,
+    spotLoading: spotQuery.isLoading,
+    spotError: spotQuery.isError,
+    spotErrorMessage: spotQuery.error,
+
+    // Current selected spot
+    currentSpot,
+    setCurrentSpot,
   };
 }
