@@ -1,0 +1,2 @@
+DROP INDEX "unique_measurement_constraint";--> statement-breakpoint
+CREATE UNIQUE INDEX "unique_measurement_constraint" ON "wave_measurements" USING btree ("point_id","data_date","data_time","forecast_time");

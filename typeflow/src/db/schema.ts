@@ -57,6 +57,7 @@ export const waveMeasurements = pgTable(
   (table) => [
     index("idx_wave_measurements_point_time").on(table.pointId, table.dataDate),
     uniqueIndex("unique_measurement_constraint").on(
+      table.pointId,
       table.dataDate,
       table.dataTime,
       table.forecastTime

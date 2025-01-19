@@ -1,0 +1,383 @@
+{
+  "id": "9e52df22-6f55-4842-af51-0af4bd488476",
+  "prevId": "f5af3a53-96f3-4245-9616-432ddf5ef583",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.forecast_points": {
+      "name": "forecast_points",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "location": {
+          "name": "location",
+          "type": "geometry(point)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.spots": {
+      "name": "spots",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "spot_name": {
+          "name": "spot_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "street_address": {
+          "name": "street_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "location": {
+          "name": "location",
+          "type": "geometry(point)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_spots_location": {
+          "name": "idx_spots_location",
+          "columns": [
+            {
+              "expression": "location",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gist",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.station_inventory": {
+      "name": "station_inventory",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "station_id": {
+          "name": "station_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "has_water_level": {
+          "name": "has_water_level",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "has_wind": {
+          "name": "has_wind",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "has_air_temperature": {
+          "name": "has_air_temperature",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "location": {
+          "name": "location",
+          "type": "geometry(point)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entry_updated": {
+          "name": "entry_updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_station_inventory_location_gist": {
+          "name": "idx_station_inventory_location_gist",
+          "columns": [
+            {
+              "expression": "location",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gist",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.wave_measurements": {
+      "name": "wave_measurements",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "point_id": {
+          "name": "point_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data_time": {
+          "name": "data_time",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "forecast_time": {
+          "name": "forecast_time",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_date": {
+          "name": "data_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "swh": {
+          "name": "swh",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "perpw": {
+          "name": "perpw",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dirpw": {
+          "name": "dirpw",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "shww": {
+          "name": "shww",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mpww": {
+          "name": "mpww",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wvdir": {
+          "name": "wvdir",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ws": {
+          "name": "ws",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "wdir": {
+          "name": "wdir",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "swell": {
+          "name": "swell",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "swper": {
+          "name": "swper",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entry_updated": {
+          "name": "entry_updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "idx_wave_measurements_point_time": {
+          "name": "idx_wave_measurements_point_time",
+          "columns": [
+            {
+              "expression": "point_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "data_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "unique_measurement_constraint": {
+          "name": "unique_measurement_constraint",
+          "columns": [
+            {
+              "expression": "point_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "data_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "data_time",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "forecast_time",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "wave_measurements_point_id_forecast_points_id_fk": {
+          "name": "wave_measurements_point_id_forecast_points_id_fk",
+          "tableFrom": "wave_measurements",
+          "tableTo": "forecast_points",
+          "columnsFrom": [
+            "point_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

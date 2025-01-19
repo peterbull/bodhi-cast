@@ -3,7 +3,7 @@
 import { EccodesWrapper } from "npm:eccodes-ts";
 import { getMeanGlobalForecastUrls } from "../../typeflow/src/utils.ts";
 import { drizzle } from "npm:drizzle-orm/node-postgres";
-import { sql, SQL, and, eq, or } from "npm:drizzle-orm";
+import { sql, SQL, and, eq, or, inArray } from "npm:drizzle-orm";
 import { DATABASE_URL } from "../../typeflow/src/db/index.ts";
 import {
   LocationForecast,
@@ -31,15 +31,18 @@ res;
 const wrapper = new EccodesWrapper(res.body);
 
 //#nbts@code
-
-//#nbts@code
 const swh = await wrapper.getSignificantWaveHeight({ addLatLon: true });
 
 //#nbts@mark
 // - `dataTime` is which of the 4 daily runs this is from [00, 06, 12, 18]
 // - `forecastTime` is how far in the future the forecast is for, in intervals of 3-6 hrs, up to ~240 or more
 //#nbts@code
+
+//#nbts@code
 swh.length;
+
+//#nbts@code
+swh[0];
 
 //#nbts@code
 /**
@@ -68,5 +71,151 @@ export function intToDate(dateInt: number): Date {
 
 //#nbts@code
 intToDate(swh[0].dataDate);
+
+//#nbts@code
+const exampleEntry = swh[0].values[0];
+exampleEntry;
+
+//#nbts@code
+const testPointId = (
+  await db
+    .select({
+      id: forecastPoints.id,
+      location: forecastPoints.location,
+    })
+    .from(forecastPoints)
+    .where(
+      and(
+        eq(forecastPoints.latitude, exampleEntry.lat),
+        eq(forecastPoints.longitude, exampleEntry.lon)
+      )
+    )
+    .limit(1)
+)[0];
+
+//#nbts@code
+testPointId.location;
+
+//#nbts@code
+swh[0];
+
+//#nbts@code
+const BATCH_SIZE = 1000;
+console.log(`Starting process at ${new Date().toISOString()}`);
+
+// Chunk helper function
+const chunk = <T>(arr: T[], size: number): T[][] => {
+  return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size)
+  );
+};
+
+// Create temp table once
+await db.execute(sql`
+  CREATE TEMP TABLE temp_coordinates (
+    latitude double precision,
+    longitude double precision
+  );
+  CREATE INDEX ON temp_coordinates (latitude, longitude);
+`);
+
+// Process in smaller chunks to manage memory
+const processChunk = async (coordinates: (typeof swh)[0]["values"]) => {
+  // Clear previous data
+  await db.execute(sql`TRUNCATE temp_coordinates`);
+
+  // Insert coordinates into temp table
+  const coordValues = coordinates.map((c) => `(${c.lat}, ${c.lon})`).join(", ");
+
+  await db.execute(sql`
+    INSERT INTO temp_coordinates (latitude, longitude)
+    VALUES ${sql.raw(coordValues)}
+  `);
+
+  // Get points and immediately process them
+  const points = await db.execute<{
+    id: number;
+    latitude: number;
+    longitude: number;
+  }>(sql`
+    SELECT DISTINCT fp.id, fp.latitude, fp.longitude
+    FROM forecast_points fp
+    JOIN temp_coordinates tc 
+    ON fp.latitude = tc.latitude 
+    AND fp.longitude = tc.longitude
+  `);
+
+  if (!points.rows?.length) {
+    return;
+  }
+
+  // Create and insert measurements immediately for this batch
+  const measurements = points.rows.map((point) => ({
+    pointId: point.id,
+    dataDate: intToDate(swh[0].dataDate),
+    dataTime: swh[0].dataTime,
+    forecastTime: swh[0].forecastTime,
+    swh:
+      coordinates.find(
+        (c) => c.lat === point.latitude && c.lon === point.longitude
+      )?.value ?? null,
+  }));
+
+  await db
+    .insert(waveMeasurements)
+    .values(measurements)
+    .onConflictDoUpdate({
+      target: [
+        waveMeasurements.pointId,
+        waveMeasurements.dataDate,
+        waveMeasurements.dataTime,
+        waveMeasurements.forecastTime,
+      ],
+      set: {
+        swh: sql`EXCLUDED.swh`,
+        entryUpdated: sql`EXCLUDED.entry_updated`,
+      },
+    });
+
+  return measurements.length;
+};
+
+// Process in batches
+let processed = 0;
+const totalCoordinates = swh[0].values.length;
+const chunks = chunk(swh[0].values, BATCH_SIZE);
+
+console.log(
+  `Processing ${totalCoordinates} coordinates in ${chunks.length} chunks`
+);
+
+try {
+  for (let i = 0; i < chunks.length; i++) {
+    try {
+      console.time(`Chunk ${i + 1}/${chunks.length}`);
+      const insertedCount = await processChunk(chunks[i]);
+      processed += insertedCount || 0;
+
+      console.timeEnd(`Chunk ${i + 1}/${chunks.length}`);
+      console.log(
+        `Processed ${processed}/${totalCoordinates} coordinates (${Math.round(
+          (processed / totalCoordinates) * 100
+        )}%)`
+      );
+
+      // Optional: Add a small delay to allow garbage collection
+      if (i % 10 === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    } catch (error) {
+      console.error(`Error processing chunk ${i + 1}:`, error);
+      // Optionally: throw error to stop processing or continue with next chunk
+    }
+  }
+} finally {
+  // Ensure temp table is dropped even if there's an error
+  await db.execute(sql`DROP TABLE IF EXISTS temp_coordinates`);
+  console.log(`Finished at ${new Date().toISOString()}`);
+}
 
 //#nbts@code
