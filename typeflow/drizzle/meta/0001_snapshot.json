@@ -1,9 +1,46 @@
 {
-  "id": "342d9a8c-6304-4308-9c78-a46d2320e028",
-  "prevId": "8819b08d-642f-4019-b9cd-2f1807f8376b",
+  "id": "f5af3a53-96f3-4245-9616-432ddf5ef583",
+  "prevId": "4ac2c470-693a-4c46-85f9-016131cdd637",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.forecast_points": {
+      "name": "forecast_points",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "location": {
+          "name": "location",
+          "type": "geometry(point)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.spots": {
       "name": "spots",
       "schema": "",
@@ -130,8 +167,8 @@
         }
       },
       "indexes": {
-        "idx_station_inventory_location": {
-          "name": "idx_station_inventory_location",
+        "idx_station_inventory_location_gist": {
+          "name": "idx_station_inventory_location_gist",
           "columns": [
             {
               "expression": "location",
@@ -153,8 +190,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.wave_forecast": {
-      "name": "wave_forecast",
+    "public.wave_measurements": {
+      "name": "wave_measurements",
       "schema": "",
       "columns": {
         "id": {
@@ -163,35 +200,11 @@
           "primaryKey": true,
           "notNull": true
         },
-        "location": {
-          "name": "location",
-          "type": "geometry(point)",
+        "point_id": {
+          "name": "point_id",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": false
-        },
-        "latitude": {
-          "name": "latitude",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "longitude": {
-          "name": "longitude",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "time": {
-          "name": "time",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "step": {
-          "name": "step",
-          "type": "interval",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "data_time": {
           "name": "data_time",
@@ -279,11 +292,17 @@
         }
       },
       "indexes": {
-        "idx_wave_forecast_location": {
-          "name": "idx_wave_forecast_location",
+        "idx_wave_measurements_point_time": {
+          "name": "idx_wave_measurements_point_time",
           "columns": [
             {
-              "expression": "location",
+              "expression": "point_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "data_date",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -291,26 +310,52 @@
           ],
           "isUnique": false,
           "concurrently": false,
-          "method": "gist",
+          "method": "btree",
           "with": {}
         },
-        "wave_forecast_location_idx": {
-          "name": "wave_forecast_location_idx",
+        "unique_measurement_constraint": {
+          "name": "unique_measurement_constraint",
           "columns": [
             {
-              "expression": "location",
+              "expression": "data_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "data_time",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "forecast_time",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
-          "isUnique": false,
+          "isUnique": true,
           "concurrently": false,
-          "method": "gist",
+          "method": "btree",
           "with": {}
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "wave_measurements_point_id_forecast_points_id_fk": {
+          "name": "wave_measurements_point_id_forecast_points_id_fk",
+          "tableFrom": "wave_measurements",
+          "tableTo": "forecast_points",
+          "columnsFrom": [
+            "point_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

@@ -13,22 +13,16 @@ import {
 import { sql } from "drizzle-orm";
 import { index, uniqueIndex } from "drizzle-orm/pg-core";
 
-export const forecastPoints = pgTable(
-  "forecast_points",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey().notNull(),
-    location: geometry("location", {
-      type: "point",
-      mode: "xy",
-      srid: 4326,
-    }).notNull(),
-    latitude: doublePrecision("latitude").notNull(),
-    longitude: doublePrecision("longitude").notNull(),
-  },
-  (table) => [
-    uniqueIndex("idx_forecast_points_location").using("gist", table.location),
-  ]
-);
+export const forecastPoints = pgTable("forecast_points", {
+  id: bigserial("id", { mode: "number" }).primaryKey().notNull(),
+  location: geometry("location", {
+    type: "point",
+    mode: "xy",
+    srid: 4326,
+  }).notNull(),
+  latitude: doublePrecision("latitude").notNull(),
+  longitude: doublePrecision("longitude").notNull(),
+});
 
 export const waveMeasurements = pgTable(
   "wave_measurements",
@@ -38,8 +32,6 @@ export const waveMeasurements = pgTable(
       .references(() => forecastPoints.id)
       .notNull(),
 
-    time: timestamp("time", { withTimezone: true }),
-    step: interval("step"),
     dataTime: integer("data_time"),
     forecastTime: integer("forecast_time"),
     dataDate: timestamp("data_date", { withTimezone: true }),
@@ -63,7 +55,12 @@ export const waveMeasurements = pgTable(
     entryUpdated: timestamp("entry_updated", { withTimezone: true }),
   },
   (table) => [
-    index("idx_wave_measurements_point_time").on(table.pointId, table.time),
+    index("idx_wave_measurements_point_time").on(table.pointId, table.dataDate),
+    uniqueIndex("unique_measurement_constraint").on(
+      table.dataDate,
+      table.dataTime,
+      table.forecastTime
+    ),
   ]
 );
 
@@ -107,6 +104,6 @@ export const stationInventory = pgTable(
       .$onUpdateFn(() => sql`now()`),
   },
   (table) => [
-    index("idx_station_inventory_location").using("gist", table.location),
+    index("idx_station_inventory_location_gist").using("gist", table.location),
   ]
 );

@@ -3,10 +3,17 @@
 import { EccodesWrapper } from "npm:eccodes-ts";
 import { getMeanGlobalForecastUrls } from "../../typeflow/src/utils.ts";
 import { drizzle } from "npm:drizzle-orm/node-postgres";
-import { sql, SQL } from "npm:drizzle-orm";
+import { sql, SQL, and, eq, or } from "npm:drizzle-orm";
 import { DATABASE_URL } from "../../typeflow/src/db/index.ts";
-import { LocationForecast } from "npm:eccodes-ts";
-import { forecastPoints } from "../../typeflow/src/db/schema.ts";
+import {
+  LocationForecast,
+  WaveParameter,
+  BaseGrib2Message,
+} from "npm:eccodes-ts";
+import {
+  forecastPoints,
+  waveMeasurements,
+} from "../../typeflow/src/db/schema.ts";
 
 //#nbts@code
 const links = await getMeanGlobalForecastUrls();
@@ -24,13 +31,15 @@ res;
 const wrapper = new EccodesWrapper(res.body);
 
 //#nbts@code
+
+//#nbts@code
 const swh = await wrapper.getSignificantWaveHeight({ addLatLon: true });
 
 //#nbts@mark
 // - `dataTime` is which of the 4 daily runs this is from [00, 06, 12, 18]
 // - `forecastTime` is how far in the future the forecast is for, in intervals of 3-6 hrs, up to ~240 or more
 //#nbts@code
-swh;
+swh.length;
 
 //#nbts@code
 /**
@@ -54,50 +63,10 @@ export function intToDate(dateInt: number): Date {
     throw new Error(`Invalid date/time combination: ${dateInt}`);
   }
 
-  return date;
+  return new Date(date);
 }
 
 //#nbts@code
 intToDate(swh[0].dataDate);
-
-//#nbts@code
-swh[0].values;
-
-//#nbts@code
-async function addPointLocations(batch: PointLocation[]) {
-  await db.insert(forecastPoints).values(batch);
-}
-
-//#nbts@code
-export interface PointLocation {
-  latitude: number;
-  longitude: number;
-  location: SQL;
-}
-
-const batchSize = 5000;
-let batch: PointLocation[] = [];
-let processed = 0;
-let processedCount = 0;
-
-for (const point of swh[0].values as LocationForecast[]) {
-  batch.push({
-    latitude: point.lat,
-    longitude: point.lon,
-    location: sql`ST_SetSRID(ST_MakePoint(${point.lon}, ${point.lat}), 4326)`,
-  });
-  processed++;
-  if (processed === batchSize) {
-    await addPointLocations(batch);
-    batch = [];
-    processed = 0;
-    processedCount += batchSize;
-    console.log(`Processed ${processedCount} out of ${swh[0].values.length}`);
-  }
-}
-
-if (batch.length > 0) {
-  await addPointLocations(batch);
-}
 
 //#nbts@code

@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - postgres-db-volume:/var/lib/postgresql/data
+      - pg-refactor:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
@@ -26,7 +26,7 @@ services:
     expose:
       - ${REDIS_PORT}
     volumes:
-      - redis_data:/data
+      - redis-refactor:/data
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
@@ -36,5 +36,5 @@ services:
     restart: always
 
 volumes:
-  postgres-db-volume:
-  redis_data:
+  pg-refactor:
+  redis-refactor:
