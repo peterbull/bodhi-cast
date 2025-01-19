@@ -1,4 +1,5 @@
 import SwellSim from '@/components/SwellSim';
+import SwellTable from '@/components/SwellTable';
 import { useSpotForecasts } from '@/hooks/useSpotForecasts';
 import { useSpots } from '@/hooks/useSpots';
 import { createFileRoute, useParams } from '@tanstack/react-router'
@@ -16,6 +17,9 @@ function RouteComponent() {
   const { spotForecasts } = useSpotForecasts(spot);
   
   return (
-    <SwellSim />
+    <>
+      <SwellSim />
+      <SwellTable />
+    </>
   )
 }
