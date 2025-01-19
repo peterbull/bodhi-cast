@@ -2,9 +2,8 @@ import { useSpotForecasts } from "@/hooks/useSpotForecasts";
 import { useSpots } from "@/hooks/useSpots";
 import { useParams } from "@tanstack/react-router";
 import { Arrow } from "./Arrow";
-import { HeightUnitType, WaveForecastType } from "@/types";
+import { WaveForecastType, HeightUnitType } from "@/types";
 
-export type intervalIdx = 0 | 1 | 2 | 3 | 4 | 5
 
 const heightConversion: Record<HeightUnitType, number> = {
   ft: 3.281,
@@ -32,8 +31,8 @@ export function SwellForecastData({forecastType, heightUnit, intervalIdx }: Swel
         return ['swh', 'perpw', 'dirpw'] as const
       case WaveForecastType.SECONDARY:
         return ['swell', 'swper', 'dirpw'] as const
-      default:
-        return ['swh', 'perpw', 'dirpw'] as const 
+      case WaveForecastType.WINDWAVES:
+        return ['shww', 'mpww', 'wvdir'] as const
     }
   }
 

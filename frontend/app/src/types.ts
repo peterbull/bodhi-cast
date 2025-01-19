@@ -3,6 +3,10 @@ export enum HeightUnitType {
     M = 'm'
 }
 
+export enum WindSpeedUnitType  {
+  MILES_PER_HOUR = 'mph',
+  METERS_PER_SECOND = 'mps'
+}
 
 export enum WaveForecastType {
   PRIMARY = 'primary',

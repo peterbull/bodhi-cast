@@ -1,5 +1,6 @@
 import { SwellForecastData } from "./SwellForecastData";
-import { HeightUnitType, WaveForecastType } from "@/types";
+import { HeightUnitType, WaveForecastType, WindSpeedUnitType } from "@/types";
+import { WindForecastData } from "./WindForecastData";
 
 export function SwellTable (){
   const timeKeys = [
@@ -63,6 +64,8 @@ export function SwellTable (){
                 <td className="py-6 font-normal">{timeKeys[index]}</td>
                 <SwellForecastData forecastType={WaveForecastType.PRIMARY} intervalIdx={index} heightUnit={HeightUnitType.FT}/> 
                 <SwellForecastData forecastType={WaveForecastType.SECONDARY} intervalIdx={index} heightUnit={HeightUnitType.FT}/> 
+                <SwellForecastData forecastType={WaveForecastType.WINDWAVES} intervalIdx={index} heightUnit={HeightUnitType.FT}/> 
+                <WindForecastData intervalIdx={index} windUnit={WindSpeedUnitType.MILES_PER_HOUR} />
               </tr>
             ))}
         </tbody>
