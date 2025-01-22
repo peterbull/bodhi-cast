@@ -17,18 +17,10 @@ import {
 
 //#nbts@code
 const links = await getMeanGlobalForecastUrls();
-
-//#nbts@code
-const res = await fetch(links[12]);
+const wrapper = new EccodesWrapper(links[0]);
 
 //#nbts@code
 export const db = drizzle(DATABASE_URL);
-
-//#nbts@code
-res;
-
-//#nbts@code
-const wrapper = new EccodesWrapper(res.body);
 
 //#nbts@code
 const swh = await wrapper.getSignificantWaveHeight({ addLatLon: true });
@@ -37,6 +29,7 @@ const swh = await wrapper.getSignificantWaveHeight({ addLatLon: true });
 // - `dataTime` is which of the 4 daily runs this is from [00, 06, 12, 18]
 // - `forecastTime` is how far in the future the forecast is for, in intervals of 3-6 hrs, up to ~240 or more
 //#nbts@code
+swh;
 
 //#nbts@code
 swh.length;
@@ -103,14 +96,12 @@ swh[0];
 const BATCH_SIZE = 1000;
 console.log(`Starting process at ${new Date().toISOString()}`);
 
-// Chunk helper function
 const chunk = <T>(arr: T[], size: number): T[][] => {
   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
     arr.slice(i * size, i * size + size)
   );
 };
 
-// Create temp table once
 await db.execute(sql`
   CREATE TEMP TABLE temp_coordinates (
     latitude double precision,
@@ -119,12 +110,9 @@ await db.execute(sql`
   CREATE INDEX ON temp_coordinates (latitude, longitude);
 `);
 
-// Process in smaller chunks to manage memory
 const processChunk = async (coordinates: (typeof swh)[0]["values"]) => {
-  // Clear previous data
   await db.execute(sql`TRUNCATE temp_coordinates`);
 
-  // Insert coordinates into temp table
   const coordValues = coordinates.map((c) => `(${c.lat}, ${c.lon})`).join(", ");
 
   await db.execute(sql`
@@ -132,7 +120,6 @@ const processChunk = async (coordinates: (typeof swh)[0]["values"]) => {
     VALUES ${sql.raw(coordValues)}
   `);
 
-  // Get points and immediately process them
   const points = await db.execute<{
     id: number;
     latitude: number;
@@ -149,7 +136,6 @@ const processChunk = async (coordinates: (typeof swh)[0]["values"]) => {
     return;
   }
 
-  // Create and insert measurements immediately for this batch
   const measurements = points.rows.map((point) => ({
     pointId: point.id,
     dataDate: intToDate(swh[0].dataDate),
@@ -180,7 +166,6 @@ const processChunk = async (coordinates: (typeof swh)[0]["values"]) => {
   return measurements.length;
 };
 
-// Process in batches
 let processed = 0;
 const totalCoordinates = swh[0].values.length;
 const chunks = chunk(swh[0].values, BATCH_SIZE);
@@ -203,17 +188,14 @@ try {
         )}%)`
       );
 
-      // Optional: Add a small delay to allow garbage collection
       if (i % 10 === 0) {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
     } catch (error) {
       console.error(`Error processing chunk ${i + 1}:`, error);
-      // Optionally: throw error to stop processing or continue with next chunk
     }
   }
 } finally {
-  // Ensure temp table is dropped even if there's an error
   await db.execute(sql`DROP TABLE IF EXISTS temp_coordinates`);
   console.log(`Finished at ${new Date().toISOString()}`);
 }

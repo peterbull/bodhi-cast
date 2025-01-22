@@ -21,8 +21,8 @@ importers:
         specifier: ^0.38.3
         version: 0.38.3(@types/pg@8.11.10)(pg@8.13.1)
       eccodes-ts:
-        specifier: ^0.0.19
-        version: 0.0.19
+        specifier: ^0.0.23
+        version: 0.0.23
       jsdom:
         specifier: ^25.0.1
         version: 25.0.1
@@ -822,8 +822,8 @@ packages:
       sqlite3:
         optional: true
 
-  eccodes-ts@0.0.19:
-    resolution: {integrity: sha512-tm6czm1u5kdtvMOZmdl5b2QcCD32oD8K4sphpEuNbLq4Qup50GrcHoGQMD17qfkT+N5Thsw+FC8oQpY+wXCgrw==}
+  eccodes-ts@0.0.23:
+    resolution: {integrity: sha512-AAdQUk0sZTJNls7pyxQW5KxWzdFPu12ooqCV0Uza7FOlTMrsEDj2qBw+WBUmIy19mU4fVcQQHUjdpGkpSz3Fiw==}
 
   entities@4.5.0:
     resolution: {integrity: sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==}
@@ -1895,7 +1895,7 @@ snapshots:
       '@types/pg': 8.11.10
       pg: 8.13.1
 
-  eccodes-ts@0.0.19:
+  eccodes-ts@0.0.23:
     dependencies:
       bindings: 1.5.0
       node-addon-api: 8.3.0

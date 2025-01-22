@@ -8,7 +8,9 @@
     "db:generate": "drizzle-kit generate:pg",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
-    "db:migrate": "tsx src/db/migrate.ts"
+    "db:migrate": "tsx src/db/migrate.ts",
+    "dev": "tsx watch src/index.ts",
+    "dev:debug": "tsx --inspect src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -31,7 +33,7 @@
     "@types/node": "^22.10.2",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.3",
-    "eccodes-ts": "^0.0.19",
+    "eccodes-ts": "^0.0.24",
     "jsdom": "^25.0.1",
     "pg": "^8.13.1"
   }
