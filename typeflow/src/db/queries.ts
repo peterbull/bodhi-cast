@@ -4,10 +4,13 @@ import { sql, SQL, and, eq, or, inArray } from "drizzle-orm";
 import { waveMeasurements } from "./schema";
 import { WaveParameter, WithLatLon } from "eccodes-ts";
 
-export async function updateWaveMeasurements(swh: WithLatLon<WaveParameter>[]) {
+export async function updateWaveMeasurements(
+  forecastParameter: WithLatLon<WaveParameter>[]
+) {
   const BATCH_SIZE = 1000;
   console.log(`Starting process at ${new Date().toISOString()}`);
-
+  const shortName = forecastParameter[0].shortName;
+  console.log("param name", shortName);
   const chunk = <T>(arr: T[], size: number): T[][] => {
     return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
       arr.slice(i * size, i * size + size)
@@ -22,9 +25,10 @@ export async function updateWaveMeasurements(swh: WithLatLon<WaveParameter>[]) {
     CREATE INDEX ON temp_coordinates (latitude, longitude);
   `);
 
-  const processChunk = async (coordinates: (typeof swh)[0]["values"]) => {
+  const processChunk = async (
+    coordinates: (typeof forecastParameter)[0]["values"]
+  ) => {
     await db.execute(sql`TRUNCATE temp_coordinates`);
-
     const coordValues = coordinates
       .map((c) => `(${c.lat}, ${c.lon})`)
       .join(", ");
@@ -52,10 +56,10 @@ export async function updateWaveMeasurements(swh: WithLatLon<WaveParameter>[]) {
 
     const measurements = points.rows.map((point) => ({
       pointId: point.id,
-      dataDate: intToDate(swh[0].dataDate),
-      dataTime: swh[0].dataTime,
-      forecastTime: swh[0].forecastTime,
-      swh:
+      dataDate: intToDate(forecastParameter[0].dataDate),
+      dataTime: forecastParameter[0].dataTime,
+      forecastTime: forecastParameter[0].forecastTime,
+      [shortName]:
         coordinates.find(
           (c) => c.lat === point.latitude && c.lon === point.longitude
         )?.value ?? null,
@@ -72,7 +76,7 @@ export async function updateWaveMeasurements(swh: WithLatLon<WaveParameter>[]) {
           waveMeasurements.forecastTime,
         ],
         set: {
-          swh: sql`EXCLUDED.swh`,
+          [shortName]: sql.raw(`EXCLUDED.${shortName}`),
           entryUpdated: sql`EXCLUDED.entry_updated`,
         },
       });
@@ -81,8 +85,8 @@ export async function updateWaveMeasurements(swh: WithLatLon<WaveParameter>[]) {
   };
 
   let processed = 0;
-  const totalCoordinates = swh[0].values.length;
-  const chunks = chunk(swh[0].values, BATCH_SIZE);
+  const totalCoordinates = forecastParameter[0].values.length;
+  const chunks = chunk(forecastParameter[0].values, BATCH_SIZE);
 
   console.log(
     `Processing ${totalCoordinates} coordinates in ${chunks.length} chunks`
