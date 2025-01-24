@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:generate": "drizzle-kit generate:pg",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
-    "db:migrate": "tsx src/db/migrate.ts",
+    "db:migrate": "drizzle-kit migrate",
     "dev": "tsx watch src/index.ts",
     "dev:debug": "tsx --inspect src/index.ts"
   },
@@ -32,10 +33,12 @@
     "@fastify/cors": "^10.0.2",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.10.2",
+    "bullmq": "^5.35.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.3",
     "eccodes-ts": "^0.0.24",
     "fastify": "^5.2.1",
+    "fastify-plugin": "^5.0.1",
     "jsdom": "^25.0.1",
     "pg": "^8.13.1"
   }

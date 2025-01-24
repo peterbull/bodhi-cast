@@ -1,4 +1,4 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
@@ -7,6 +7,8 @@ export default defineConfig({
   dialect: "postgresql",
   extensionsFilters: ["postgis"],
   dbCredentials: {
-    url: `postgresql://airflow:airflow@localhost:5432/airflow`,
+    url:
+      process.env.DATABASE_URL ??
+      `postgresql://airflow:airflow@localhost:5432/airflow`,
   },
 });
