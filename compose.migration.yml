@@ -3,6 +3,8 @@ services:
     build:
       context: ./typeflow
       dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:${REDIS_PORT}

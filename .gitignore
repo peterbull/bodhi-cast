@@ -204,3 +204,4 @@ firestore.rules
 
 **/data/*
 routeTree.gen.ts
+dist

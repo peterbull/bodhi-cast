@@ -1,4 +1,4 @@
-import "dotenv/config";
+import * as dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 
 export const DATABASE_URL =

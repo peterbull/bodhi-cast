@@ -37,5 +37,4 @@ RUN apt-get update && apt-get install -y cron vim \
 
 
 ENTRYPOINT ["entrypoint.sh"]
-# CMD ["/bin/sh", "-c", "tail -f /dev/null"]
-
+CMD ["node", "dist/index.js"]
