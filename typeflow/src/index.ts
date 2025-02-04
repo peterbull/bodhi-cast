@@ -8,7 +8,6 @@ const server = Fastify({
   logger: true,
 });
 
-// Create a new scheduler instance
 const scheduler = new ToadScheduler();
 
 function createWrapper(url: string) {
@@ -32,16 +31,14 @@ async function updateWaveData() {
     const links = await getMeanGlobalForecastUrls();
     const singleLink = links[0];
 
-    await updateSwellWaveHeight(singleLink);
-    await updatePrimaryWavePeriod(singleLink);
+    // await updateSwellWaveHeight(singleLink);
+    // await updatePrimaryWavePeriod(singleLink);
 
     server.log.info("Wave data updated successfully");
   } catch (error) {
     server.log.error("Error updating wave data:", error);
   }
 }
-
-// Create the task
 const task = new AsyncTask(
   "wave-data-update",
   async () => {
@@ -52,7 +49,6 @@ const task = new AsyncTask(
   }
 );
 
-// Create the job with the task
 const job = new SimpleIntervalJob(
   {
     seconds: 30, // For testing: run every 30 seconds
@@ -65,18 +61,16 @@ server.get("/health", async () => {
   return { status: "ok" };
 });
 
-// Manual trigger endpoint
 server.get("/trigger-update", async () => {
   await updateWaveData();
+  console.log("updating");
   return { status: "update triggered" };
 });
 
 const start = async () => {
   try {
-    // Add the job to the scheduler
     scheduler.addSimpleIntervalJob(job);
 
-    // Start the server
     await server.listen({
       port: 3000,
       host: "0.0.0.0",
@@ -89,7 +83,6 @@ const start = async () => {
   }
 };
 
-// Handle graceful shutdown
 process.on("SIGINT", async () => {
   scheduler.stop();
   await server.close();
@@ -102,5 +95,4 @@ process.on("SIGTERM", async () => {
   process.exit(0);
 });
 
-// Start the server
 start();
