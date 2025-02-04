@@ -6,7 +6,10 @@
       "type": "python",
       "request": "launch",
       "module": "uvicorn",
-      "args": ["app.main:app", "--reload"],
+      "args": [
+        "app.main:app",
+        "--reload"
+      ],
       "cwd": "${workspaceFolder}/backend",
       "jinja": false,
       "console": "integratedTerminal"
@@ -17,6 +20,21 @@
       "type": "pwa-chrome",
       "url": "http://localhost:3000/",
       "webRoot": "${workspaceFolder}/frontend/my-app",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
+        "${workspaceFolder}/frontend/my-app/node_modules/**/*.js",
+        "${workspaceFolder}/frontend/my-app/node_modules/**/*.mjs",
+        "**/build/*"
+      ]
+    },
+    {
+      "name": "Launch Chrome against vite",
+      "request": "launch",
+      "type": "pwa-chrome",
+      "url": "http://localhost:5173/",
+      "webRoot": "${workspaceFolder}/frontend/app",
       "sourceMaps": true,
       "skipFiles": [
         "<node_internals>/**/*.js",
@@ -96,4 +114,3 @@
     }
   ]
 }
-

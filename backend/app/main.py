@@ -5,20 +5,24 @@ from datetime import datetime, timedelta
 import redis
 from app.db.database import add_spots, create_tables, get_db
 from app.models.models import Spots, StationInventory
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
 from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
 
 create_tables()
 db = get_db()
 app = FastAPI()
 
-allowed_origins = os.getenv("ALLOWED_ORIGINS").split(",")
+# allowed_origins = os.getenv("ALLOWED_ORIGINS").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    # allow_origins=allowed_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],  # Allows all headers
@@ -120,7 +124,9 @@ def read_root():
 
 
 @app.get("/forecasts/spots/{date}/{spot_lat}/{spot_lng}")
-def get_forecast_by_lat_lng(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
+def get_forecast_by_lat_lng(
+    date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)
+):
     """
     Retrieve wave forecasts for a specific spot based on date and coordinates.
 
@@ -189,13 +195,21 @@ def get_forecast_by_lat_lng(date: str, spot_lat: str, spot_lng: str, db: Session
         )
 
         result = db.execute(
-            sql, {"date": date, "next_day": next_day, "spot_lat": spot_lat, "spot_lng": spot_lng}
+            sql,
+            {
+                "date": date,
+                "next_day": next_day,
+                "spot_lat": spot_lat,
+                "spot_lng": spot_lng,
+            },
         )
 
         rows = result.all()
         forecasts = [row._asdict() for row in rows]
 
-        redis_client.set(key, json.dumps(forecasts, cls=DateTimeEncoder), ex=timedelta(hours=1))
+        redis_client.set(
+            key, json.dumps(forecasts, cls=DateTimeEncoder), ex=timedelta(hours=1)
+        )
 
         return forecasts
 
@@ -216,6 +230,24 @@ def get_all_spots(db: Session = Depends(get_db)):
     """
     spots = db.query(Spots).order_by(Spots.spot_name.asc()).all()
     return [spot.as_dict() for spot in spots]
+
+@app.get("/spots/{spot_id}")
+def get_spot(spot_id: int, db: Session = Depends(get_db)):
+    """
+    Retrieve a single spot from the db by id 
+
+    Parameters:
+    - id: Spot Id
+
+    Returns: 
+    - A single spot  
+    """
+    spot = db.query(Spots).filter(Spots.id == spot_id).first()
+    
+    if spot is None:
+        raise HTTPException(status_code=404, detail="Spot not found")
+        
+    return JSONResponse(content=spot.as_dict())
 
 
 # Write new spots
@@ -269,7 +301,9 @@ def create_spot(spot: SpotCreate, db: Session = Depends(get_db)):
 
 # Get nearby station data
 @app.get("/current/spots/{range}/{lat}/{lng}")
-def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depends(get_db)):
+def get_nearby_station_data(
+    range: str, lat: str, lng: str, db: Session = Depends(get_db)
+):
     """
     Retrieve nearby weather station data within a specified range. The station data is populated to redis in near realtime via consumption from a kafka topic
 
@@ -323,7 +357,9 @@ def get_nearby_station_data(range: str, lat: str, lng: str, db: Session = Depend
 
 
 @app.get("/forecasts/nearest/{date}/{spot_lat}/{spot_lng}")
-def get_forecasts_by_spot(date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)):
+def get_forecasts_by_spot(
+    date: str, spot_lat: str, spot_lng: str, db: Session = Depends(get_db)
+):
     date = datetime.strptime(date, "%Y%m%d").date()
     next_day = date + timedelta(days=1)
     spot_lat = float(spot_lat)

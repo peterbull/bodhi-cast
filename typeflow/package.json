@@ -1,0 +1,48 @@
+{
+  "name": "typeflow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "build": "node esbuild.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio",
+    "db:migrate": "drizzle-kit migrate",
+    "dev": "tsx watch src/index.ts",
+    "dev:debug": "tsx --inspect src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/pg": "^8.11.10",
+    "@typescript-eslint/eslint-plugin": "^8.19.0",
+    "@typescript-eslint/parser": "^8.19.0",
+    "dotenv-cli": "^8.0.0",
+    "drizzle-kit": "^0.30.1",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.2",
+    "@fastify/schedule": "^6.0.0",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.10.2",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.38.3",
+    "eccodes-ts": "^0.0.25",
+    "esbuild": "^0.24.2",
+    "fastify": "^5.2.1",
+    "fastify-plugin": "^5.0.1",
+    "jsdom": "^25.0.1",
+    "pg": "^8.13.1",
+    "toad-scheduler": "^3.0.1"
+  }
+}

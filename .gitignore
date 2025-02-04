@@ -197,3 +197,11 @@ firebase.json
 firestore.indexes.json
 firestore.rules
 .firebaserc
+
+
+# ds
+.DS_Store
+
+**/data/*
+routeTree.gen.ts
+dist
