@@ -20,6 +20,8 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "tim
 tower-http = { version = "0.6", features = ["fs", "trace", "compression-gzip", "limit"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+openidconnect = { version = "4", default-features = false, features = ["reqwest", "rustls-tls"] }
+sha2 = "0.10"
 
 [dev-dependencies]
 http-body-util = "0.1"

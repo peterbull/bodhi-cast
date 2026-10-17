@@ -1,4 +1,6 @@
 use crate::{
+    accounts::CustomSpotLimit,
+    auth::{self, GoogleAuth},
     db::{Db, FollowLimit},
     model::{Forecast, NewSpot, validate_coordinates},
 };
@@ -23,13 +25,14 @@ pub struct AppState {
     pub db: Db,
     pub write_token: Option<Arc<str>>,
     pub allow_writes: bool,
+    pub auth: Option<Arc<GoogleAuth>>,
 }
 
 #[derive(Debug)]
-pub struct ApiError(StatusCode, String);
+pub struct ApiError(pub(crate) StatusCode, pub(crate) String);
 impl From<anyhow::Error> for ApiError {
     fn from(error: anyhow::Error) -> Self {
-        if error.is::<FollowLimit>() {
+        if error.is::<FollowLimit>() || error.is::<CustomSpotLimit>() {
             return Self(StatusCode::CONFLICT, error.to_string());
         }
         tracing::error!(error=%format!("{error:#}"),"API request failed");
@@ -52,6 +55,9 @@ fn not_found() -> ApiError {
 }
 
 fn writable(state: &AppState, headers: &HeaderMap) -> bool {
+    if state.auth.is_some() {
+        return false;
+    }
     if state.allow_writes {
         return true;
     }
@@ -87,6 +93,9 @@ pub fn router(state: AppState, web_dir: PathBuf) -> Router {
     Router::new()
         .route("/healthz", get(health))
         .route("/api/capabilities", get(capabilities))
+        .route("/api/auth/google", get(auth::login))
+        .route("/api/auth/google/callback", get(auth::callback))
+        .route("/api/auth/logout", post(auth::logout))
         .route("/api/status", get(status))
         .route("/api/spots", get(spots).post(add_spot))
         .route("/api/spots/{id}", get(spot))
@@ -111,7 +120,14 @@ pub fn router(state: AppState, web_dir: PathBuf) -> Router {
         )
         .layer(axum::extract::DefaultBodyLimit::max(16 * 1024))
         .layer(CompressionLayer::new())
-        .layer(TraceLayer::new_for_http())
+        .layer(axum::middleware::from_fn(|request: axum::extract::Request, next: axum::middleware::Next| async move {
+            let private = request.uri().path().starts_with("/api/") || request.uri().path().starts_with("/spots");
+            let mut response = next.run(request).await;
+            if private { response.headers_mut().insert(axum::http::header::CACHE_CONTROL, axum::http::HeaderValue::from_static("no-store")); }
+            response.headers_mut().insert(axum::http::header::REFERRER_POLICY, axum::http::HeaderValue::from_static("no-referrer"));
+            response
+        }))
+        .layer(TraceLayer::new_for_http().make_span_with(|request: &axum::http::Request<_>| tracing::info_span!("http", method=%request.method(), path=request.uri().path())))
         .with_state(state)
 }
 async fn health(State(state): State<AppState>) -> Result<Json<serde_json::Value>, ApiError> {
@@ -131,31 +147,56 @@ async fn health(State(state): State<AppState>) -> Result<Json<serde_json::Value>
 async fn capabilities(
     State(state): State<AppState>,
     headers: HeaderMap,
-) -> Json<serde_json::Value> {
-    Json(
-        serde_json::json!({"can_write":writable(&state,&headers),"requires_token":state.write_token.is_some(),"max_watched_spots":20}),
-    )
+) -> Result<Json<serde_json::Value>, ApiError> {
+    let session = auth::session(&state, &headers).await?;
+    Ok(Json(serde_json::json!({
+        "can_write":session.is_some() || writable(&state,&headers),
+        "can_retry_jobs":writable(&state,&headers),
+        "requires_token":state.auth.is_none() && state.write_token.is_some(),
+        "google_sign_in":state.auth.is_some(),
+        "user":session.as_ref().map(|s| &s.user),
+        "csrf_token":session.as_ref().map(|s| &s.csrf),
+        "max_watched_spots":20
+    })))
 }
 async fn status(State(state): State<AppState>) -> Result<Json<crate::db::Status>, ApiError> {
-    Ok(Json(state.db.status().await?))
+    let mut status = state.db.status().await?;
+    if state.auth.is_some() {
+        status.errors.clear();
+    }
+    Ok(Json(status))
 }
-async fn spots(State(state): State<AppState>) -> Result<Json<Vec<crate::model::Spot>>, ApiError> {
-    Ok(Json(state.db.spots().await?))
+async fn spots(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> Result<Json<Vec<crate::model::Spot>>, ApiError> {
+    let user = auth::session(&state, &headers).await?.map(|s| s.user.id);
+    Ok(Json(state.db.spots_for(user).await?))
 }
 async fn spot(
     State(state): State<AppState>,
     Path(id): Path<i64>,
+    headers: HeaderMap,
 ) -> Result<Json<crate::model::Spot>, ApiError> {
-    Ok(Json(state.db.spot(id).await?.ok_or_else(not_found)?))
+    let user = auth::session(&state, &headers).await?.map(|s| s.user.id);
+    Ok(Json(
+        state.db.spot_for(id, user).await?.ok_or_else(not_found)?,
+    ))
 }
 async fn add_spot(
     State(state): State<AppState>,
     headers: HeaderMap,
     Json(mut new): Json<NewSpot>,
 ) -> Result<impl IntoResponse, ApiError> {
-    authorize(&state, &headers)?;
     new.validate().map_err(bad_request)?;
-    Ok((StatusCode::CREATED, Json(state.db.add_spot(&new).await?)))
+    let spot = if state.auth.is_some() {
+        let user = auth::authorize(&state, &headers).await?;
+        state.db.add_personal_spot(user.id, &new).await?
+    } else {
+        authorize(&state, &headers)?;
+        state.db.add_spot(&new).await?
+    };
+    Ok((StatusCode::CREATED, Json(spot)))
 }
 #[derive(Deserialize)]
 struct WatchRequest {
@@ -167,14 +208,17 @@ async fn watch_spot(
     headers: HeaderMap,
     Json(request): Json<WatchRequest>,
 ) -> Result<Json<crate::model::Spot>, ApiError> {
-    authorize(&state, &headers)?;
-    Ok(Json(
+    let spot = if state.auth.is_some() {
+        let user = auth::authorize(&state, &headers).await?;
         state
             .db
-            .set_watch(id, request.watched)
+            .set_personal_watch(user.id, id, request.watched)
             .await?
-            .ok_or_else(not_found)?,
-    ))
+    } else {
+        authorize(&state, &headers)?;
+        state.db.set_watch(id, request.watched).await?
+    };
+    Ok(Json(spot.ok_or_else(not_found)?))
 }
 #[derive(Serialize)]
 struct ForecastResponse {
@@ -185,8 +229,10 @@ struct ForecastResponse {
 async fn forecasts(
     State(state): State<AppState>,
     Path(id): Path<i64>,
+    headers: HeaderMap,
 ) -> Result<Json<ForecastResponse>, ApiError> {
-    state.db.spot(id).await?.ok_or_else(not_found)?;
+    let user = auth::session(&state, &headers).await?.map(|s| s.user.id);
+    state.db.spot_for(id, user).await?.ok_or_else(not_found)?;
     let points = state.db.forecasts(id).await?;
     let stale = points
         .iter()
@@ -202,8 +248,10 @@ async fn forecasts(
 async fn stations(
     State(state): State<AppState>,
     Path(id): Path<i64>,
+    headers: HeaderMap,
 ) -> Result<Json<Vec<crate::model::Station>>, ApiError> {
-    let spot = state.db.spot(id).await?.ok_or_else(not_found)?;
+    let user = auth::session(&state, &headers).await?.map(|s| s.user.id);
+    let spot = state.db.spot_for(id, user).await?.ok_or_else(not_found)?;
     validate_coordinates(spot.latitude, spot.longitude).map_err(bad_request)?;
     Ok(Json(
         state
