@@ -1,0 +1,30 @@
+services:
+  app:
+    command:
+      [
+        serve,
+        --listen,
+        "0.0.0.0:8000",
+        --write-token-file,
+        /run/secrets/write_token,
+      ]
+    secrets: [write_token]
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      BODHI_DOMAIN: ${BODHI_DOMAIN:?Set the DNS name of this server}
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [app]
+    restart: unless-stopped
+secrets:
+  write_token:
+    file: ./secrets/write-token
+volumes:
+  caddy-data:
+  caddy-config:

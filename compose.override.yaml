@@ -1,0 +1,2 @@
+# Prevent automatic loading of the retained legacy docker-compose.override.yml.
+services: {}
