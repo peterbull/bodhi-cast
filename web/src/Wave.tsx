@@ -85,7 +85,7 @@ function OceanCanvas({
       document.removeEventListener("visibilitychange", redraw);
       ocean.dispose();
     };
-  }, [point?.time, point?.valid_time, spot?.id]);
+  }, [point, spot?.id, spot?.latitude, spot?.longitude]);
   useEffect(() => {
     redrawRef.current?.();
   }, [playing, enabled]);
@@ -96,7 +96,7 @@ function OceanCanvas({
         role="img"
         aria-label={
           point
-            ? `Beach perspective at ${spot?.spot_name ?? "this spot"}: ${point.swh?.toFixed(1) ?? "unknown"} meter seas with a ${point.perpw?.toFixed(1) ?? "unknown"} second period`
+            ? `Beach perspective at ${spot?.spot_name ?? "this spot"}: ${point.swh?.toFixed(1) ?? "unknown"} meter seas with a ${point.perpw?.toFixed(1) ?? "unknown"} second period, with a 1.8 meter person holding a surfboard for scale`
             : "Beach perspective waiting for forecast data"
         }
       />
@@ -242,8 +242,8 @@ function BeachDialog({
           {point.perpw?.toFixed(1) ?? "—"} s period
         </span>
         <p>
-          Waves follow the forecast. Shoreline, lighting, and breaking surf are
-          illustrative.
+          {units === "imperial" ? "5 ft 11 in" : "1.8 m"} figure for scale.
+          Shoreline and breaking surf are illustrative.
         </p>
       </div>
     </dialog>
