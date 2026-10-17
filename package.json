@@ -1,0 +1,14 @@
+{
+  "name": "bodhi-cast",
+  "private": true,
+  "packageManager": "pnpm@12.3.4",
+  "scripts": {
+    "dev": "pnpm --filter @bodhi/web dev",
+    "build": "pnpm --filter @bodhi/web build",
+    "check": "pnpm --filter @bodhi/web check",
+    "test": "node --test web/tests/*.test.ts"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}
