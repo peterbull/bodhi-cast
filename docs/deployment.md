@@ -19,7 +19,7 @@ docker save bodhi-cast:RELEASE | gzip > bodhi-cast-image.tar.gz
 
 Transfer the archive over SSH, then load it with `docker load -i bodhi-cast-image.tar.gz`. Runtime files live in `/opt/bodhi-cast`: copy `deploy/compose.droplet.yaml` as `compose.yaml`, `deploy/Caddyfile.droplet` as `Caddyfile`, and the initialization and backup scripts alongside them.
 
-Run `sh initialize-droplet.sh` for first setup. It generates a database password and write token only if missing, then starts Compose. For updates, load the new image, update `BODHI_IMAGE` in the host's `.env`, and run `docker compose up -d --wait`. Keep the previous image until the new version passes verification. The first deployment uses `bodhi-cast:20261017-qa`.
+Run `sh initialize-droplet.sh` for first setup. It generates a database password only if missing, checks that `secrets/google-client.json` is installed, then starts Compose. For updates, load the new image, update `BODHI_IMAGE` in the host's `.env`, and run `docker compose up -d --wait`. Keep the previous image until the new version passes verification. The first deployment uses `bodhi-cast:20261017-qa`.
 
 ## DNS and HTTPS
 
@@ -27,13 +27,13 @@ Run `sh initialize-droplet.sh` for first setup. It generates a database password
 
 The scoped token is in the ignored `secrets/cloudflare-api-token` file, mode 600. Supply it as `CLOUDFLARE_API_TOKEN` in the Terraform process environment. It has DNS Edit and Zone Read for bodhicast.com only and expires October 17, 2027. It cannot change TLS settings or other domains. Terraform state is local in each infrastructure directory; preserve it with the credentials.
 
-Caddy obtains and renews public certificates for bodhicast.com and www.bodhicast.com. Use Cloudflare **Full (strict)** encryption so the origin certificate is verified. Caddy's certificate volumes persist across updates. Direct HTTP to the IP exposes only a readiness response and `/healthz`.
+Caddy obtains and renews public certificates for bodhicast.com and www.bodhicast.com. The www host redirects to the apex so OAuth cookies use one origin. Use Cloudflare **Full (strict)** encryption so the origin certificate is verified. Caddy's certificate volumes persist across updates. Direct HTTP to the IP exposes only a readiness response and `/healthz`.
 
 ## Editing and secrets
 
-The site is publicly readable. Following or adding spots requires **Unlock editing** with the server's write token. The browser keeps it in memory and forgets it on reload. This is a single-owner app; everyone with that token has the same editing rights.
+The site is publicly readable. Google sign-in gives each user separate followed spots and private custom locations. No server token is used in the droplet deployment. See [account setup](accounts.md) for the Google client, redirect URL, and session behavior.
 
-The host stores `.env` with mode 600 and `secrets/` with mode 700. The token file inside that private directory is mode 644 so the unprivileged container user can read its bind mount. Do not add secrets to Terraform variables, state, Git, logs, or public messages. Retrieve the editing token over SSH when needed.
+The host stores `.env` with mode 600 and `secrets/` with mode 700. The Google client JSON inside that private directory is mode 644 so container uid 10001 can read its bind mount. Store the local copy in the ignored `secrets/` directory with mode 600. Keep credentials out of Terraform variables, state, Git, logs, and public messages.
 
 ## Health and operations
 
@@ -49,13 +49,13 @@ free -m
 
 `/healthz` checks database connectivity. `/api/status` reports the queue, latest forecast model, and recent failures. NOAA requests run serially with at least ten seconds between wave downloads. Forecasts appear progressively. Older coverage remains available while a new model loads.
 
-Failed jobs stop retrying after eight attempts. Investigate the cause before using the UI's retry control or `docker compose exec app bodhi-cast jobs --retry-failed`. Use `docker compose restart app` to restart only the app. Never use `down -v` during normal updates: it removes the database.
+Failed jobs stop retrying after eight attempts. Investigate the cause before using `docker compose exec app bodhi-cast jobs --retry-failed`. Use `docker compose restart app` to restart only the app. Never use `down -v` during normal updates: it removes the database.
 
 ## Backups
 
 `deploy/backup.sh` writes seven rotating daily PostgreSQL custom-format archives to `/var/backups/bodhi-cast`. A root cron entry runs it daily. These copies are on the same host; download them separately for protection from host loss. Paid cloud backups are not enabled.
 
-Restore an archive into a separate PostGIS database before relying on it. A destructive restore requires stopping the app and an explicit recovery decision. Back up the host credentials, editing token, Terraform state, and Caddy certificate volumes separately.
+Restore an archive into a separate PostGIS database before relying on it. A destructive restore requires stopping the app and an explicit recovery decision. Back up the host credentials, Google client JSON, Terraform state, and Caddy certificate volumes separately.
 
 The Rust database client uses `NoTls` only within the private Docker network or local loopback. A database on another host needs TLS support or a private encrypted tunnel.
 

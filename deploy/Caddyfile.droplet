@@ -1,9 +1,13 @@
-{$BODHI_DOMAIN}, www.{$BODHI_DOMAIN} {
+www.{$BODHI_DOMAIN} {
+    redir https://{$BODHI_DOMAIN}{uri} permanent
+}
+
+{$BODHI_DOMAIN} {
     encode zstd gzip
     reverse_proxy app:8000
     header {
         X-Content-Type-Options nosniff
-        Referrer-Policy strict-origin-when-cross-origin
+        Referrer-Policy no-referrer
         X-Frame-Options DENY
     }
 }
