@@ -22,8 +22,9 @@ services:
     environment:
       DATABASE_URL: postgresql://bodhi:${BODHI_DB_PASSWORD}@db:5432/bodhi
       RUST_LOG: bodhi_cast=info,tower_http=info
-    command: [serve, --listen, "0.0.0.0:8000", --write-token-file, /run/secrets/write_token]
-    secrets: [write_token]
+      BODHI_PUBLIC_URL: https://${BODHI_DOMAIN:?Set BODHI_DOMAIN}
+    command: [serve, --listen, "0.0.0.0:8000", --google-client-file, /run/secrets/google_client]
+    secrets: [google_client]
     depends_on:
       db:
         condition: service_healthy
@@ -48,8 +49,8 @@ services:
     restart: unless-stopped
     mem_limit: 96m
 secrets:
-  write_token:
-    file: ./secrets/write-token
+  google_client:
+    file: ./secrets/google-client.json
 volumes:
   bodhi-postgres:
   caddy-data:

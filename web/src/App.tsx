@@ -66,6 +66,11 @@ export default function App() {
   const [spots, setSpots] = useState<Spot[]>([]),
     [status, setStatus] = useState<Status>(),
     [caps, setCaps] = useState<Capabilities>();
+  const [authNotice, setAuthNotice] = useState(() =>
+    new URLSearchParams(location.search).has("auth_error")
+      ? "Google sign-in did not finish. Please try again."
+      : "",
+  );
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [token, setToken] = useState("");
@@ -113,6 +118,16 @@ export default function App() {
     [showUnlock, setShowUnlock] = useState(false);
   const selected = resolveSpot(spots, requestedId);
   const selectedId = selected?.id ?? 0;
+  const signInUrl = `/api/auth/google${selectedId ? `?spot=${selectedId}` : ""}`;
+  const writeHeaders = () =>
+    caps?.csrf_token ? { "X-CSRF-Token": caps.csrf_token } : undefined;
+  useEffect(() => {
+    const url = new URL(location.href);
+    if (url.searchParams.has("auth_error")) {
+      url.searchParams.delete("auth_error");
+      history.replaceState(null, "", url);
+    }
+  }, []);
   const forecast =
     forecastState?.spotId === selectedId ? forecastState.data : undefined;
   const stations = stationState?.spotId === selectedId ? stationState.data : [];
@@ -360,6 +375,34 @@ export default function App() {
               m / m/s
             </button>
           </div>
+          {caps?.google_sign_in &&
+            (caps.user ? (
+              <details className="account-menu">
+                <summary>{caps.user.name || "Your account"}</summary>
+                <div className="account-popover">
+                  <span>{caps.user.email}</span>
+                  <button
+                    className="text-button"
+                    disabled={busy}
+                    onClick={() =>
+                      void mutate(async () => {
+                        await request("/auth/logout", {
+                          method: "POST",
+                          headers: writeHeaders(),
+                        });
+                        location.replace("/");
+                      })
+                    }
+                  >
+                    Sign out
+                  </button>
+                </div>
+              </details>
+            ) : (
+              <a className="sign-in-button" href={signInUrl}>
+                Sign in with Google
+              </a>
+            ))}
           {caps?.requires_token && !caps.can_write && (
             <button className="text-button" onClick={() => setShowUnlock(true)}>
               Unlock editing
@@ -367,6 +410,12 @@ export default function App() {
           )}
         </div>
       </header>
+      {authNotice && (
+        <div className="alert" role="alert">
+          {authNotice}
+          <button onClick={() => setAuthNotice("")}>Dismiss</button>
+        </div>
+      )}
       {error && (
         <div className="alert" role="alert">
           {error}
@@ -426,7 +475,8 @@ export default function App() {
                 aria-pressed={activeMode === "following"}
                 onClick={() => chooseMode("following")}
               >
-                Following <span>{following.length}</span>
+                {caps?.google_sign_in && !caps.user ? "Featured" : "Following"}{" "}
+                <span>{following.length}</span>
               </button>
             </div>
           </div>
@@ -512,8 +562,12 @@ export default function App() {
             </button>
             <small>
               {caps?.can_write
-                ? "Or click anywhere on the map."
-                : "Browse freely. Editing is controlled by the server."}
+                ? caps?.user
+                  ? "Your custom spots are private. Click the map to add one."
+                  : "Or click anywhere on the map."
+                : caps?.google_sign_in
+                  ? "Sign in to save your spots."
+                  : "Browsing only."}
             </small>
           </div>
         </aside>
@@ -553,21 +607,30 @@ export default function App() {
               {selected && (
                 <button
                   className={`follow-button ${selected.watched ? "is-following" : ""}`}
-                  disabled={!caps?.can_write || busy}
-                  onClick={() =>
+                  disabled={(!caps?.can_write && !caps?.google_sign_in) || busy}
+                  onClick={() => {
+                    if (!caps?.can_write && caps?.google_sign_in) {
+                      location.assign(signInUrl);
+                      return;
+                    }
                     void mutate(() =>
                       request(
                         `/spots/${selected.id}/watch`,
                         {
                           method: "PUT",
                           body: JSON.stringify({ watched: !selected.watched }),
+                          headers: writeHeaders(),
                         },
                         token,
                       ),
-                    )
-                  }
+                    );
+                  }}
                 >
-                  {selected.watched ? "✓ Following" : "+ Follow spot"}
+                  {caps?.google_sign_in && !caps.user
+                    ? "Sign in to follow"
+                    : selected.watched
+                      ? "✓ Following"
+                      : "+ Follow spot"}
                 </button>
               )}
             </div>
@@ -623,9 +686,11 @@ export default function App() {
                 </p>
                 {!caps?.can_write && (
                   <small>
-                    {caps?.requires_token
-                      ? "Unlock editing with your server token to follow a spot."
-                      : "Start the server with editing enabled to follow a spot."}
+                    {caps?.google_sign_in ? (
+                      <a href={signInUrl}>Sign in to follow this spot.</a>
+                    ) : (
+                      "Editing is unavailable."
+                    )}
                   </small>
                 )}
               </div>
@@ -872,7 +937,7 @@ export default function App() {
                 <span className="footer-wave" aria-hidden="true">
                   ∿
                 </span>{" "}
-                NOAA data
+                NOAA data · <a href="/privacy.html">Privacy</a>
               </span>
               <details>
                 <summary>
@@ -892,7 +957,7 @@ export default function App() {
                     Job {e.id}: {e.error}
                   </p>
                 ))}
-                {failed > 0 && caps?.can_write && (
+                {failed > 0 && caps?.can_retry_jobs && (
                   <button
                     disabled={busy}
                     onClick={() =>
@@ -916,7 +981,11 @@ export default function App() {
           onSave={async (input) => {
             const created = await request<Spot>(
               "/spots",
-              { method: "POST", body: JSON.stringify(input) },
+              {
+                method: "POST",
+                body: JSON.stringify(input),
+                headers: writeHeaders(),
+              },
               token,
             );
             await load();

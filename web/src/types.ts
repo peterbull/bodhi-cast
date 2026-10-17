@@ -66,5 +66,9 @@ export interface Capabilities {
   can_write: boolean;
   requires_token: boolean;
   max_watched_spots: number;
+  can_retry_jobs: boolean;
+  google_sign_in: boolean;
+  user: { id: number; name: string; email: string } | null;
+  csrf_token: string | null;
 }
 export type Units = "metric" | "imperial";

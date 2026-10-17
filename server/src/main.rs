@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use bodhi_cast::{
     api::{AppState, router},
+    auth::GoogleAuth,
     db::Db,
     model::NewSpot,
     noaa, worker,
@@ -43,6 +44,10 @@ enum Command {
         allow_writes: bool,
         #[arg(long, help = "Read the editing token from a private file")]
         write_token_file: Option<PathBuf>,
+        #[arg(long, env="BODHI_GOOGLE_CLIENT_FILE", requires="public_url", conflicts_with_all=["allow_writes","write_token_file"])]
+        google_client_file: Option<PathBuf>,
+        #[arg(long, env = "BODHI_PUBLIC_URL", requires = "google_client_file")]
+        public_url: Option<String>,
     },
     Sync {
         #[arg(long,default_value_t=72,value_parser=clap::value_parser!(u16).range(12..=384))]
@@ -76,6 +81,8 @@ async fn main() -> Result<()> {
             no_worker,
             allow_writes,
             write_token_file,
+            google_client_file,
+            public_url,
         } => {
             anyhow::ensure!(
                 web_dir.join("index.html").exists(),
@@ -90,6 +97,15 @@ async fn main() -> Result<()> {
                 write_token.as_ref().is_none_or(|s| s.len() >= 24),
                 "Write token must contain at least 24 bytes"
             );
+            let auth = google_client_file
+                .map(|path| {
+                    GoogleAuth::from_file(
+                        &path,
+                        public_url.as_deref().expect("Required public URL"),
+                    )
+                    .map(Arc::new)
+                })
+                .transpose()?;
             let listener = tokio::net::TcpListener::bind(listen).await?;
             let (stop_tx, stop_rx) = watch::channel(false);
             let worker_task = if no_worker {
@@ -102,6 +118,7 @@ async fn main() -> Result<()> {
                     db,
                     write_token,
                     allow_writes,
+                    auth,
                 },
                 web_dir,
             );

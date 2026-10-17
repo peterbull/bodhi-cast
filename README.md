@@ -40,7 +40,7 @@ cargo run --release -- serve --allow-writes
 
 For frontend hot reload, run `pnpm dev` in another terminal and visit http://localhost:5173. Vite proxies `/api` to the Rust server on port 8000. Production serves the UI and API from the same origin.
 
-The server defaults to read-only access. Use `--allow-writes` on a trusted local machine, or `--write-token-file /path/to/token` for a public deployment. Tokens are held in browser memory after unlocking editing. No token is stored in local storage.
+The server defaults to read-only access. Use `--allow-writes` on a trusted local machine. Public deployments use Google sign-in with `--google-client-file /path/to/google-client.json --public-url https://bodhicast.com`. Each account has its own followed spots and private custom locations. See [Google sign-in setup](docs/accounts.md). The legacy `--write-token-file` mode remains available for single-owner installations; it cannot be combined with Google sign-in.
 
 ## Data and resource use
 

@@ -19,7 +19,7 @@ impl std::fmt::Display for FollowLimit {
 }
 impl std::error::Error for FollowLimit {}
 
-fn spot(row: Row) -> Spot {
+pub(crate) fn spot(row: Row) -> Spot {
     Spot {
         id: row.get("id"),
         latitude: row.get("latitude"),
@@ -55,6 +55,8 @@ impl Db {
         tx.execute("SELECT pg_advisory_xact_lock(76249100)", &[])
             .await?;
         tx.batch_execute(include_str!("../schema.sql")).await?;
+        tx.batch_execute(include_str!("../accounts-schema.sql"))
+            .await?;
         let catalog: serde_json::Value = serde_json::from_str(include_str!("../catalog.json"))?;
         tx.execute("INSERT INTO bodhi.spots(spot_name,street_address,latitude,longitude) SELECT spot_name,street_address,latitude,longitude FROM jsonb_to_recordset($1) AS s(spot_name text, street_address text, latitude float8, longitude float8) ON CONFLICT DO NOTHING", &[&catalog]).await?;
         tx.commit().await?;
@@ -66,7 +68,10 @@ impl Db {
             .pool
             .get()
             .await?
-            .query("SELECT * FROM bodhi.spots ORDER BY spot_name,id", &[])
+            .query(
+                "SELECT * FROM bodhi.spots WHERE owner_user_id IS NULL ORDER BY spot_name,id",
+                &[],
+            )
             .await?
             .into_iter()
             .map(spot)
@@ -78,7 +83,10 @@ impl Db {
             .pool
             .get()
             .await?
-            .query_opt("SELECT * FROM bodhi.spots WHERE id=$1", &[&id])
+            .query_opt(
+                "SELECT * FROM bodhi.spots WHERE owner_user_id IS NULL AND id=$1",
+                &[&id],
+            )
             .await?
             .map(spot))
     }
@@ -88,7 +96,7 @@ impl Db {
             .pool
             .get()
             .await?
-            .query("SELECT * FROM bodhi.spots WHERE watched ORDER BY id", &[])
+            .query("SELECT * FROM bodhi.spots s WHERE watched OR EXISTS(SELECT 1 FROM bodhi.user_follows f WHERE f.spot_id=s.id) ORDER BY id", &[])
             .await?
             .into_iter()
             .map(spot)
@@ -101,7 +109,10 @@ impl Db {
         tx.execute("SELECT pg_advisory_xact_lock(76249101)", &[])
             .await?;
         let Some(existing) = tx
-            .query_opt("SELECT * FROM bodhi.spots WHERE id=$1", &[&id])
+            .query_opt(
+                "SELECT * FROM bodhi.spots WHERE owner_user_id IS NULL AND id=$1",
+                &[&id],
+            )
             .await?
         else {
             return Ok(None);
@@ -135,7 +146,7 @@ impl Db {
         let tx = conn.transaction().await?;
         tx.execute("SELECT pg_advisory_xact_lock(76249101)", &[])
             .await?;
-        let existing = tx.query_opt("SELECT * FROM bodhi.spots WHERE lower(spot_name)=lower($1) AND ST_DWithin(location,ST_SetSRID(ST_MakePoint($2,$3),4326)::geography,1) ORDER BY id LIMIT 1", &[&new.spot_name,&new.longitude,&new.latitude]).await?.map(spot);
+        let existing = tx.query_opt("SELECT * FROM bodhi.spots WHERE owner_user_id IS NULL AND lower(spot_name)=lower($1) AND ST_DWithin(location,ST_SetSRID(ST_MakePoint($2,$3),4326)::geography,1) ORDER BY id LIMIT 1", &[&new.spot_name,&new.longitude,&new.latitude]).await?.map(spot);
         if let Some(ref existing) = existing
             && existing.watched
         {
@@ -156,7 +167,7 @@ impl Db {
             tx.commit().await?;
             return Ok(spot(row));
         }
-        let row = tx.query_one("INSERT INTO bodhi.spots(spot_name,street_address,latitude,longitude,watched) VALUES($1,$2,$3,$4,true) ON CONFLICT(spot_name,latitude,longitude) DO UPDATE SET watched=true RETURNING *", &[&new.spot_name,&new.street_address,&new.latitude,&new.longitude]).await?;
+        let row = tx.query_one("INSERT INTO bodhi.spots(spot_name,street_address,latitude,longitude,watched) VALUES($1,$2,$3,$4,true) ON CONFLICT(spot_name,latitude,longitude) WHERE owner_user_id IS NULL DO UPDATE SET watched=true RETURNING *", &[&new.spot_name,&new.street_address,&new.latitude,&new.longitude]).await?;
         tx.commit().await?;
         Ok(spot(row))
     }
@@ -289,6 +300,13 @@ impl Db {
         .await?;
         conn.execute(
             "DELETE FROM bodhi.jobs WHERE created_at<now()-interval '4 days' AND status<>'running'",
+            &[],
+        )
+        .await?;
+        conn.execute("DELETE FROM bodhi.sessions WHERE expires_at<=now()", &[])
+            .await?;
+        conn.execute(
+            "DELETE FROM bodhi.login_attempts WHERE expires_at<=now()",
             &[],
         )
         .await?;

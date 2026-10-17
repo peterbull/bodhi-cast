@@ -1,4 +1,5 @@
 import type { Forecast, Spot } from "./types";
+import { waveNumber } from "./swell";
 
 const vertex = `attribute vec2 position;void main(){gl_Position=vec4(position,0.,1.);}`;
 const fragment = `
@@ -6,6 +7,8 @@ precision highp float;
 uniform vec2 resolution;
 uniform float time;
 uniform vec3 waves[4];
+uniform vec4 waveNumbers[4];
+uniform vec2 offshoreNumbers[4];
 uniform float wind;
 uniform float significantHeight;
 uniform vec3 lightDirection;
@@ -32,33 +35,62 @@ float fbm(vec2 p) {
   return sum;
 }
 float coast(float x) { return sin(x*.075)*.65 + sin(x*.19)*.18; }
-float sandHeight(vec2 p) { return -.105*(p.y-coast(p.x)); }
+float sandHeight(vec2 p) {
+  float shore=p.y-coast(p.x);
+  return shore<0. ? -shore*.13 : -.04*shore-.22*(1.-exp(-shore*.12));
+}
+float breakDistance() { return clamp(significantHeight/(.78*.04),12.,170.); }
+float phaseIntegral(float shore,vec4 k, float deep) {
+  vec4 length=vec4(24.,72.,224.,680.);
+  vec4 x=clamp(vec4(shore)-vec4(0.,24.,96.,320.),vec4(0.),length);
+  vec4 end=vec4(k.yzw,deep);
+  return dot(k*x+.5*(end-k)*x*x/length,vec4(1.))+max(shore-1000.,0.)*deep;
+}
+float wavePhase(vec2 p,float shore,float period,vec4 nearK,vec2 farK,float seed) {
+  float omega=2.*PI/max(period,2.);
+  return p.x*farK.y-phaseIntegral(shore,nearK,farK.x)-time*omega+seed*2.31;
+}
 float sea(vec2 p) {
-  float shore = max(p.y-coast(p.x),0.);
-  float shallow = exp(-shore*.035);
-  float h = 0.;
+  float shore=max(p.y-coast(p.x),0.);
+  float breaking=breakDistance();
+  float shoal=exp(-pow((shore-breaking)/(breaking*.65+8.),2.));
+  float h=0.;
   for(int i=0;i<4;i++) {
-    float period = max(waves[i].y,2.);
-    float k = 4.*PI*PI/(9.81*period*period);
-    vec2 direction = vec2(sin(waves[i].z),cos(waves[i].z));
-    direction = normalize(mix(direction,vec2(direction.x*.3,-1.),shallow*.85));
-    vec2 q = vec2(p.x, p.y + 46.*(1.-exp(-shore*.055)));
-    float phase = dot(q,direction)*k - time*2.*PI/period + float(i)*2.31;
-    float spread = dot(q,vec2(direction.y,-direction.x))*k*.24;
-    float group = .82 + .18*sin(phase*.31 + spread*.9);
-    float profile = sin(phase + .32*sin(phase));
-    profile += .32*sin(phase*1.18+spread+float(i)*1.7);
-    h += waves[i].x*profile*group;
+    float phase=wavePhase(p,shore,waves[i].y,waveNumbers[i],offshoreNumbers[i],float(i));
+    float omega=2.*PI/max(waves[i].y,2.);
+    float group=.84+.16*cos(phase*.16+time*omega*.08+float(i)*1.8);
+    float bend=.12*sin(p.x*.018+float(i)*2.1);
+    float theta=phase+bend;
+    float steepness=.18+.38*shoal;
+    theta+=steepness*sin(theta);
+    float profile=cos(theta)+.5*steepness+.12*shoal*cos(theta*2.+.5);
+    h+=waves[i].x*profile*group;
   }
-  float shoal = (1.+.55*exp(-pow((shore-16.)/13.,2.)))*smoothstep(0.,6.,shore);
+  float spent=mix(.12,1.,smoothstep(0.,breaking,shore));
+  h*=spent*(1.+.35*shoal)*smoothstep(0.,4.,shore);
+  float depth=max(-sandHeight(p),0.);
+  float limit=max(.04,depth*.48);
+  h=limit*(2./(1.+exp(-2.*h/limit))-1.);
   float period=max(waves[0].y,max(waves[3].y,4.));
-  float runup=(.07+.14*sin(-time*2.*PI/period+sin(p.x*.23)*.28))*smoothstep(0.,.3,significantHeight);
-  float limit=.45+shore*.11;
-  h=limit*(2./(1.+exp(-2.*h*shoal/limit))-1.);
-  return max(h,-shore*.075) + runup*exp(-shore*.38);
+  float runup=(.035+.12*sin(-time*2.*PI/period+sin(p.x*.18)*.2))*smoothstep(.15,.6,significantHeight);
+  return h+runup*exp(-shore*.24);
+}
+float breakingFoam(vec2 p,float shore) {
+  float breaking=breakDistance();
+  float surf=smoothstep(2.,12.,shore)*(1.-smoothstep(breaking*.8,breaking*1.45,shore));
+  float foam=0.;
+  for(int i=0;i<4;i++) {
+    float phase=wavePhase(p,max(shore,0.),waves[i].y,waveNumbers[i],offshoreNumbers[i],float(i))+.12*sin(p.x*.018+float(i)*2.1);
+    float sinceCrest=mod(-phase+2.*PI,2.*PI);
+    float trail=exp(-sinceCrest*1.25);
+    float crest=pow(max(cos(phase),0.),10.);
+    float weight=clamp(waves[i].x/max(significantHeight*.35,.05),0.,1.);
+    foam+=weight*(trail*.62+crest*.55);
+  }
+  return foam*surf*smoothstep(.2,.8,significantHeight);
 }
 float detail(vec2 p, float footprint) {
-  float total=0., amplitude=.004+min(wind,25.)*.003;
+  float total=0., amplitude=.003+min(wind,25.)*.0013;
   float frequency=1.15;
   vec2 q=p;
   for(int i=0;i<5;i++) {
@@ -75,13 +107,13 @@ float detail(vec2 p, float footprint) {
 }
 vec3 sky(vec3 ray, bool clouds) {
   float elevation=max(ray.y,0.);
-  vec3 horizon=vec3(.48,.65,.73);
-  vec3 zenith=vec3(.025,.16,.34);
+  vec3 horizon=vec3(.29,.48,.62);
+  vec3 zenith=vec3(.012,.10,.27);
   vec3 color=mix(horizon,zenith,pow(elevation,.47));
   float sun=max(dot(ray,lightDirection),0.);
   color+=vec3(1.,.75,.44)*pow(sun,9.)*.22;
   color+=vec3(1.,.85,.63)*pow(sun,220.)*.55;
-  color+=vec3(4.,3.6,2.8)*smoothstep(.99965,.9999,sun);
+  if(clouds) color+=vec3(4.,3.6,2.8)*smoothstep(.99965,.9999,sun);
   if(clouds && ray.y>.015) {
     vec2 uv=ray.xz/(ray.y+.13)*1.4;
     uv.x+=time*.0018;
@@ -139,7 +171,7 @@ vec3 render(vec3 origin,vec3 ray) {
   float shore=p.z-coast(p.x);
   float period=max(waves[0].y,max(waves[3].y,4.));
   float surface=sea(p.xz);
-  float waterline=(surface-sandHeight(p.xz))/.105;
+  float waterline=(surface-sandHeight(p.xz))/.13;
   float footprint=max(t/resolution.y,.002);
   vec3 sandColor=sand(p.xz);
   if(sandHeight(p.xz)>=surface-.012) {
@@ -151,7 +183,7 @@ vec3 render(vec3 origin,vec3 ray) {
     float lace=foamCells(p.xz*vec2(1.2,1.8)+vec2(0,time*.15),footprint);
     float front=exp(-abs(waterline)*5.)*(.4+.6*lace);
     float washed=sheet*(1.-smoothstep(0.,2.,waterline))*.3*lace;
-    color=mix(color,vec3(.85,.9,.86),clamp((front+washed)*smoothstep(0.,.3,significantHeight),0.,.9));
+    color=mix(color,vec3(.85,.9,.86),clamp((front+washed)*smoothstep(.15,.6,significantHeight),0.,.9));
     return color;
   }
   float epsilon=max(.025,footprint*.7);
@@ -169,7 +201,7 @@ vec3 render(vec3 origin,vec3 ray) {
   float fresnel=.02+.98*pow(1.-facing,5.);
   float depth=max(p.y-sandHeight(p.xz),0.);
   vec3 transmittance=exp(-depth*vec3(.52,.105,.075));
-  vec3 underwater=mix(vec3(.006,.073,.105),sandColor*vec3(.22,.65,.64),transmittance);
+  vec3 underwater=mix(vec3(.003,.044,.075),sandColor*vec3(.22,.65,.64),transmittance);
   float backlight=pow(max(dot(ray,lightDirection),0.),3.);
   float crestLight=smoothstep(0.,max(significantHeight*.5,.1),h);
   underwater+=vec3(.015,.23,.145)*crestLight*(.35+backlight)*exp(-depth*.035);
@@ -179,28 +211,26 @@ vec3 render(vec3 origin,vec3 ray) {
   float spec=pow(max(dot(normal,halfVector),0.),180.);
   color+=vec3(1.,.89,.66)*spec*.85;
   float turbulent=fbm(p.xz*vec2(.32,.55)+vec2(time*.15,time*.65));
-  float heightScale=max(significantHeight*.3,.12);
-  float breaker=smoothstep(heightScale*.15,heightScale*.95,h);
-  float surfZone=smoothstep(1.,5.,shore)*(1.-smoothstep(16.,38.,shore));
-  float whitecap=smoothstep(10.,22.,wind)*smoothstep(.2,.55,1.-normal.y);
-  float foam=breaker*surfZone*(.35+turbulent*.65)+whitecap*.3;
-  float wash=(1.-smoothstep(0.,9.,shore))*smoothstep(-.6,.8,sin(shore*.8+time*2.*PI/period+turbulent*2.))*smoothstep(0.,.3,significantHeight);
-  float lace=foamCells(p.xz*vec2(1.1,1.6)+vec2(time*.12,time*.6),footprint);
-  foam=max(foam,wash*lace*.7);
-  foam=max(foam,exp(-depth*18.)*(.3+.6*lace)*smoothstep(0.,.3,significantHeight));
-  foam*=mix(lace,1.,smoothstep(.4,.9,foam));
+  float whitecap=smoothstep(12.,25.,wind)*smoothstep(.28,.65,1.-normal.y);
+  float foam=breakingFoam(p.xz,shore)*(.35+turbulent*.9)+whitecap*.22;
+  float lace=foamCells(p.xz*vec2(.8,1.2)+vec2(time*.06,time*.4),footprint);
+  float wash=(1.-smoothstep(0.,12.,shore))*smoothstep(.15,.9,sin(shore*.6+time*2.*PI/period+turbulent))
+    *smoothstep(.15,.6,significantHeight);
+  foam=max(foam,wash*lace*.42);
+  foam=max(foam,exp(-depth*24.)*(.22+.5*lace)*smoothstep(.15,.6,significantHeight));
+  foam*=mix(lace*.75+.25,1.,smoothstep(.5,1.1,foam));
   vec3 foamColor=mix(vec3(.44,.64,.62),vec3(.92,.98,.94),.6+turbulent*.4);
   color=mix(color,foamColor,clamp(foam*.95,0.,.95));
-  float mist=1.-exp(-t*.002);
+  float mist=1.-exp(-t*.0009);
   return mix(color,sky(vec3(ray.x,0.,ray.z),false),mist);
 }
 void main() {
   vec2 uv=(2.*gl_FragCoord.xy-resolution)/resolution.y;
-  vec3 origin=vec3(0.,2.15,-3.8);
-  vec3 ray=normalize(vec3(uv.x*.55,uv.y*.55-.12,1.));
+  vec3 origin=vec3(0.,3.4,-7.5);
+  vec3 ray=normalize(vec3(uv.x*.55,uv.y*.55-.16,1.));
   vec3 color=render(origin,ray);
   color=vec3(1.)-exp(-color*1.35);
-  color=pow(color,vec3(.4545));
+  color=pow(max(color-.018,vec3(0.)),vec3(.4545));
   vec2 screen=gl_FragCoord.xy/resolution;
   color*=1.-.1*pow(length(screen-.5),2.);
   color+=(hash(gl_FragCoord.xy)-.5)/255.;
@@ -275,10 +305,10 @@ export function createOcean(
   gl.enableVertexAttribArray(position);
   gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
   const offshore = bearing(spot, point);
-  const components = point.swells.slice(0, 2).map((s) => ({
-    height: s.height ?? 0,
-    period: s.period ?? 0,
-    direction: s.direction ?? point.dirpw ?? 0,
+  const components = Array.from({ length: 2 }, (_, i) => ({
+    height: point.swells[i]?.height ?? 0,
+    period: point.swells[i]?.period ?? 0,
+    direction: point.swells[i]?.direction ?? point.dirpw ?? 0,
   }));
   const totalComponentEnergy =
     components.reduce((sum, c) => sum + c.height * c.height, 0) +
@@ -300,12 +330,36 @@ export function createOcean(
     },
   ];
   const uniforms = new Float32Array(12);
+  const nearNumbers = new Float32Array(16);
+  const farNumbers = new Float32Array(8);
   seaComponents.slice(0, 4).forEach((c, i) => {
     uniforms[i * 3] = Math.min(c.height, 12) / (2 * Math.sqrt(2));
     uniforms[i * 3 + 1] = c.period;
     uniforms[i * 3 + 2] = ((c.direction + 180) * Math.PI) / 180 - offshore;
+    const omega = (2 * Math.PI) / Math.max(c.period, 2);
+    const alongshore =
+      ((omega * omega) / 9.81) * Math.sin(uniforms[i * 3 + 2]) * 0.8;
+    const crossShore = (distance: number) => {
+      const depth = Math.max(
+        0.5,
+        0.04 * distance + 0.22 * (1 - Math.exp(-distance * 0.12)),
+      );
+      return Math.sqrt(
+        Math.max(0, waveNumber(c.period, depth) ** 2 - alongshore ** 2),
+      );
+    };
+    [0, 24, 96, 320].forEach((distance, j) => {
+      nearNumbers[i * 4 + j] = crossShore(distance);
+    });
+    farNumbers[i * 2] = crossShore(1000);
+    farNumbers[i * 2 + 1] = alongshore;
   });
   gl.uniform3fv(gl.getUniformLocation(program, "waves[0]"), uniforms);
+  gl.uniform4fv(gl.getUniformLocation(program, "waveNumbers[0]"), nearNumbers);
+  gl.uniform2fv(
+    gl.getUniformLocation(program, "offshoreNumbers[0]"),
+    farNumbers,
+  );
   gl.uniform1f(gl.getUniformLocation(program, "wind"), point.ws ?? 0);
   gl.uniform1f(
     gl.getUniformLocation(program, "significantHeight"),

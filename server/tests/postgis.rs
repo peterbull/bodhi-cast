@@ -1,3 +1,5 @@
+#[path = "support/accounts.rs"]
+mod accounts;
 use axum::{
     body::Body,
     http::{Request, StatusCode},
@@ -136,6 +138,7 @@ async fn postgis_queue_forecasts_and_api_are_durable() {
         db: db.clone(),
         write_token: Some(token.into()),
         allow_writes: false,
+        auth: None,
     };
     let app = router(state, "../web/dist".into());
     let response = app
@@ -290,4 +293,5 @@ async fn postgis_queue_forecasts_and_api_are_durable() {
         .await
         .unwrap();
     db.set_watch(spot.id, true).await.unwrap();
+    accounts::check_accounts(&db).await;
 }
