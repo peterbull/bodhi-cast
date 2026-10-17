@@ -1,0 +1,56 @@
+name: bodhi-cast
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_USER: bodhi
+      POSTGRES_DB: bodhi
+      POSTGRES_PASSWORD: ${BODHI_DB_PASSWORD:?Set BODHI_DB_PASSWORD}
+    command: [postgres, -c, shared_buffers=64MB, -c, max_connections=30, -c, work_mem=4MB]
+    volumes:
+      - bodhi-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -h 127.0.0.1 -U bodhi -d bodhi]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    mem_limit: 256m
+    shm_size: 128m
+  app:
+    image: ${BODHI_IMAGE:?Set BODHI_IMAGE to a locally built linux/amd64 image}
+    environment:
+      DATABASE_URL: postgresql://bodhi:${BODHI_DB_PASSWORD}@db:5432/bodhi
+      RUST_LOG: bodhi_cast=info,tower_http=info
+    command: [serve, --listen, "0.0.0.0:8000", --write-token-file, /run/secrets/write_token]
+    secrets: [write_token]
+    depends_on:
+      db:
+        condition: service_healthy
+    ports: ["127.0.0.1:8000:8000"]
+    init: true
+    read_only: true
+    tmpfs: [/tmp:size=16m]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    mem_limit: 256m
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      BODHI_DOMAIN: ${BODHI_DOMAIN:?Set BODHI_DOMAIN}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [app]
+    restart: unless-stopped
+    mem_limit: 96m
+secrets:
+  write_token:
+    file: ./secrets/write-token
+volumes:
+  bodhi-postgres:
+  caddy-data:
+  caddy-config:
