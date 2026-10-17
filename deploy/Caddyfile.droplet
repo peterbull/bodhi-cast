@@ -5,9 +5,10 @@ www.{$BODHI_DOMAIN} {
 {$BODHI_DOMAIN} {
     encode zstd gzip
     reverse_proxy app:8000
+    @pages not path /api/* /spots* /addspot
+    header @pages Referrer-Policy strict-origin-when-cross-origin
     header {
         X-Content-Type-Options nosniff
-        Referrer-Policy no-referrer
         X-Frame-Options DENY
     }
 }

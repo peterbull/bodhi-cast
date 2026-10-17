@@ -153,6 +153,18 @@ pub async fn check_accounts(db: &Db) {
         },
         "../web/dist".into(),
     );
+    for (path, policy) in [
+        ("/", "strict-origin-when-cross-origin"),
+        ("/api/capabilities", "no-referrer"),
+        ("/api/auth/google/callback?code=test-code", "no-referrer"),
+    ] {
+        let response = app
+            .clone()
+            .oneshot(Request::get(path).body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(response.headers().get("referrer-policy").unwrap(), policy);
+    }
     for path in [
         format!("/api/spots/{}", private.id),
         format!("/api/spots/{}/forecasts", private.id),

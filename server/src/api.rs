@@ -124,7 +124,8 @@ pub fn router(state: AppState, web_dir: PathBuf) -> Router {
             let private = request.uri().path().starts_with("/api/") || request.uri().path().starts_with("/spots");
             let mut response = next.run(request).await;
             if private { response.headers_mut().insert(axum::http::header::CACHE_CONTROL, axum::http::HeaderValue::from_static("no-store")); }
-            response.headers_mut().insert(axum::http::header::REFERRER_POLICY, axum::http::HeaderValue::from_static("no-referrer"));
+            let referrer_policy = if private { "no-referrer" } else { "strict-origin-when-cross-origin" };
+            response.headers_mut().insert(axum::http::header::REFERRER_POLICY, axum::http::HeaderValue::from_static(referrer_policy));
             response
         }))
         .layer(TraceLayer::new_for_http().make_span_with(|request: &axum::http::Request<_>| tracing::info_span!("http", method=%request.method(), path=request.uri().path())))

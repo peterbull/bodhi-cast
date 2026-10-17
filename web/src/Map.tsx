@@ -27,10 +27,11 @@ export default function SpotMap({
       zoomControl: false,
       minZoom: 2,
     }).setView([35, -65], 3);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 17,
+      referrerPolicy: "strict-origin-when-cross-origin",
     })
       .on("tileerror", () => setTileError(true))
       .on("tileload", () => setTileError(false))
