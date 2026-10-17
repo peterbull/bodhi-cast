@@ -1,174 +1,96 @@
-# Bodhi-Cast
+# Bodhi Cast
 
-![alt text](assets/imgs/landing-page.png)
+A surf forecast app with a Rust service, a React/TypeScript frontend, and PostgreSQL/PostGIS. The Rust process serves the UI, exposes the API, and runs a persistent background job queue. Kafka, Airflow, Celery, Redis, and Python are no longer part of the runtime.
 
-Welcome to Bodhi-Cast, an open-source application designed for surf enthusiasts around the globe. Bodhi-Cast offers comprehensive swell and surf forecasting along with real-time weather conditions, enabling users to explore and analyze surf conditions anywhere in the world.
+Browse the original surf-spot catalog, follow the breaks you care about, and see a three-day ocean outlook with nearby NOAA observations. The beach view uses forecast wave energy, period, and direction to render a lightweight ocean scene.
 
-1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Getting Started](#getting-started)
-   - [Prerequisites](#prerequisites)
-   - [Installation & Quickstart](#installation)
-   - [Default Locations](#default-locations)
-4. [Architecture Overview](#architecture-overview)
-   - [Frontend (React)](#frontendreact)
-   - [Backend (FastAPI)](#backendfastapi)
-   - [Postgis](#postgis)
-   - [Redis](#redis)
-   - [Airflow](#airflow)
-   - [Kafka](#kafka)
-5. [Contributing](#contributing)
-6. [License](#license)
+## Quick start
 
-## Introduction
+Install Docker with Compose. The official PostGIS image runs as amd64; Docker Desktop uses emulation on Apple Silicon. A cloud server with an x86 CPU runs it natively.
 
-Bodhi-Cast is more than just a surf forecasting app; it's your go-to platform for discovering and assessing surf spots with ease and precision. With the ability to select any location from a map, users can add surf spots and receive detailed forecasts including primary swell, secondary swell, wind waves, and wind speed/direction.
+1. Copy `.env.example` to `.env`.
+2. Generate a password with `openssl rand -hex 24`, then put it in `.env` as `BODHI_DB_PASSWORD`. Use the hex output so it is safe to include in the connection URL.
+3. Run:
 
-Bodhi-Cast also aims to bring surf data to life with animated visualizations. Utilizing Three.js, the app generates captivating animations that depict wave height and period based on the primary swell, offering a quick and visually engaging way to evaluate surf conditions at a glance.
-
-## Features
-
-- **Global Surf Spot Discovery:** Choose any location on the map to explore surf conditions.
-  ![alt text](assets/imgs/add-spot.png)
-  ![alt text](assets/imgs/spots.png)
-- **Comprehensive Data Forecasts:** Get detailed information on primary and secondary swells, wind waves, and wind speed/direction. As well as real-time weather data from nearby available stations(_only US based stations currently available_)
-  ![alt text](assets/imgs/swell-table.png)
-  ![alt text](assets/imgs/nearby-stations.png)
-- **Animated Wave Visualizations:** Visualize surf data with animated representations of wave height and period, powered by Three.js.
-  ![alt text](assets/imgs/swell-vis.png)
-
-## Getting Started
-
-Setting up Bodhi-Cast in your local development environment is straightforward, thanks to Docker and Docker Compose. Follow the steps below to get started.
-
-### Prerequisites
-
-- A Windows, Mac, or Linux environment.
-- Docker and Docker Compose installed on your machine.
-
-### Installation & Quickstart
-
-Clone the Bodhi-Cast repository from GitHub:
-
-```bash
-git clone https://github.com/peterbull/bodhi-cast
+```sh
+docker compose -f compose.yaml -f compose.local.yaml up --build -d
 ```
 
-Navigate to the project directory and create env file:
+Open http://localhost:8000. Follow a spot to begin collecting forecasts. The first download starts within a minute. Points appear progressively; a complete three-day outlook for one region takes a few minutes. The initial catalog does not trigger a global import.
 
-```bash
-cd bodhi-cast
-cp .env.example .env
+`compose.local.yaml` permits local editing. The app and database ports bind to loopback. For an Internet-facing server, use the token-protected HTTPS configuration in [the deployment guide](docs/deployment.md).
+
+## Local development
+
+Required: Rust 1.92 or newer, Node 24, pnpm 12, and PostgreSQL 17 with PostGIS 3.5. The locked dependencies and supplied Docker build use Rust 1.98. The workspace applies a seven-day minimum release age to JavaScript dependencies.
+
+Start only the database:
+
+```sh
+docker compose -f compose.yaml up -d db
+pnpm install --frozen-lockfile
+pnpm build
 ```
 
-Install npm packages for frontend:<br>(_Doing this locally accounts for host machine differences to prevent volume conflicts_)
+Set `DATABASE_URL` in your shell to the local PostGIS connection, then run:
 
-```bash
-npm install ./frontend/my-app --prefix ./frontend/my-app
+```sh
+cargo run --release -- serve --allow-writes
 ```
 
-Build and run the docker containers:<br>(_This will run the app with the docker override file that includes debug for `backend` and `airflow-worker`_)
+For frontend hot reload, run `pnpm dev` in another terminal and visit http://localhost:5173. Vite proxies `/api` to the Rust server on port 8000. Production serves the UI and API from the same origin.
 
-```bash
-docker compose up --build
+The server defaults to read-only access. Use `--allow-writes` on a trusted local machine, or `--write-token-file /path/to/token` for a public deployment. Tokens are held in browser memory after unlocking editing. No token is stored in local storage.
+
+## Data and resource use
+
+- **Forecasts:** NOAA GEFS Wave, 0.25° ensemble mean. The scheduler considers four UTC runs daily with a six-hour publication allowance. Each request covers a small region around followed spots. Nearby spots share a request. Downloads are sequential and separated by at least 10 seconds, as required by [NOAA's regional-filter guidance](https://nomads.ncep.noaa.gov/info.php?page=gribfilter).
+- **Storage:** Only forecasts sampled at the nearest wet grid cell for each followed spot are retained. No global grid is written to PostgreSQL. Missing values remain null. Model time and valid time are distinct. Each valid time uses the newest available run, so progressive updates retain useful older coverage.
+- **Limits:** At most 20 followed spots, 72 forecast hours by default, 8 MiB per response, 200,000 grid cells per field, one ingestion worker, and four-minute job timeouts. `serve --horizon 168` extends the outlook; higher horizons increase download time and storage. Forecast steps are three hours through hour 240 and six hours afterward, matching the NOAA feed.
+- **Queue:** PostgreSQL deduplication, `FOR UPDATE SKIP LOCKED`, leases, exponential retry backoff, and eight attempts. An advisory lock keeps a single ingester active. Pending jobs and successful checkpoints survive restarts. Worker failure stops the service so the supervisor can restart it.
+- **Retention:** Hourly cleanup keeps two days of past forecast points and four days of job history. Future forecasts remain. Followed spots and the catalog are not removed. Unfollowing stops new downloads; existing points age out normally.
+- **Observations:** NOAA CO-OPS inventory and up to three nearby stations per followed spot, refreshed every 10 minutes. Water level, wind, air temperature, and water temperature are collected when available. Each observation keeps its original timestamp; unavailable products do not erase prior data. The UI identifies old measurements. Coverage is primarily in the United States.
+- **Coverage:** The wave model represents the open ocean, not local breaking surf. No forecast is substituted from more than 100 km away. Inland and Great Lakes spots may have no coverage. Individual swell directions are absent from the ensemble-mean source and remain unknown.
+
+The PostgreSQL schema is named `bodhi`. PostGIS geography columns and GiST indexes support nearby-station searches. The legacy `public` tables are not changed by application initialization. See [migration](docs/migration.md) before switching an existing installation.
+
+## Beach view
+
+The renderer uses a small WebGL shader with deep-water dispersion, directional swell and wind-wave components, reflection, and an illustrative beach. Component energy is scaled from significant wave height. The view faces toward the nearest wet forecast point; it does not infer a real shoreline model or nearshore bathymetry. Lighting is illustrative daylight, not a solar or weather observation.
+
+Select a forecast time to change the scene, then choose **Open beach view** to expand it. Rendering is capped near 30 frames per second, 1440 pixels wide, and 1.05 million pixels. It pauses offscreen, in background tabs, or when paused by the user, and starts still when reduced motion is requested. The forecast table remains usable when WebGL is unavailable.
+
+## Commands
+
+```sh
+cargo run --release -- serve --help
+cargo run --release -- sync
+cargo run --release -- jobs
+cargo run --release -- jobs --retry-failed
+cargo run --release -- import-spots /path/to/spots.json
 ```
 
-_**Warning:** DAGs will begin to pull data as soon as the container is run, so ensure you have some extra hard drive space and compute. Otherwise change the DAG setting to `is_paused_upon_creation=True` in the `gefs_wave_urls_from_kafka.py` and `gefs_wave_etl_from_kafka.py` files prior to running the above command._
+`sync` queues current jobs; it does not start a second worker. `serve --no-worker` runs only the API/UI. `import-spots` accepts an array with `spot_name`, `street_address`, `latitude`, and `longitude`; it preserves existing spots and does not automatically follow every imported location.
 
-### Default Locations
+## Checks
 
-- **Frontend:** Access the Bodhi-Cast user interface at [http://localhost:3001](http://localhost:3001). This is where you can explore surf spots, view forecasts, and interact with the animated visualizations.
-- **Backend:** The backend API can be accessed at [http://localhost:8000](http://localhost:8000). This serves as the backbone of Bodhi-Cast, handling data processing, forecasting, and API requests.
-- **Airflow Webserver:** For managing and monitoring your workflows, visit the Airflow webserver at [http://localhost:8080](http://localhost:8080). This tool is crucial for orchestrating the data pipeline tasks that power the forecasts in Bodhi-Cast.
+```sh
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo test
+pnpm test
+pnpm build
+```
 
-_Default username and password for the webserver are both `airflow`_
+Database integration tests require a **dedicated test database**, separate from your app database:
 
-_Enabling them will begin processing the latest swell data and writing to your local `postgis` service._
+```sh
+BODHI_TEST_DATABASE_URL='postgresql://USER:PASSWORD@localhost:5438/DEDICATED_TEST_DB' \
+  cargo test --test postgis -- --ignored
+```
 
-## Architecture Overview
-
-The architecture of Bodhi-Cast incorporates several advanced components, which might initially appear as an overextension for the application's current scope. However, these choices were strategically made to accommodate future expansion and scalability. The components detailed below are foundational to providing a robust, flexible platform capable of evolving alongside the app's growth and user demands.
-
-![alt text](assets/imgs/bodhi-cast-arch.jpg)
-
-### Frontend(React)
-
-- **Chosen for**:
-  - Composability
-  - Scalability
-  - Existing ecosystem
-
-### **Backend Framework:** FastAPI
-
-- **Chosen for**:
-
-  - High performance
-  - Ease of API development
-  - Asynchronous support, enhancing concurrency and scalability
-
-- **Development Approach:**
-
-  - Initial endpoint setup avoids default async for simplicity and stability
-
-- **ORM for PostGIS:** Sqlalchemy 1.4
-  - Initial use of Sqlalchemy 2.0; reverted to 1.4 for Airflow compatibility
-
-### PostGIS
-
-**Extension for PostgreSQL:**
-
-- **Chosen for:**
-
-  - Strong database management capabilities
-  - Superior handling of spatial and geographic data
-
-- **Performance Optimization:**
-
-  - Outperforms PostgreSQL indexing on latitude and longitude for query optimization
-
-- **Spatial Queries:**
-  - Enables efficient querying of points by bounding box, essential for returning swell data for any lat/lon pairing
-
-### Redis
-
-- **Multi Purpose:** Enhances performance and reliability by serving as:
-  - A messaging system for Airflow's Celery executor, ensuring efficient task management
-  - A cache for the backend API, reducing database load by storing frequently accessed query results
-  - A cache for current weather data streaming from Kafka
-
-### Airflow
-
-- **Data Pipeline Orchestration:**
-
-  - Managing complex workflows with precision
-  - Offering control, fault tolerance, and transparency
-
-- **Adaptability:**
-  - Ensures Bodhi-Cast's data handling evolves without losing robustness or adaptability
-
-### Kafka
-
-- **Framework for Real-Time Data:**
-
-  - Kafka's architecture is crucial for handling and processing real-time data streams
-
-- **Future-Proofing Bodhi-Cast:**
-  - Prepares the app for scalable growth and further real-time data integration
-
-## Contributing
-
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make to Bodhi-Cast are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+The integration suite changes only that test database's `bodhi` schema. It checks real PostGIS distances, idempotent writes, concurrent claims, retry backoff, expired-lease recovery, and API validation/access control. The GRIB fixture tests run offline; fixture provenance and independent ecCodes checks are in `server/tests/fixtures/README.md`.
 
 ## License
 
-Bodhi-Cast is under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details. This license allows for a permissive usage of the software, provided that the proper credit is given by retaining this license notice. For more details on the terms, please review the license directly.
-
-
-
-
+Apache 2.0. See [LICENSE](LICENSE).

@@ -1,23 +1,44 @@
-name: CI/CD Pipeline
-
+name: Checks
 on:
   push:
-    branches: [main]
-
+  pull_request:
+permissions:
+  contents: read
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
-
+    services:
+      postgis:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: bodhi
+          POSTGRES_PASSWORD: bodhi-ci-only
+          POSTGRES_DB: bodhi_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U bodhi -d bodhi_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
-      - uses: actions/checkout@v2
-      - name: Deploy to Server
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
-          chmod 600 private_key
-          ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "git clone https://github.com/peterbull/bodhi-cast.git ~/bodhi-cast || (cd ~/bodhi-cast && git pull origin main)"'
-          ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "cd ~/bodhi-cast && chmod +x setup.sh && ./setup.sh"'
-          ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f ~/bodhi-cast/docker-compose.prod.yml down"'
-          ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker compose -f ~/bodhi-cast/docker-compose.prod.yml up --build -d"'
-          ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "mkdir -p ~/bodhi-cast/logs"'
-          ssh-agent bash -c 'ssh-add private_key; ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "docker image prune -f"'
-          rm private_key
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.98.0"
+          components: rustfmt,clippy
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.3.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test --all-targets
+      - run: cargo test --test postgis -- --ignored
+        env:
+          BODHI_TEST_DATABASE_URL: postgresql://bodhi:bodhi-ci-only@localhost:5432/bodhi_test
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm build

@@ -1,0 +1,41 @@
+name: bodhi-cast
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    platform: linux/amd64
+    environment:
+      POSTGRES_USER: bodhi
+      POSTGRES_DB: bodhi
+      POSTGRES_PASSWORD: ${BODHI_DB_PASSWORD:?Set BODHI_DB_PASSWORD to a new random hex password}
+    volumes:
+      - bodhi-postgres-v2:/var/lib/postgresql/data
+    ports:
+      - 127.0.0.1:5438:5432
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -h 127.0.0.1 -U bodhi -d bodhi]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    mem_limit: 512m
+    shm_size: 128m
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://bodhi:${BODHI_DB_PASSWORD}@db:5432/bodhi
+      RUST_LOG: bodhi_cast=info,tower_http=info
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 127.0.0.1:8000:8000
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    mem_limit: 384m
+volumes:
+  bodhi-postgres-v2:

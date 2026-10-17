@@ -205,3 +205,13 @@ firestore.rules
 **/data/*
 routeTree.gen.ts
 dist
+/target/
+**/dist/
+*.tsbuildinfo
+/secrets/
+*.dump
+
+**/.terraform/
+**/*.tfstate*
+**/*.tfplan
+**/*.auto.tfvars*

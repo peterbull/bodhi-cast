@@ -1,0 +1,18 @@
+{$BODHI_DOMAIN}, www.{$BODHI_DOMAIN} {
+    encode zstd gzip
+    reverse_proxy app:8000
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        X-Frame-Options DENY
+    }
+}
+
+:80 {
+    handle /healthz {
+        reverse_proxy app:8000
+    }
+    handle {
+        respond "Bodhi Cast is ready. Domain setup is pending." 200
+    }
+}

@@ -1,0 +1,30 @@
+#cloud-config
+package_update: true
+packages:
+  - docker.io
+  - docker-compose-v2
+  - curl
+  - openssl
+  - unattended-upgrades
+write_files:
+  - path: /etc/docker/daemon.json
+    permissions: '0644'
+    content: |
+      {"log-driver":"local","log-opts":{"max-size":"10m","max-file":"3"}}
+  - path: /etc/ssh/sshd_config.d/60-bodhi.conf
+    permissions: '0644'
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin prohibit-password
+  - path: /etc/sysctl.d/90-bodhi.conf
+    permissions: '0644'
+    content: |
+      vm.swappiness=10
+runcmd:
+  - [install, -d, -m, '0755', /opt/bodhi-cast]
+  - [systemctl, enable, --now, docker]
+  - [systemctl, reload, ssh]
+  - [sysctl, --system]
+  - [sh, -c, 'fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile && echo "/swapfile none swap sw 0 0" >> /etc/fstab']
+  - [touch, /var/lib/bodhi-host-ready]
