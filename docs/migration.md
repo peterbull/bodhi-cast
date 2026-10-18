@@ -1,8 +1,10 @@
 # Move from the original stack
 
-The old Python/FastAPI service, Airflow DAGs, Celery, Redis, Kafka, experimental TypeScript ETL, and duplicate React applications are no longer used by the runtime. Their files remain in place for reference and rollback, and are excluded from the new builds. No commit, push, cloud change, or removal of an existing database/container is required for the rewrite.
+The original Python/FastAPI service, Airflow DAGs, Celery, Redis, Kafka, experimental TypeScript ETL, and duplicate React applications have been removed from the current checkout. Their source, deployment files, and old assets remain available in Git. See [project history](../README.md#project-history) for the migration commits and the last pre-rewrite revision.
 
-Use the new compose.yaml explicitly with -f; the retained docker-compose*.yml files describe the old stack. The empty preferred `compose.override.yaml` prevents automatic loading of the old override. The replacement consists of `server/` (Rust), `web/` (React), and the new Compose files. `server/catalog.json` preserves the original 1,320 seed entries; the database removes exact duplicate name/coordinate entries at insertion. These records begin unfollowed, so starting the app does not download every region.
+The replacement consists of `server/` (Rust), `web/` (React), and `compose.yaml` with optional local or public deployment overrides. `server/catalog.json` preserves the original 1,320 seed entries; the database removes exact duplicate name/coordinate entries at insertion. These records begin unfollowed, so starting the app does not download every region.
+
+Removing the old source does not change existing database tables, containers, or volumes. Preserve the old database and revision before switching an existing installation.
 
 ## Safe sequence
 

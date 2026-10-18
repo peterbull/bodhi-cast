@@ -4,6 +4,18 @@ A surf forecast app with a Rust service, a React/TypeScript frontend, and Postgr
 
 Browse the original surf-spot catalog, follow the breaks you care about, and see a three-day ocean outlook with nearby NOAA observations. The beach view uses forecast wave energy, period, and direction to render a lightweight ocean scene.
 
+[Open Bodhi Cast](https://bodhicast.com/)
+
+## Screenshots
+
+**Beach view** — forecast-driven waves with a 1.8 m person and surfboard for scale.
+
+![Beach view at 1st Street Jetty with a surfer for scale](docs/screenshots/beach-view.jpg)
+
+**Forecast browser** — coastal map, daily outlook, and wave and wind conditions.
+
+![Surf forecast and coastal map for 1st Street Jetty](docs/screenshots/forecast.jpg)
+
 ## Quick start
 
 Install Docker with Compose. The official PostGIS image runs as amd64; Docker Desktop uses emulation on Apple Silicon. A cloud server with an x86 CPU runs it natively.
@@ -18,7 +30,7 @@ docker compose -f compose.yaml -f compose.local.yaml up --build -d
 
 Open http://localhost:8000. Follow a spot to begin collecting forecasts. The first download starts within a minute. Points appear progressively; a complete three-day outlook for one region takes a few minutes. The initial catalog does not trigger a global import.
 
-`compose.local.yaml` permits local editing. The app and database ports bind to loopback. For an Internet-facing server, use the token-protected HTTPS configuration in [the deployment guide](docs/deployment.md).
+`compose.local.yaml` permits local editing. The app and database ports bind to loopback. For an Internet-facing server, use HTTPS and Google sign-in as described in [the deployment guide](docs/deployment.md).
 
 ## Local development
 
@@ -56,7 +68,7 @@ The PostgreSQL schema is named `bodhi`. PostGIS geography columns and GiST index
 
 ## Beach view
 
-The renderer uses a small WebGL shader with deep-water dispersion, directional swell and wind-wave components, reflection, and an illustrative beach. Component energy is scaled from significant wave height. The view faces toward the nearest wet forecast point; it does not infer a real shoreline model or nearshore bathymetry. Lighting is illustrative daylight, not a solar or weather observation.
+The renderer uses a small WebGL shader with finite-depth dispersion, directional swell and wind-wave components, shoaling, reflection, and an illustrative beach. Component energy is scaled from significant wave height. A fixed camera and a 1.8 m person holding a 2 m surfboard provide a size reference as forecasts change. The view faces toward the nearest wet forecast point; it does not infer a real shoreline model or nearshore bathymetry. Lighting is illustrative daylight, not a solar or weather observation.
 
 Select a forecast time to change the scene, then choose **Open beach view** to expand it. Rendering is capped near 30 frames per second, 1440 pixels wide, and 1.05 million pixels. It pauses offscreen, in background tabs, or when paused by the user, and starts still when reduced motion is requested. The forecast table remains usable when WebGL is unavailable.
 
@@ -90,6 +102,18 @@ BODHI_TEST_DATABASE_URL='postgresql://USER:PASSWORD@localhost:5438/DEDICATED_TES
 ```
 
 The integration suite changes only that test database's `bodhi` schema. It checks real PostGIS distances, idempotent writes, concurrent claims, retry backoff, expired-lease recovery, and API validation/access control. The GRIB fixture tests run offline; fixture provenance and independent ecCodes checks are in `server/tests/fixtures/README.md`.
+
+## Project history
+
+The Rust rewrite started at [`53117b8cf5fbe6be938f0499ea21c29314d7753a`](https://github.com/peterbull/bodhi-cast/commit/53117b8cf5fbe6be938f0499ea21c29314d7753a) and landed on `main` in [`c109e8afeeb0bd77072ba43e73650af2c479d9d5`](https://github.com/peterbull/bodhi-cast/commit/c109e8afeeb0bd77072ba43e73650af2c479d9d5) ([PR #9](https://github.com/peterbull/bodhi-cast/pull/9)).
+
+The last pre-rewrite version is [`2336d9c83fd88c5a72b6af73e106801ee7395018`](https://github.com/peterbull/bodhi-cast/tree/2336d9c83fd88c5a72b6af73e106801ee7395018). It contains the original Python service, Airflow/Kafka pipelines, experimental ETL, notebooks, frontends, and architecture images. To browse that version in a separate checkout:
+
+```sh
+git worktree add --detach ../bodhi-cast-legacy 2336d9c83fd88c5a72b6af73e106801ee7395018
+```
+
+For an existing installation, see [the database migration and rollback guide](docs/migration.md).
 
 ## License
 
