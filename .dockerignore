@@ -4,13 +4,7 @@ target
 .git
 .env*
 secrets
-backend
-airflow
-typeflow
-frontend
-nbs
-assets
 work
 outputs
-
 infra
+docs
